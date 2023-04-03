@@ -32,17 +32,17 @@ namespace dd {
 	// General package configuration parameters
 	constexpr unsigned int GCLIMIT1 = 25000;                // first garbage collection limit
 	constexpr unsigned int GCLIMIT_INC = 0;                  // garbage collection limit increment
-	constexpr unsigned int MAXREFCNT = 20000;     // max reference count (saturates at this value)
-	constexpr unsigned int NODECOUNT_BUCKETS = 10000;
-	constexpr unsigned short NBUCKET = 64;                  // no. of hash table buckets; must be a power of 2
+	constexpr unsigned int MAXREFCNT = 400000;     // max reference count (saturates at this value)
+	constexpr unsigned int NODECOUNT_BUCKETS = 20000;
+	constexpr unsigned short NBUCKET = 16384;                  // no. of hash table buckets; must be a power of 2
 	constexpr unsigned short HASHMASK = NBUCKET - 1;  // must be nbuckets-1
-	constexpr unsigned short CTSLOTS = 2048;         // no. of computed table slots
+	constexpr unsigned short CTSLOTS = 8192;         // no. of computed table slots
 	constexpr unsigned short CTMASK = CTSLOTS - 1;    // must be CTSLOTS-1
-	constexpr unsigned short TTSLOTS = 2048;          // Toffoli table slots
+	constexpr unsigned short TTSLOTS = 1024;          // Toffoli table slots
 	constexpr unsigned short TTMASK = TTSLOTS - 1;    // must be TTSLOTS-1
-	constexpr unsigned short CHUNK_SIZE = 2000;
-	constexpr unsigned short MAXN = 25535;                       // max no. of inputs
-	constexpr unsigned short MAXIDX = 100;   // max no. of index
+	constexpr unsigned short CHUNK_SIZE = 1000;
+	constexpr unsigned short MAXN = 64;                       // max no. of inputs
+	constexpr unsigned short MAXIDX = 10000;   // max no. of index
 
     typedef struct Node *NodePtr;
 
@@ -51,6 +51,21 @@ namespace dd {
 	struct Index {
 		std::string key; //
 		short idx;
+
+		//bool operator == (const Index& a) const 
+		//{
+		//		return varOrder[a.key] == varOrder[key] && a.idx==idx;
+		//}
+
+		//bool operator < (const Index & a) const
+		//{
+		//	if (varOrder[a.key] > varOrder[key]) {
+		//		return true;
+		//	}
+		//	else {
+		//		return (varOrder[a.key] == varOrder[key]) && (a.idx > idx); 
+		//	}
+		//}
 	};
 
     struct Edge {
@@ -62,13 +77,15 @@ namespace dd {
 	    NodePtr next;         // link for unique table and available space chain
 	    Edge e[NEDGE];     // edges out of this node
 	    unsigned int ref;       // reference count
-	    std::string v;        // variable index (nonterminal) value (-1 for terminal)
+	    int v;        // variable index (nonterminal) value (-1 for terminal)
 	    bool ident, symm; // special matrices flags
     };
 
 	struct TDD {
 		Edge e;
 		std::vector<Index> index_set;
+		std::map<int, std::string> key_2_index;
+		std::map<std::string, int> index_2_key;
 	};
 
     // list definitions for breadth first traversals (e.g. printing)
@@ -124,7 +141,8 @@ namespace dd {
 	{
 		Edge a, b;
 		NodePtr r;
-	    std::vector<std::string> var_cont;
+		std::map<int, int> key_2_new_key1;
+		std::map<int, int> key_2_new_key2;
 		ComplexValue rw;
 	};
 
@@ -195,8 +213,9 @@ namespace dd {
 
 	    Edge& UTlookup(Edge& e);
 
-		Edge cont2(Edge x, Edge y, const std::vector<std::string>* var_cont, int var_num, int ttt=0);
-		Edge cont3(Edge& x, Edge& y, const std::vector<std::string>* var_cont, int var_num);
+		Edge cont2(Edge& x, Edge& y, std::map<int, int> *key_2_new_key1 ,  std::map<int, int> *key_2_new_key2, std::map<int, int> *cont_order1, std::map<int, int> *cont_order2, int var_num);
+
+
 	    static inline unsigned long CThash(const Edge& a, const Edge& b, const CTkind which) {
 		    const uintptr_t node_pointer = ((uintptr_t) a.p + (uintptr_t) b.p) >> 3u;
 		    const uintptr_t weights = (uintptr_t) a.w.i + (uintptr_t) a.w.r + (uintptr_t) b.w.i + (uintptr_t) b.w.r;
@@ -209,11 +228,23 @@ namespace dd {
 		    return (node_pointer + weights + (uintptr_t) which) & CTMASK;
 	    }
 
-	    static inline unsigned long CThash4(const Edge& a, const Edge& b, const std::vector<std::string>* var_cont) {
+	    static inline unsigned long CThash4(const Edge& a, const Edge& b, std::map<int, int> *key_2_new_key1, std::map<int, int> *key_2_new_key2) {
 			const uintptr_t node_pointer = ((uintptr_t)a.p + (uintptr_t)b.p) >> 3u;
 			const uintptr_t weights = (uintptr_t)a.w.i + (uintptr_t)a.w.r + (uintptr_t)b.w.i + (uintptr_t)b.w.r;
-
-			return (node_pointer + weights+ (uintptr_t) var_cont) & CTMASK;
+			int t1=0;
+			int t2 = 0;
+			//std::hash<int> hash_int;
+			std::map<int, int>::iterator pos;
+			for (pos = key_2_new_key1->begin(); pos != key_2_new_key1->end(); pos++)
+			{
+				t1 += pow(2,pos->first)*pos->second;
+			}
+			for (pos = key_2_new_key2->begin(); pos != key_2_new_key2->end(); pos++)
+			{
+				t2 += pow(2,pos->first+ key_2_new_key1->size()) * pos->second;
+			}
+			//std::cout << t << std::endl;
+			return (node_pointer + weights+ (uintptr_t)t1+ (uintptr_t)t2) & CTMASK;
 		}
 
 	    static unsigned short TThash(unsigned short n, unsigned short t, const short line[]);
@@ -232,7 +263,7 @@ namespace dd {
         //std::array<unsigned short, MAXN> varOrder{ };    // variable order initially 0,1,... from bottom up | Usage: varOrder[level] := varible at a certain level
         //std::array<unsigned short, MAXN> invVarOrder{ };// inverse of variable order (inverse permutation) | Usage: invVarOrder[variable] := level of a certain variable
 		std::map<std::string, int> varOrder;
-
+		
         Package(std::map<std::string, int> var);
         ~Package();
 
@@ -240,25 +271,26 @@ namespace dd {
         // DD creation
         static inline Edge makeTerminal(const Complex& w) { return { terminalNode, w }; }
 
-	    Edge makeNonterminal(std::string v, const Edge *edge, bool cached = false);
+	    Edge makeNonterminal(int v, const Edge *edge, bool cached = false);
 
-	    inline Edge makeNonterminal(std::string v, const std::array<Edge, NEDGE>& edge, bool cached = false) {
+	    inline Edge makeNonterminal(int v, const std::array<Edge, NEDGE>& edge, bool cached = false) {
 	    	return makeNonterminal(v, edge.data(), cached);
 	    };
 
         Edge CTlookup(const Edge& a, const Edge& b, CTkind which);
         void CTinsert(const Edge& a, const Edge& b, const Edge& r, CTkind which);
 
-		Edge CTlookup4(const Edge& a, const Edge& b, const std::vector<std::string>* var_cont);
-		void CTinsert4(const Edge& a, const Edge& b, const Edge& r, const std::vector<std::string>* var_cont);
+		Edge CTlookup4(const Edge& a, const Edge& b, std::map<int, int> *key_2_new_key1, std::map<int, int> *key_2_new_key2);
+		void CTinsert4(const Edge& a, const Edge& b, const Edge& r, std::map<int, int> *key_2_new_key1, std::map<int, int> *key_2_new_key2);
 
 
 		//TDD的运算
 		TDD cont(TDD tdd1, TDD tdd2,int ttt=0);
-		
+		//bool lessmark(const Index& a, const Index& b);
+		//std::vector<Index> vector_sort(std::vector<Index> var);
 		Edge T_add(Edge x, Edge y);
 		Edge T_add2(Edge x, Edge y);
-		Edge Slice(Edge x, std::string a, unsigned int c);
+		Edge Slice(Edge x, int a, short c);
 		TDD Matrix2TDD(const Matrix2x2& mat, std::vector<Index> var_out);
 		TDD diag_matrix_2_TDD(const Matrix2x2& mat, std::vector<Index> var_out);
 		TDD cnot_2_TDD(std::vector<Index> var_out, int ca);

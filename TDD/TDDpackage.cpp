@@ -11,7 +11,7 @@
 #include <string>
 namespace dd {
 
-	Node Package::terminal{ nullptr, {{ nullptr, CN::ZERO}, { nullptr, CN::ZERO }}, 0, std::to_string(-1), true, true};
+	Node Package::terminal{ nullptr, {{ nullptr, CN::ZERO}, { nullptr, CN::ZERO }}, 0, -1, true, true};
 	constexpr Edge Package::DDzero;
 	constexpr Edge Package::DDone;
 
@@ -323,7 +323,7 @@ namespace dd {
         }
         key = key & HASHMASK;
 
-        unsigned short v = varOrder[e.p->v];
+        unsigned short v = e.p->v;
         //std::cout << v << "  " << key << std::endl;
         NodePtr p = Unique[v][key]; // find pointer to appropriate collision chain
         while (p != nullptr)    // search for a match
@@ -375,7 +375,8 @@ namespace dd {
             }
             for (auto& table : CTable4) {
                 table[i].r= nullptr;
-                table[i].var_cont = {};
+                table[i].key_2_new_key1 = {};
+                table[i].key_2_new_key2 = {};
             }
         }
         for (auto & i : TTable) {
@@ -479,7 +480,7 @@ namespace dd {
 		            incRef(edge);
                 }
 
-            active[varOrder[e.p->v]]++;
+            active[e.p->v]++;
             activeNodeCount++;
             maxActive = std::max(maxActive, activeNodeCount);
         }
@@ -512,8 +513,8 @@ namespace dd {
 	            }
 	        }
 
-            active[varOrder[e.p->v]]--;
-            if (active[varOrder[e.p->v]] < 0) {
+            active[e.p->v]--;
+            if (active[e.p->v] < 0) {
                 std::cerr << "ERROR in decref\n";
                 std::exit(1);
             }
@@ -647,13 +648,13 @@ namespace dd {
         }
     }
 
-    Edge Package::CTlookup4(const Edge& a, const Edge& b, const std::vector<std::string>* var_cont)
+    Edge Package::CTlookup4(const Edge& a, const Edge& b, std::map<int, int> *key_2_new_key1, std::map<int, int> *key_2_new_key2)
     {
         Edge r{ nullptr, {nullptr, nullptr} };
         CTlook[con]++;
         std::array<CTentry4, CTSLOTS>& table = CTable4.at(mode);
 
-        const unsigned long i = CThash4(a, b, var_cont);
+        const unsigned long i = CThash4(a, b, key_2_new_key1, key_2_new_key2);
 
         if (!equals(table[i].a, a)) return r;
         if (!equals(table[i].b, b)) return r;
@@ -668,10 +669,10 @@ namespace dd {
             std::cout << "dddd" << std::endl;
         }*/
 
-        std::vector<std::string> temp_var_cont;
-        temp_var_cont.assign(var_cont->begin(), var_cont->end());
-        if (table[i].var_cont != temp_var_cont) return r;
-
+        //std::vector<std::string> temp_var_cont;
+        //temp_var_cont.assign(var_cont->begin(), var_cont->end());
+        if (table[i].key_2_new_key1!= *key_2_new_key1) return r;
+        if (table[i].key_2_new_key2 != *key_2_new_key2) return r;
         CThit[con]++;
         r.p = table[i].r;
 
@@ -685,7 +686,7 @@ namespace dd {
         return r;
     }
  
-    void Package::CTinsert4(const Edge& a, const Edge& b, const Edge& r, const std::vector<std::string>* var_cont)
+    void Package::CTinsert4(const Edge& a, const Edge& b, const Edge& r, std::map<int, int> *key_2_new_key1, std::map<int, int> *key_2_new_key2)
     {
         if (CN::equalsZero(a.w) || CN::equalsZero(b.w)) {
             std::cerr << "[WARN] CTinsert: Edge with near zero weight a.w=" << a.w << "  b.w=" << b.w << "\n";
@@ -696,11 +697,12 @@ namespace dd {
 
         std::array<CTentry4, CTSLOTS>& table = CTable4.at(mode);
 
-        const unsigned long i = CThash4(a, b, var_cont);
+        const unsigned long i = CThash4(a, b, key_2_new_key1, key_2_new_key2);
 
         table[i].a = a;
         table[i].b = b;
-        table[i].var_cont.assign(var_cont->begin(), var_cont->end());
+        table[i].key_2_new_key1= *key_2_new_key1;
+        table[i].key_2_new_key2 = *key_2_new_key2;
         table[i].r = r.p;
         table[i].rw.r = r.w.r->val;
         table[i].rw.i = r.w.i->val;
@@ -733,7 +735,7 @@ namespace dd {
 
     // make a DD nonterminal node and return an edge pointing to it
     // node is not recreated if it already exists
-    Edge Package::makeNonterminal(std::string v, const Edge *edge, const bool cached) {
+    Edge Package::makeNonterminal(int v, const Edge *edge, const bool cached) {
         //std::cout << "nodeAvail " << nodeAvail << std::endl;
     	Edge e{ getNode(), CN::ONE};
         //std::cout << "top before " << e.p << std::endl;
@@ -766,6 +768,12 @@ namespace dd {
 	    visited.max_load_factor(10);
 
         varOrder = var;
+        //std::map<std::string, int>::iterator pos3;
+        //std::cout << "=======================" << std::endl;
+        //for (pos3 = var.begin(); pos3 != var.end(); pos3++) {
+        //    std::cout << pos3->first << ',' << pos3->second << std::endl;
+        //}
+        //std::cout << "=======================" << std::endl;
 
     }
 
@@ -778,13 +786,13 @@ namespace dd {
         }
     }
 
-    Edge Package::Slice(Edge x, std::string a, unsigned int c) {
+    Edge Package::Slice(Edge x, int a, short c) {
 
-        if (isTerminal(x) || varOrder[a] < varOrder[x.p->v]) {
+        if (isTerminal(x) || x.p->v < a) {
             return x;
         }
         Edge res;
-        if (varOrder[a] == varOrder[x.p->v]) {
+        if (x.p->v == a) {
             res = x.p->e[c];
             return res;
         }
@@ -825,13 +833,13 @@ namespace dd {
             return r;
         }
 
-        std::string w;
+        int w;
         if (isTerminal(x)) {
             w = y.p->v;
         }
         else {
             w = x.p->v;
-            if (!isTerminal(y) && varOrder[y.p->v] < varOrder[w]) {
+            if (!isTerminal(y) && y.p->v > w) {
                 w = y.p->v;
             }
         }
@@ -896,28 +904,58 @@ namespace dd {
         return result;
     }
 
+
+    //bool Package::lessmark(const Index& a, const Index& b) {
+    //    if (a.key!= a.key) return varOrder[a.key] < varOrder[b.key];
+    //    return a.idx < b.idx;
+    //}
+
+    //std::vector<Index> Package::vector_sort(std::vector<Index> var) {
+    //    for (int k = 1; k < var.size(); k++) {
+    //        for (int k1 = k - 1; k1 >= 0; k1--) {
+    //            if (varOrder[var[k].key]<varOrder[var[k1].key]) {
+    //                Index temp = var[k];
+    //                var[k] = var[k1];
+    //                var[k1] = temp;
+    //            }
+    //        }
+    //    }
+    //
+    //}
+
+
     TDD Package::cont(TDD tdd1, TDD tdd2, int ttt) {
 
+        //std::vector<Index> var_all;
         std::vector<Index> var_out;
-        std::vector<std::string> var_cont_temp;
-        std::vector<std::string> var_cont;
-        std::vector<std::string> var_out_key;
- 
+        std::vector<Index> var_cont;
+        std::set<std::string> var_cont_key;
+        std::set<std::string> var_out_key;
+        std::map<int, std::string> key_2_index;
+        std::map<std::string, int> index_2_key;
+        std::map<int, int> key_2_new_key1;
+        std::map<int, int> key_2_new_key2;
+        std::map<int, int> cont_order1;
+        std::map<int, int> cont_order2;
+        std::vector<Index>::iterator pos;
+        std::map<int, std::string>::iterator pos2;
+        //set_union(tdd1.index_set.begin(), tdd1.index_set.end(), tdd2.index_set.begin(), tdd2.index_set.end(), inserter(var_all, var_all.begin()));
+        //set_intersection(tdd1.index_set.begin(), tdd1.index_set.end(), tdd2.index_set.begin(), tdd2.index_set.end(), inserter(var_cont, var_cont.begin()));
+        //set_difference(var_all.begin(), var_all.end(), var_cont.begin(), var_cont.end(), inserter(var_out, var_out.begin()));
+
         int k;
         int k1;
-        for (k = 0; k < tdd1.index_set.size(); ++k) {
+        for (int k = 0; k < tdd1.index_set.size(); ++k) {
             bool flag = true;
             for (k1 = 0; k1 < tdd2.index_set.size(); ++k1) {
                 if (tdd2.index_set[k1].idx == tdd1.index_set[k].idx && tdd2.index_set[k1].key == tdd1.index_set[k].key) {
-                    var_cont_temp.push_back(tdd1.index_set[k].key);
+                    var_cont.push_back(tdd1.index_set[k]);
                     flag = false;
                     break;
                 }
             }
-
             if (flag) {
                 var_out.push_back(tdd1.index_set[k]);
-                var_out_key.push_back(tdd1.index_set[k].key);
             }
         }
         for (k = 0; k < tdd2.index_set.size(); ++k) {
@@ -930,55 +968,126 @@ namespace dd {
             }
             if (flag) {
                 var_out.push_back(tdd2.index_set[k]);
-                var_out_key.push_back(tdd2.index_set[k].key);
             }
         }
+        //std::cout << "=====================" << std::endl;
+        //for (int k = 0; k < var_out.size(); k++) {
+        //    std::cout << var_out[k].key << ',' << varOrder[var_out[k].key] << std::endl;
+        //}
+        //std::cout << "-------------------" << std::endl;
 
-        for (k = 0; k < var_cont_temp.size(); ++k) {
-            if (find(var_out_key.begin(), var_out_key.end(), var_cont_temp[k]) == var_out_key.end()) {
-                if (find(var_cont.begin(), var_cont.end(), var_cont_temp[k]) == var_cont.end()) {
-                    var_cont.push_back(var_cont_temp[k]);
-
+        //std::sort(var_out.begin(), var_out.end(), lessmark);
+        for (int k = 1; k < var_out.size(); k++) {
+            for (int k1 = k; k1 >= 1; k1--) {
+                if (varOrder[var_out[k1].key] > varOrder[var_out[k1-1].key]) {
+                    Index temp = var_out[k1];
+                    var_out[k1] = var_out[k1-1];
+                    var_out[k1-1] = temp;
                 }
             }
         }
+        //std::cout << "-------------------" << std::endl;
+        //for (int k = 0; k < var_out.size(); k++) {
+        //    std::cout << var_out[k].key<<','<<varOrder[var_out[k].key] << std::endl;
+        //}
+        //std::cout << "====================" << std::endl;
 
-        std::sort(var_cont.begin(), var_cont.end());
+        key_2_index[-1] = "-1";
+        index_2_key["-1"] = -1;
+        int n = 0;
+        for (pos = var_out.begin(); pos != var_out.end(); pos++)
+        {
+            if (!var_out_key.count(pos->key)) {
+                var_out_key.insert(pos->key);
+                index_2_key[pos->key] = n;
+                key_2_index[n] = pos->key;
+                n++;
+            }
+        }
+        for (pos = var_cont.begin(); pos != var_cont.end(); pos++)
+        {
+            if (!var_out_key.count(pos->key)) {
+                var_cont_key.insert(pos->key);
+            }
+        }
+        //std::map<std::string,int>::iterator pos3;
+        //std::cout << "=======================" << std::endl;
+        //for (pos2 = key_2_index.begin(); pos2 != key_2_index.end(); pos2++) {
+        //    std::cout << pos2->first<<',' << pos2->second << std::endl;
+        //}
+        //std::cout << "-------------------" << std::endl;
+        //for (pos3 = index_2_key.begin(); pos3 != index_2_key.end(); pos3++) {
+        //    std::cout << pos3->first << ',' << pos3->second << std::endl;
+        //}
+        //std::cout << "=======================" << std::endl;
 
+        key_2_new_key1[-1] = -1;
+        key_2_new_key2[-1] = -1;
+        cont_order1[-1] = MAXIDX;
+        cont_order2[-1] = MAXIDX;
+        for (pos2 = tdd1.key_2_index.begin(); pos2 != tdd1.key_2_index.end(); pos2++) {
+            cont_order1[pos2->first] = varOrder[pos2->second];
+            if (!var_cont_key.count(pos2->second)) {
+                key_2_new_key1[pos2->first] = index_2_key[pos2->second];
+            }
+            else {
+                key_2_new_key1[pos2->first] = -2;
+            }
+        }
+        for (pos2 = tdd2.key_2_index.begin(); pos2 != tdd2.key_2_index.end(); pos2++) {
+            cont_order2[pos2->first] = varOrder[pos2->second];
+            if (!var_cont_key.count(pos2->second)) {
+                key_2_new_key2[pos2->first] = index_2_key[pos2->second];
+            }
+            else {
+                key_2_new_key2[pos2->first] = -2;
+            }
+        }
         const auto before = cn.cacheCount;
 
+        //std::map<int, int>::iterator pos3;
+        //std::cout << "-------------------" << std::endl;
+        //for (pos3 = key_2_new_key1.begin(); pos3 != key_2_new_key1.end(); pos3++) {
+        //    std::cout << pos3->first << pos3->second << std::endl;
+        //}
+        //std::cout << "-------------------" << std::endl;
+
+        //std::cout << "-------------------" << std::endl;
+        //for (pos3 = key_2_new_key2.begin(); pos3 != key_2_new_key2.end(); pos3++) {
+        //    std::cout << pos3->first << pos3->second << std::endl;
+        //}
+        //std::cout << "-------------------" << std::endl;
+
+        //std::cout << "-------------------" << std::endl;
+        //for (pos3 = cont_order1.begin(); pos3 != cont_order1.end(); pos3++) {
+        //    std::cout << pos3->first << pos3->second << std::endl;
+        //}
+        //std::cout << "-------------------" << std::endl;
+
+        //std::cout << "-------------------" << std::endl;
+        //for (pos3 = cont_order2.begin(); pos3 != cont_order2.end(); pos3++) {
+        //    std::cout << pos3->first << pos3->second << std::endl;
+        //}
+        //std::cout << "-------------------" << std::endl;
+
+        //int t1 = 0;
+        //int t2 = 0;
+        //std::map<int, int>::iterator pos4;
+        //for (pos4 = key_2_new_key1.begin(); pos4 != key_2_new_key1.end(); pos4++)
+        //{
+        //    t1 += pos4->first * pos4->second;
+        //}
+        //for (pos4 = key_2_new_key2.begin(); pos4 != key_2_new_key2.end(); pos4++)
+        //{
+        //    t2 += pos4->first * pos4->second;
+        //}
+        //std::cout << t1 << ',' << (uintptr_t)t1 << ',' << t2 << ',' << (uintptr_t)t2 << std::endl;
+
         TDD res;
+        res.e = cont2(tdd1.e, tdd2.e, &key_2_new_key1, &key_2_new_key2, &cont_order1, &cont_order2, var_cont_key.size());
         res.index_set = var_out;
-
-        var_out.clear();
-        var_cont_temp.clear();
-        
-        var_out_key.clear();
-
-        //std::cout << "---" << std::endl;
-        //for (int k = 0; k < var_cont.size(); k++) {
-
-        //    std::cout << var_cont[k] << std::endl;
-        //}
-        //std::cout << "---" << std::endl;
-
-        //if (ttt == 1) {
-        //    dd::Edge t1 = Slice(tdd1.e, "x301", 0);
-        //    t1 = Slice(t1, "x300", 0);
-        //    t1 = Slice(t1, "x202", 0);
-        //    t1 = Slice(t1, "x200", 0);
-        //    dd::Edge t2 = Slice(tdd2.e, "x301", 0);
-        //    t2 = Slice(t2, "x102", 0);
-        //    export2Dot(t1, "t1", false);
-        //    export2Dot(t2, "t2", false);
-        //    res.e = cont2(t1, t2, var_cont, var_cont.size(), ttt);
-        //}
-        //else {
-            res.e = cont2(tdd1.e, tdd2.e, &var_cont, var_cont.size(), ttt);
-        //}
-        
-        //export2Dot(res.e, "res", false);
-        var_cont.clear();
+        res.index_2_key = index_2_key;
+        res.key_2_index = key_2_index;
 
         if (res.e.w != ComplexNumbers::ZERO && res.e.w != ComplexNumbers::ONE) {
             cn.releaseCached(res.e.w);
@@ -986,170 +1095,169 @@ namespace dd {
         }
         const auto after = cn.cacheCount;
         assert(before == after);
-
+        //var_all.clear();
+        var_out.clear();
+        var_cont.clear();
+        var_out_key.clear();
+        key_2_index.clear();
+        index_2_key.clear();
+        key_2_new_key1.clear();
+        key_2_new_key2.clear();
+        cont_order1.clear();
+        cont_order2.clear();
         return res;
     }
 
 
-   Edge Package::cont2(Edge x, Edge y, const std::vector<std::string>* var_cont, int var_num,int ttt) {
-
+   Edge Package::cont2(Edge& x, Edge& y, std::map<int, int> *key_2_new_key1, std::map<int, int> *key_2_new_key2, std::map<int, int> *cont_order1, std::map<int, int> *cont_order2, int var_num) {
+   
        if (x.p == nullptr)
            return x;
        if (y.p == nullptr)
            return y;
-        nOps[con]++;
+       nOps[con]++;
 
-        //if (ttt == 1) {
-        //    std::cout << "---------" << std::endl;
-        //    std::cout << x.p->v << std::endl;
-        //    std::cout << y.p->v << std::endl;
-        //    for (int k = 0; k < var_cont.size(); k++) {
-        //        std::cout << var_cont.at(k) << std::endl;
-        //    }
-        //}
+       if (x.w == CN::ZERO || y.w == CN::ZERO || equals(x, DDzero) || equals(y, DDzero)) {
+           return DDzero;
+       }
 
-        if (x.w == CN::ZERO || y.w == CN::ZERO|| equals(x,DDzero)||equals(y,DDzero)) {
-            //if (ttt == 1) {
-            //    std::cout << "case1" << std::endl;
-            //}
-            return DDzero;
-        }
+       if (isTerminal(x) and isTerminal(y))
+       {
 
-        if (isTerminal(x) and isTerminal(y))
-        {
-            //if (ttt == 1) {
-            //    std::cout << "case2" << std::endl;
-            //}
-            Edge res;
-            auto c = cn.getCachedComplex(pow(2, var_num), 0);
-            CN::mul(c, c, x.w);
-            CN::mul(c, c, y.w);
-            res=makeTerminal(c);
-            if (CN::equalsZero(res.w)) {
-                cn.releaseCached(res.w);
-                res = DDzero;
-            }
+           Edge res;
+           auto c = cn.getCachedComplex(pow(2, var_num), 0);
+           CN::mul(c, c, x.w);
+           CN::mul(c, c, y.w);
+           res = makeTerminal(c);
+           if (CN::equalsZero(res.w)) {
+               cn.releaseCached(res.w);
+               res = DDzero;
+           }
 
-            return res;
-        }
+           return res;
+       }
 
-        if (isTerminal(x)&& var_num==0) {
-            //if (ttt == 1) {
-            //    std::cout << "case3" << std::endl;
-            //}
-            Edge res;
-            res= y;
-            res.w= cn.mulCached(x.w, y.w);
-            if (CN::equalsZero(res.w)) {
-                cn.releaseCached(res.w);
-                res = DDzero;
-            }
+       if (isTerminal(x) && var_num == 0 && key_2_new_key2->at(y.p->v)==y.p->v) {
+           Edge res;
+           res = y;
+           res.w = cn.mulCached(x.w, y.w);
+           if (CN::equalsZero(res.w)) {
+               cn.releaseCached(res.w);
+               res = DDzero;
+           }
 
-            return res;
-        }
+           return res;
+       }
 
-        if (isTerminal(y)) {
-            //if (ttt == 1) {
-            //    std::cout << "case4" << std::endl;
-            //}
-            return cont2(y, x,var_cont, var_num);
-        }
+       if (isTerminal(y) && var_num==0 && key_2_new_key1->at(x.p->v) == x.p->v) {
+           Edge res;
+           res = x;
+           res.w = cn.mulCached(x.w, y.w);
+           if (CN::equalsZero(res.w)) {
+               cn.releaseCached(res.w);
+               res = DDzero;
+           }
 
-        const Complex xweight = x.w;
-        const Complex yweight = y.w;
-        x.w = CN::ONE;
-        y.w = CN::ONE;
+           return res;
+       }
 
-        Edge r = CTlookup4(x, y, var_cont);
-        if (r.p != nullptr) {
-            //if (ttt == 1) {
-            //    export2Dot(x, "x", false);
-            //    export2Dot(y, "y", false);
-            //    export2Dot(r, "r", false);
-                //std::cout << "case5" << std::endl;
-            //}
-            if (r.w != CN::ZERO) {
-                CN::mul(r.w, r.w, xweight);
-                CN::mul(r.w, r.w, yweight);
-                if (CN::equalsZero(r.w)) {
-                    cn.releaseCached(r.w);
-                    return DDzero;
-                }
-            }
-            return r;
-        }
+       const Complex xweight = x.w;
+       const Complex yweight = y.w;
+       x.w = CN::ONE;
+       y.w = CN::ONE;
 
-        std::string v_top;
-        if (varOrder[x.p->v] < varOrder[y.p->v]) {
-            v_top = x.p->v;
-        }
-        else {
-            v_top = y.p->v;
-        }
+       Edge r;
+       r = CTlookup4(x, y, key_2_new_key1, key_2_new_key2);
+       if (r.p != nullptr) {
+           if (r.w != CN::ZERO) {
+               CN::mul(r.w, r.w, xweight);
+               CN::mul(r.w, r.w, yweight);
+               if (CN::equalsZero(r.w)) {
+                   cn.releaseCached(r.w);
+                   return DDzero;
+               }
+           }
+           return r;
+       }
+
+       int v_top;
+       int s1, s2;
+       std::map<int, int> *key_2_new_key;
+       if (cont_order1->at(x.p->v) < cont_order2->at(y.p->v)) {
+           key_2_new_key = key_2_new_key1;
+           v_top = x.p->v;
+           s1 = x.p -> v;
+           s2 = MAXIDX;
+       }
+       else if (cont_order1->at(x.p->v) == cont_order2->at(y.p->v)) {
+           key_2_new_key = key_2_new_key1;
+           v_top = x.p->v;
+           s1 = x.p->v;
+           s2 = y.p->v;
+       }
+       else {
+           key_2_new_key = key_2_new_key2;
+           v_top = y.p->v;
+           s1 = MAXIDX;
+           s2 = y.p->v;
+       }
 
 
-        Edge low{}, high{};
-        if (find(var_cont->begin(), var_cont->end(), v_top) == var_cont->end()) {
-            //if (ttt == 1) {
-            //    std::cout << "case6" << std::endl;
-            //}
-            Edge low = cont2(Slice(x, v_top, 0), Slice(y, v_top, 0), var_cont, var_num ,ttt);
-            Edge high = cont2(Slice(x, v_top, 1), Slice(y, v_top, 1), var_cont, var_num,ttt );
-            //if (equals(low,high)) {
-            //    if (low.w == CN::ZERO) {
-            //        r = DDzero;
-            //    }
-            //    else {
-            //        r = low;
-            //        cn.releaseCached(high.w);
-            //    }
+       Edge low{}, high{};
+       if (key_2_new_key->at(v_top)!=-2) {
+           Edge e1 = Slice(x, s1, 0);
+           Edge e2 = Slice(y, s2, 0);
+           Edge low = cont2(e1, e2, key_2_new_key1, key_2_new_key2, cont_order1, cont_order2, var_num);
+           Edge e3 = Slice(x, s1, 1);
+           Edge e4 = Slice(y, s2, 1);
+           Edge high = cont2(e3, e4, key_2_new_key1, key_2_new_key2, cont_order1, cont_order2, var_num);
+           Edge e[NEDGE];
+           e[0] = low;
+           e[1] = high;
+           r = makeNonterminal(key_2_new_key->at(v_top), e, true);
 
-            //}
-            //else {
-                Edge e[NEDGE];
-                e[0] = low;
-                e[1] = high;
-                r = makeNonterminal(v_top, e, true);
-            //}
+       }
+       else {
+           Edge e1 = Slice(x, s1, 0);
+           Edge e2 = Slice(y, s2, 0);
+           Edge low = cont2(e1, e2, key_2_new_key1, key_2_new_key2, cont_order1, cont_order2, var_num-1);
+           Edge e3 = Slice(x, s1, 1);
+           Edge e4 = Slice(y, s2, 1);
+           Edge high = cont2(e3, e4, key_2_new_key1, key_2_new_key2, cont_order1, cont_order2, var_num-1);
+           if (low.w == CN::ZERO) {
+               r = high;
+           }
+           else if (high.w == CN::ZERO) {
+               r = low;
+           }
+           else {
+               r = T_add2(low, high);
+               cn.releaseCached(low.w);
+               cn.releaseCached(high.w);
+           }
+       }
 
-        }
-        else {
-            //if (ttt == 1) {
-            //    std::cout << "case7" << std::endl;
-            //}
-            Edge low = cont2(Slice(x, v_top, 0), Slice(y, v_top, 0), var_cont, var_num - 1,ttt);
-            Edge high = cont2(Slice(x, v_top, 1), Slice(y, v_top, 1), var_cont, var_num - 1,ttt);
-            if (low.w == CN::ZERO) {
-                r = high;
-            }
-            else if(high.w == CN::ZERO){
-                r = low;
-            }
-            else {
-                r = T_add2(low, high);
-                cn.releaseCached(low.w);
-                cn.releaseCached(high.w);
-            }
-        }
+       CTinsert4(x, y, r, key_2_new_key1, key_2_new_key2);
 
-        CTinsert4(x, y, r, var_cont);
+       if (r.w != CN::ZERO && (xweight != CN::ONE || yweight != CN::ONE)) {
+           if (r.w == CN::ONE) {
+               r.w = cn.mulCached(xweight, yweight);
+           }
+           else {
+               CN::mul(r.w, r.w, xweight);
+               CN::mul(r.w, r.w, yweight);
+           }
+           if (CN::equalsZero(r.w)) {
+               cn.releaseCached(r.w);
+               r = DDzero;
+           }
 
-        if (r.w != CN::ZERO && (xweight != CN::ONE || yweight != CN::ONE)) {
-            if (r.w == CN::ONE) {
-                r.w = cn.mulCached(xweight, yweight);
-            }
-            else {
-                CN::mul(r.w, r.w, xweight);
-                CN::mul(r.w, r.w, yweight);
-            }
-            if (CN::equalsZero(r.w)) {
-                cn.releaseCached(r.w);
-                r = DDzero;
-            }
+       }
+       return r;
+   
+   }
 
-        }
-        return r;
-    }
+
 
     TDD Package::Matrix2TDD(const Matrix2x2& mat, std::vector<Index> var_out)
     {
@@ -1173,19 +1281,19 @@ namespace dd {
                 }
             }
         }
-        std::string v_top;
-        std::string v_bottom;
+        std::string v_top, v_bottom;
+
         if (varOrder[var_out[0].key] < varOrder[var_out[1].key]) {
             v_top = var_out[0].key;
-            v_bottom= var_out[1].key;
+            v_bottom = var_out[1].key;
             e_low[0] = e_temp[0];
             e_low[1] = e_temp[2];
             e_high[0] = e_temp[1];
             e_high[1] = e_temp[3];
         }
         else {
-             v_top= var_out[1].key;
-             v_bottom = var_out[0].key;
+            v_top = var_out[1].key;
+            v_bottom = var_out[0].key;
             e_low[0] = e_temp[0];
             e_low[1] = e_temp[1];
             e_high[0] = e_temp[2];
@@ -1197,13 +1305,13 @@ namespace dd {
             low.e = e_low[0];
         }
         else {
-            low.e = makeNonterminal(v_bottom, e_low);
+            low.e = makeNonterminal(0, e_low);
         }
         if (equals(e_high[0], e_high[1])) {
             high.e = e_high[0];
         }
         else {
-            high.e = makeNonterminal(v_bottom, e_high);
+            high.e = makeNonterminal(0, e_high);
         }
         if (equals(low.e, high.e)) {
             res.e = low.e;
@@ -1211,10 +1319,15 @@ namespace dd {
         else {
             e[0] = low.e;
             e[1] = high.e;
-            res.e = makeNonterminal(v_top, e);
+            res.e = makeNonterminal(1, e);
         }
-        res.index_set = var_out;
- 
+        res.index_set = { var_out[0],var_out[1] };
+        res.index_2_key[v_top] = 1;
+        res.index_2_key[v_bottom] = 0;
+        res.key_2_index[1] = v_top;
+        res.key_2_index[0] = v_bottom;
+        res.index_2_key["-1"] = -1;
+        res.key_2_index[-1] = "-1";
         return res;
     }
 
@@ -1241,10 +1354,13 @@ namespace dd {
           
         }
 
-        res.e = makeNonterminal(var_out[0].key, e_temp);
+        res.e = makeNonterminal(0, e_temp);
 
-        res.index_set = var_out;
-
+        res.index_set = { var_out[0],var_out[1] };
+        res.index_2_key[var_out[0].key] = 0;
+        res.key_2_index[0] = var_out[0].key;
+        res.index_2_key["-1"] = -1;
+        res.key_2_index[-1] = "-1";
         return res;
     }
 
@@ -1260,55 +1376,89 @@ namespace dd {
                 v_top = var[0].key;
                 low = Matrix2TDD(Imat, { var[3] ,var[4] });
                 high = Matrix2TDD(Xmat, { var[3] ,var[4] });
-                res.e = makeNonterminal(v_top, {low.e,high.e});
+                res.e = makeNonterminal(2, {low.e,high.e});
                 res.index_set = { var[0],var[2],var[3],var[4] };
-                
+                res.index_2_key = high.index_2_key;
+                res.index_2_key[v_top] = 2;
+                res.key_2_index = high.key_2_index;
+                res.key_2_index[2] = v_top;
+                res.index_2_key["-1"] = -1;
+                res.key_2_index[-1] = "-1";
             }
             else if (varOrder[var[3].key] < varOrder[var[0].key] && varOrder[var[3].key] < varOrder[var[4].key]) {
                 v_top = var[3].key;
                 low = Matrix2TDD(Imat, { var[0] ,var[4] });
                 high = Matrix2TDD(Xmat, { var[0] ,var[4] });
-                res.e = makeNonterminal(v_top, { low.e,high.e });
+                res.e = makeNonterminal(2, { low.e,high.e });
                 res.index_set = { var[0],var[2],var[3],var[4] };
-                
+                res.index_2_key = high.index_2_key;
+                res.index_2_key[v_top] = 2;
+                res.key_2_index = high.key_2_index;
+                res.key_2_index[2] = v_top;
+                res.index_2_key["-1"] = -1;
+                res.key_2_index[-1] = "-1";
             }
             else {
                 v_top = var[4].key;
                 low = Matrix2TDD(Imat, { var[0] ,var[3] });
                 high = Matrix2TDD(Xmat, { var[0] ,var[3] });
-                res.e = makeNonterminal(v_top, { low.e,high.e });
+                res.e = makeNonterminal(2, { low.e,high.e });
                 res.index_set = { var[0],var[2],var[3],var[4] };
-                
+                res.index_2_key = high.index_2_key;
+                res.index_2_key[v_top] = 2;
+                res.key_2_index = high.key_2_index;
+                res.key_2_index[2] = v_top;
+                res.index_2_key["-1"] = -1;
+                res.key_2_index[-1] = "-1";
             }
         }
         if (ca == 2) {
             res.e = DDone;
             res.index_set = { var[0],var[1],var[2] };
+            res.index_2_key["-1"] = -1;
+            res.key_2_index[-1] = "-1";
+            res.index_2_key[var[0].key] = 0;
+            res.key_2_index[0] = var[0].key;
         }
         if (ca == 3) {
             if (varOrder[var[1].key] < varOrder[var[3].key] && varOrder[var[1].key] < varOrder[var[4].key]) {
                 v_top = var[1].key;
                 low = Matrix2TDD(Imat, { var[3] ,var[4] });
                 high = Matrix2TDD(Xmat, { var[3] ,var[4] });
-                res.e = makeNonterminal(v_top, { low.e,high.e });
+                res.e = makeNonterminal(2, { low.e,high.e });
                 res.index_set = { var[1],var[3],var[4] };
-                
+                res.index_2_key = high.index_2_key;
+                res.index_2_key[v_top] = 2;
+                res.key_2_index = high.key_2_index;
+                res.key_2_index[2] = v_top;
+                res.index_2_key["-1"] = -1;
+                res.key_2_index[-1] = "-1";
             }
             else if (varOrder[var[3].key] < varOrder[var[1].key] && varOrder[var[3].key] < varOrder[var[4].key]) {
                 v_top = var[3].key;
                 low = Matrix2TDD(Imat, { var[1] ,var[4] });
                 high = Matrix2TDD(Xmat, { var[1] ,var[4] });
-                res.e = makeNonterminal(v_top, { low.e,high.e });
+                res.e = makeNonterminal(2, { low.e,high.e });
                 res.index_set = { var[1],var[3],var[4] };
-                
+                res.index_2_key = high.index_2_key;
+                res.index_2_key[v_top] = 2;
+                res.key_2_index = high.key_2_index;
+                res.key_2_index[2] = v_top;
+                res.index_2_key["-1"] = -1;
+                res.key_2_index[-1] = "-1";
             }
             else {
                 v_top = var[4].key;
                 low = Matrix2TDD(Imat, { var[1] ,var[3] });
                 high = Matrix2TDD(Xmat, { var[1] ,var[3] });
-                res.e = makeNonterminal(v_top, { low.e,high.e });
+                res.e = makeNonterminal(2, { low.e,high.e });
                 res.index_set = { var[1],var[3],var[4] };
-                
+                res.index_2_key = high.index_2_key;
+                res.index_2_key[v_top] = 2;
+                res.key_2_index = high.key_2_index;
+                res.key_2_index[2] = v_top;
+                res.index_2_key["-1"] = -1;
+                res.key_2_index[-1] = "-1";
             }
         }
         return res;

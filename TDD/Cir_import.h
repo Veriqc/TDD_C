@@ -235,23 +235,15 @@ std::map<int, map<int, std::vector<int>>>  cir_partition1(std::map<int, gate> ga
 			}
 			else {
 				if (cx_cut < cx_cut_max) {
-					if (gate_set[k].qubits[1] >= qubits_num / 2) {
-						par[block][1].push_back(k);
-					}
-					else {
-						par[block][0].push_back(k);
-					}
+					par[block][0].push_back(k);
+					par[block][1].push_back(k);
 					cx_cut += 1;
 				}
 				else {
 					block += 1;
 					cx_cut = 1;
-					if (gate_set[k].qubits[1] >= qubits_num / 2) {
-						par[block][1].push_back(k);
-					}
-					else {
-						par[block][0].push_back(k);
-					}
+					par[block][0].push_back(k);
+					par[block][1].push_back(k);
 				}
 			}
 		}
@@ -270,6 +262,82 @@ std::map<int, map<int, std::vector<int>>>  cir_partition1(std::map<int, gate> ga
 	//}
 
 
+	return par;
+}
+
+std::map<int, map<int, std::vector<int>>>  cir_partition2(std::map<int, gate> gate_set, int cx_cut_max, int c_part_width) {
+	std::map<int, map<int, std::vector<int>>>   par;
+	int cx_cut = 0;
+	int block = 0;
+	int c_part_min = (qubits_num - c_part_width) / 2;
+	int c_part_max = (qubits_num + c_part_width) / 2;
+	for (int k = 0; k < gates_num; k++)
+	{
+		string nam = gate_set[k].name;
+		if (cx_cut <= cx_cut_max) {
+
+			if (nam != "cx") {
+				if (gate_set[k].qubits[0] <= qubits_num / 2) {
+					par[block][0].push_back(k);
+				}
+				else {
+					par[block][1].push_back(k);
+				}
+			}
+			else {
+				if (gate_set[k].qubits[0] <= qubits_num / 2 && gate_set[k].qubits[1] <= qubits_num / 2) {
+					par[block][0].push_back(k);
+				}
+				else if (gate_set[k].qubits[0] > qubits_num / 2 && gate_set[k].qubits[1] > qubits_num / 2) {
+					par[block][1].push_back(k);
+				}
+				else {
+					par[block][0].push_back(k);
+					par[block][1].push_back(k);
+					cx_cut += 1;
+				}
+			}
+		}
+		else {
+			if (nam != "cx") {
+				if (gate_set[k].qubits[0] < c_part_min) {
+					par[block][0].push_back(k);
+				}
+				else if (gate_set[k].qubits[0] > c_part_max) {
+					par[block][1].push_back(k);
+				}
+				else {
+					par[block][2].push_back(k);
+				}
+			}
+			else if (gate_set[k].qubits[0] >= c_part_min && gate_set[k].qubits[0] <= c_part_max && gate_set[k].qubits[1] >= c_part_min && gate_set[k].qubits[1] <= c_part_max) {
+				par[block][2].push_back(k);
+			}
+			else if (gate_set[k].qubits[0] < c_part_min && gate_set[k].qubits[1] < c_part_min)
+			{
+				par[block][0].push_back(k);
+			}
+			else if (gate_set[k].qubits[0] > c_part_max && gate_set[k].qubits[1] > c_part_max)
+			{
+				par[block][1].push_back(k);
+			}
+			else {
+				block += 1;
+				cx_cut = 0;
+				if (gate_set[k].qubits[0] <= qubits_num / 2 && gate_set[k].qubits[1] <= qubits_num / 2) {
+					par[block][0].push_back(k);
+				}
+				else if (gate_set[k].qubits[0] > qubits_num / 2 && gate_set[k].qubits[1] > qubits_num / 2) {
+					par[block][1].push_back(k);
+				}
+				else {
+					par[block][0].push_back(k);
+					par[block][1].push_back(k);
+					cx_cut += 1;
+				}
+			}
+		}
+	}
 	return par;
 }
 
@@ -292,7 +360,7 @@ int max(int a, int b) {
 	}
 }
 
-std::map<int, map<int, std::vector<int>>>  cir_partition2(std::map<int, gate> gate_set, int cx_cut_max, int c_part_width) {
+std::map<int, map<int, std::vector<int>>>  cir_partition3(std::map<int, gate> gate_set, int cx_cut_max, int c_part_width) {
 	std::map<int, map<int, std::vector<int>>>   par;
 	int cx_cut = 0;
 	int block = 0;
@@ -319,12 +387,8 @@ std::map<int, map<int, std::vector<int>>>  cir_partition2(std::map<int, gate> ga
 					par[block][1].push_back(k);
 				}
 				else {
-					if (gate_set[k].qubits[1] >= qubits_num / 2) {
-						par[block][1].push_back(k);
-					}
-					else {
-						par[block][0].push_back(k);
-					}
+					par[block][0].push_back(k);
+					par[block][1].push_back(k);
 					cx_cut += 1;
 				}
 			}
@@ -367,12 +431,8 @@ std::map<int, map<int, std::vector<int>>>  cir_partition2(std::map<int, gate> ga
 						par[block][1].push_back(k);
 					}
 					else {
-						if (gate_set[k].qubits[1] >= qubits_num / 2) {
-							par[block][1].push_back(k);
-						}
-						else {
-							par[block][0].push_back(k);
-						}
+						par[block][0].push_back(k);
+						par[block][1].push_back(k);
 						cx_cut += 1;
 					}
 				}
@@ -388,118 +448,10 @@ std::map<int, map<int, std::vector<int>>>  cir_partition2(std::map<int, gate> ga
 }
 
 
-dd::TDD apply(dd::Package* dd, dd::TDD tdd, string nam, std::vector<dd::Index> index_set) {
-
-	std::map<std::string, int> gate_type;
-	gate_type["x"] = 1;
-	gate_type["y"] = 2;
-	gate_type["z"] = 3;
-	gate_type["h"] = 4;
-	gate_type["s"] = 5;
-	gate_type["sdg"] = 6;
-	gate_type["t"] = 7;
-	gate_type["tdg"] = 8;
-
-	dd::TDD temp_tdd;
-
-	if (nam == "cx") {
-		temp_tdd = dd->cnot_2_TDD(index_set, 1);
-	}
-	else {
-		switch (gate_type[nam]) {
-		case 1:
-			temp_tdd = dd->Matrix2TDD(Xmat, index_set);
-			break;
-		case 2:
-			temp_tdd = dd->Matrix2TDD(Ymat, index_set);
-			break;
-		case 3:
-			temp_tdd = dd->diag_matrix_2_TDD(Zmat, index_set);
-			break;
-		case 4:
-			temp_tdd = dd->Matrix2TDD(Hmat, index_set);
-			break;
-		case 5:
-			temp_tdd = dd->diag_matrix_2_TDD(Smat, index_set);
-			break;
-		case 6:
-			temp_tdd = dd->diag_matrix_2_TDD(Sdgmat, index_set);
-			break;
-		case 7:
-			temp_tdd = dd->diag_matrix_2_TDD(Tmat, index_set);
-			break;
-		case 8:
-			temp_tdd = dd->diag_matrix_2_TDD(Tdgmat, index_set);
-			break;
-		default:
-			if (nam[0] == 'r' and nam[1] == 'z') {
-				regex pattern("rz\\((-?\\d.\\d+)\\)");
-				smatch result;
-				regex_match(nam, result, pattern);
-				float theta = stof(result[1]);
-				dd::Matrix2x2 Rzmat = { {{ 1, 0 }, { 0, 0 } }, {{ 0, 0 }, { cos(theta), sin(theta) } } };
-				temp_tdd = dd->diag_matrix_2_TDD(Rzmat, index_set);
-				break;
-			}
-			if (nam[0] == 'u' and nam[1] == '1') {
-				regex pattern("u1\\((-?\\d.\\d+)\\)");
-				smatch result;
-				regex_match(nam, result, pattern);
-				float theta = stof(result[1]);
-				dd::Matrix2x2 U1mat = { {{ 1, 0 }, { 0, 0 } }, {{ 0, 0 }, { cos(theta), sin(theta) } } };
-				temp_tdd = dd->diag_matrix_2_TDD(U1mat, index_set);
-				break;
-			}
-			if (nam[0] == 'u' and nam[1] == '3') {
-				regex pattern("u3\\((-?\\d.\\d+), ?(-?\\d.\\d+), ?(-?\\d.\\d+)\\)");
-				smatch result;
-				regex_match(nam, result, pattern);
-				float theta = stof(result[1]);
-				float phi = stof(result[2]);
-				float lambda = stof(result[3]);
-				dd::Matrix2x2 U3mat = { {{ cos(theta / 2), 0 }, { -cos(lambda) * sin(theta / 2),-sin(lambda) * sin(theta / 2)} }, {{ cos(phi) * sin(theta / 2),sin(phi) * sin(theta / 2) }, { cos(lambda + phi) * cos(theta / 2),sin(lambda + phi) * cos(theta / 2) } } };
-				temp_tdd = dd->Matrix2TDD(U3mat, index_set);
-				break;
-			}
-		}
-	}
-	tdd = dd->cont(tdd, temp_tdd);
-
-	return tdd;
-}
-
-std::map<std::string, int> get_var_order() {
-
-	std::map<std::string, int> var;
-
-
-	//设置变量顺序
-	int order_num = 1;
-	for (int k = qubits_num - 1; k >= 0; k--) {
-		string idx_nam;
-		idx_nam = "x";
-		idx_nam += to_string(k);
-		var[idx_nam] = order_num;
-		order_num += 1;
-		for (int k2 = 0; k2 <= gates_num; k2++) {
-			idx_nam = "x";
-			idx_nam += to_string(k);
-			idx_nam += to_string(0);
-			idx_nam += to_string(k2);
-			var[idx_nam] = order_num;
-			order_num += 1;
-			//cout << idx_nam << endl;
-		}
-		idx_nam = "y";
-		idx_nam += to_string(k);
-		var[idx_nam] = order_num;
-		order_num += 1;
-	}
-
-	var["-1"] = order_num;
-
-	return var;
-}
+//constexpr dd::Matrix2x2 get_gate_matrix(std::string) {
+//
+//
+//}
 
 
 int* Simulate_with_partition1(std::string path, std::string  file_name) {
@@ -512,10 +464,40 @@ int* Simulate_with_partition1(std::string path, std::string  file_name) {
 	int* nodes = new int[2];
 	nodes[0] = 0;
 	nodes[1] = 0;
+	std::map<std::string, int> gate_type;
+	gate_type["x"] = 1;
+	gate_type["y"] = 2;
+	gate_type["z"] = 3;
+	gate_type["h"] = 4;
+	gate_type["s"] = 5;
+	gate_type["sdg"] = 6;
+	gate_type["t"] = 7;
+	gate_type["tdg"] = 8;
 
 	std::map<std::string, int> var;
 
-	var = get_var_order();
+	//设置变量顺序
+	int order_num = 1;
+	for (int k = qubits_num - 1; k >= 0; k--) {
+		string idx_nam;
+		idx_nam = "x";
+		idx_nam += to_string(k);
+		var[idx_nam] = order_num;
+		order_num += 1;
+		for (int k2 = gates_num; k2 >= 0; k2--) {
+			idx_nam = "x";
+			idx_nam += to_string(k);
+			idx_nam += to_string(0);
+			idx_nam += to_string(k2);
+			var[idx_nam] = order_num;
+			order_num += 1;
+		}
+		idx_nam = "y";
+		idx_nam += to_string(k);
+		var[idx_nam] = order_num;
+		order_num += 1;
+	}
+	var["-1"] = dd::MAXIDX;
 
 	auto* dd = new dd::Package(var);
 
@@ -526,25 +508,189 @@ int* Simulate_with_partition1(std::string path, std::string  file_name) {
 		//std::cout << "block:" << k << std::endl;
 		dd::TDD temp_tdd1 = { dd->DDone ,{} };
 		for (int k1 = 0; k1 < par[k][0].size(); k1++) {
+			dd::TDD temp_tdd;
 			int gate_idx = par[k][0][k1];
+			//std::cout << "part0:" << gate_idx << std::endl;
 			string nam = gate_set[gate_idx].name;
-			temp_tdd1 = apply(dd, temp_tdd1, nam, Index_set[gate_idx]);
+			if (nam == "cx") {
+				if (gate_set[gate_idx].qubits[0] < qubits_num / 2 && gate_set[gate_idx].qubits[1] < qubits_num / 2) {
+					temp_tdd = dd->cnot_2_TDD(Index_set[gate_idx], 1);
+				}
+				else if (gate_set[gate_idx].qubits[0] < qubits_num / 2) {
+					temp_tdd = dd->cnot_2_TDD(Index_set[gate_idx], 2);
+				}
+				else {
+					temp_tdd = dd->cnot_2_TDD(Index_set[gate_idx], 3);
+				}
+			}
+			else {
+				switch (gate_type[nam]) {
+				case 1:
+					temp_tdd = dd->Matrix2TDD(Xmat, Index_set[gate_idx]);
+					break;
+				case 2:
+					temp_tdd = dd->Matrix2TDD(Ymat, Index_set[gate_idx]);
+					break;
+				case 3:
+					temp_tdd = dd->diag_matrix_2_TDD(Zmat, Index_set[gate_idx]);
+					break;
+				case 4:
+					temp_tdd = dd->Matrix2TDD(Hmat, Index_set[gate_idx]);
+					break;
+				case 5:
+					temp_tdd = dd->diag_matrix_2_TDD(Smat, Index_set[gate_idx]);
+					break;
+				case 6:
+					temp_tdd = dd->diag_matrix_2_TDD(Sdgmat, Index_set[gate_idx]);
+					break;
+				case 7:
+					temp_tdd = dd->diag_matrix_2_TDD(Tmat, Index_set[gate_idx]);
+					break;
+				case 8:
+					temp_tdd = dd->diag_matrix_2_TDD(Tdgmat, Index_set[gate_idx]);
+					break;
+				default:
+					if (nam[0] == 'r' and nam[1] == 'z') {
+						regex pattern("rz\\((-?\\d.\\d+)\\)");
+						smatch result;
+						regex_match(nam, result, pattern);
+						float theta = stof(result[1]);
+						dd::Matrix2x2 Rzmat = { {{ 1, 0 }, { 0, 0 } }, {{ 0, 0 }, { cos(theta), sin(theta) } } };
+						temp_tdd = dd->diag_matrix_2_TDD(Rzmat, Index_set[gate_idx]);
+						break;
+					}
+					if (nam[0] == 'u' and nam[1] == '1') {
+						regex pattern("u1\\((-?\\d.\\d+)\\)");
+						smatch result;
+						regex_match(nam, result, pattern);
+						float theta = stof(result[1]);
+						dd::Matrix2x2 U1mat = { {{ 1, 0 }, { 0, 0 } }, {{ 0, 0 }, { cos(theta), sin(theta) } } };
+						temp_tdd = dd->diag_matrix_2_TDD(U1mat, Index_set[gate_idx]);
+						break;
+					}
+					if (nam[0] == 'u' and nam[1] == '3') {
+						regex pattern("u3\\((-?\\d.\\d+), ?(-?\\d.\\d+), ?(-?\\d.\\d+)\\)");
+						smatch result;
+						regex_match(nam, result, pattern);
+						float theta = stof(result[1]);
+						float phi = stof(result[2]);
+						float lambda = stof(result[3]);
+						dd::Matrix2x2 U3mat = { {{ cos(theta / 2), 0 }, { -cos(lambda) * sin(theta / 2),-sin(lambda) * sin(theta / 2)} }, {{ cos(phi) * sin(theta / 2),sin(phi) * sin(theta / 2) }, { cos(lambda + phi) * cos(theta / 2),sin(lambda + phi) * cos(theta / 2) } } };
+						temp_tdd = dd->Matrix2TDD(U3mat, Index_set[gate_idx]);
+						break;
+					}
+				}
+			}
+			temp_tdd1 = dd->cont(temp_tdd1, temp_tdd);
 		}
 
 
 		dd::TDD temp_tdd2 = { dd->DDone ,{} };
 		for (int k1 = 0; k1 < par[k][1].size(); k1++) {
+			dd::TDD temp_tdd;
 			int gate_idx = par[k][1][k1];
+			//std::cout << "part1:" << gate_idx << std::endl;
 			string nam = gate_set[gate_idx].name;
-			temp_tdd2 = apply(dd, temp_tdd2, nam, Index_set[gate_idx]);
+			if (nam == "cx") {
+				if (gate_set[gate_idx].qubits[0] >= qubits_num / 2 && gate_set[gate_idx].qubits[1] >= qubits_num / 2)
+				{
+					temp_tdd = dd->cnot_2_TDD(Index_set[gate_idx], 1);
+				}
+				else if (gate_set[gate_idx].qubits[0] >= qubits_num / 2) {
+					temp_tdd = dd->cnot_2_TDD(Index_set[gate_idx], 2);
+				}
+				else {
+					temp_tdd = dd->cnot_2_TDD(Index_set[gate_idx], 3);
+				}
+			}
+			else {
+				switch (gate_type[nam]) {
+				case 1:
+					temp_tdd = dd->Matrix2TDD(Xmat, Index_set[gate_idx]);
+					break;
+				case 2:
+					temp_tdd = dd->Matrix2TDD(Ymat, Index_set[gate_idx]);
+					break;
+				case 3:
+					temp_tdd = dd->diag_matrix_2_TDD(Zmat, Index_set[gate_idx]);
+					break;
+				case 4:
+					temp_tdd = dd->Matrix2TDD(Hmat, Index_set[gate_idx]);
+					break;
+				case 5:
+					temp_tdd = dd->diag_matrix_2_TDD(Smat, Index_set[gate_idx]);
+					break;
+				case 6:
+					temp_tdd = dd->diag_matrix_2_TDD(Sdgmat, Index_set[gate_idx]);
+					break;
+				case 7:
+					temp_tdd = dd->diag_matrix_2_TDD(Tmat, Index_set[gate_idx]);
+					break;
+				case 8:
+					temp_tdd = dd->diag_matrix_2_TDD(Tdgmat, Index_set[gate_idx]);
+					break;
+				default:
+					if (nam[0] == 'r' and nam[1] == 'z') {
+						regex pattern("rz\\((-?\\d.\\d+)\\)");
+						smatch result;
+						regex_match(nam, result, pattern);
+						float theta = stof(result[1]);
+						dd::Matrix2x2 Rzmat = { {{ 1, 0 }, { 0, 0 } }, {{ 0, 0 }, { cos(theta), sin(theta) } } };
+						temp_tdd = dd->diag_matrix_2_TDD(Rzmat, Index_set[gate_idx]);
+						break;
+					}
+					if (nam[0] == 'u' and nam[1] == '1') {
+						regex pattern("u1\\((-?\\d.\\d+)\\)");
+						smatch result;
+						regex_match(nam, result, pattern);
+						float theta = stof(result[1]);
+						dd::Matrix2x2 U1mat = { {{ 1, 0 }, { 0, 0 } }, {{ 0, 0 }, { cos(theta), sin(theta) } } };
+						temp_tdd = dd->diag_matrix_2_TDD(U1mat, Index_set[gate_idx]);
+						break;
+					}
+					if (nam[0] == 'u' and nam[1] == '3') {
+						regex pattern("u3\\((-?\\d.\\d+), ?(-?\\d.\\d+), ?(-?\\d.\\d+)\\)");
+						smatch result;
+						regex_match(nam, result, pattern);
+						float theta = stof(result[1]);
+						float phi = stof(result[2]);
+						float lambda = stof(result[3]);
+						dd::Matrix2x2 U3mat = { {{ cos(theta / 2), 0 }, { -cos(lambda) * sin(theta / 2),-sin(lambda) * sin(theta / 2)} }, {{ cos(phi) * sin(theta / 2),sin(phi) * sin(theta / 2) }, { cos(lambda + phi) * cos(theta / 2),sin(lambda + phi) * cos(theta / 2) } } };
+						temp_tdd = dd->Matrix2TDD(U3mat, Index_set[gate_idx]);
+						break;
+					}
+				}
+			}
+			temp_tdd2 = dd->cont(temp_tdd2, temp_tdd);
 		}
 
+		//dd->export2Dot(temp_tdd1.e, to_string(k) + to_string(0), false);
+		//cout << "======================" << endl;
+		//cout << k << endl;
+		//print_index_set(temp_tdd1.index_set);
+		//cout << "----------------" << endl;
+		//dd->export2Dot(temp_tdd2.e, to_string(k) + to_string(1), false);
+		//print_index_set(temp_tdd2.index_set);
+		//cout << "----------------" << endl;
 		dd::TDD temp_tdd = dd->cont(temp_tdd1, temp_tdd2);
-		tdd = dd->cont(tdd, temp_tdd);
+		//dd->export2Dot(temp_tdd.e, to_string(k)+to_string(2), false);
+		//print_index_set(temp_tdd.index_set);
+		//cout << "----------------" << endl;
+		//if (k == 1) {
+		//	tdd = dd->cont(tdd, temp_tdd,1);
+		//}
+		//else {
+			tdd = dd->cont(tdd, temp_tdd);
+		//}
+		
+		//dd->export2Dot(tdd.e, to_string(k) + to_string(3), false);
+		//print_index_set(tdd.index_set);
+		//cout << "----------------" << endl;
 		int node_num_max = dd->size(tdd.e);
 		if (node_num_max > nodes[0]) {
 			nodes[0] = node_num_max;
 		}
+		//dd->export2Dot(tdd.e, to_string(k), false);
 		finish = clock();
 		double time = (double)(finish - start) / CLOCKS_PER_SEC;
 		if (time > 1800) {
@@ -552,6 +698,9 @@ int* Simulate_with_partition1(std::string path, std::string  file_name) {
 		}
 	}
 
+
+	//cout << "=============" << endl;
+	//print_index_set(tdd.index_set);
 	int node_num_final = dd->size(tdd.e);
 
 	nodes[1] = node_num_final;
@@ -569,15 +718,45 @@ int* Simulate_with_partition2(std::string path, std::string  file_name) {
 	std::map<int, gate> gate_set = import_circuit(path + file_name);
 	std::map<int, std::vector<dd::Index>> Index_set = get_index(gate_set);
 	int cx_cut_max = qubits_num / 2 + 1;
-	std::map<int, map<int, std::vector<int>>>  par = cir_partition2(gate_set, cx_cut_max, qubits_num / 2);
+	std::map<int, map<int, std::vector<int>>>  par = cir_partition3(gate_set, cx_cut_max, qubits_num / 2);
 
 	int* nodes = new int[2];
 	nodes[0] = 0;
 	nodes[1] = 0;
+	std::map<std::string, int> gate_type;
+	gate_type["x"] = 1;
+	gate_type["y"] = 2;
+	gate_type["z"] = 3;
+	gate_type["h"] = 4;
+	gate_type["s"] = 5;
+	gate_type["sdg"] = 6;
+	gate_type["t"] = 7;
+	gate_type["tdg"] = 8;
 
 	std::map<std::string, int> var;
 
-	var = get_var_order();
+	//设置变量顺序
+	int order_num = 1;
+	for (int k = qubits_num - 1; k >= 0; k--) {
+		string idx_nam;
+		idx_nam = "x";
+		idx_nam += to_string(k);
+		var[idx_nam] = order_num;
+		order_num += 1;
+		for (int k2 = 0; k2 <= gates_num; k2++) {
+			idx_nam = "x";
+			idx_nam += to_string(k);
+			idx_nam += to_string(0);
+			idx_nam += to_string(k2);
+			var[idx_nam] = order_num;
+			order_num += 1;
+		}
+		idx_nam = "y";
+		idx_nam += to_string(k);
+		var[idx_nam] = order_num;
+		order_num += 1;
+	}
+	var["-1"] = dd::MAXIDX;
 
 	auto* dd = new dd::Package(var);
 
@@ -588,31 +767,233 @@ int* Simulate_with_partition2(std::string path, std::string  file_name) {
 
 		dd::TDD temp_tdd1 = { dd->DDone ,{} };
 		for (int k1 = 0; k1 < par[k][0].size(); k1++) {
+			dd::TDD temp_tdd;
 			int gate_idx = par[k][0][k1];
 			string nam = gate_set[gate_idx].name;
-			temp_tdd1 = apply(dd, temp_tdd1, nam, Index_set[gate_idx]);
+			if (nam == "cx") {
+				if (gate_set[gate_idx].qubits[0] <= qubits_num / 2 && gate_set[gate_idx].qubits[1] <= qubits_num / 2) {
+					temp_tdd = dd->cnot_2_TDD(Index_set[gate_idx], 1);
+				}
+				else if (gate_set[gate_idx].qubits[0] <= qubits_num / 2) {
+					temp_tdd = dd->cnot_2_TDD(Index_set[gate_idx], 2);
+				}
+				else {
+					temp_tdd = dd->cnot_2_TDD(Index_set[gate_idx], 3);
+				}
+			}
+			else {
+				switch (gate_type[nam]) {
+				case 1:
+					temp_tdd = dd->Matrix2TDD(Xmat, Index_set[gate_idx]);
+					break;
+				case 2:
+					temp_tdd = dd->Matrix2TDD(Ymat, Index_set[gate_idx]);
+					break;
+				case 3:
+					temp_tdd = dd->diag_matrix_2_TDD(Zmat, Index_set[gate_idx]);
+					break;
+				case 4:
+					temp_tdd = dd->Matrix2TDD(Hmat, Index_set[gate_idx]);
+					break;
+				case 5:
+					temp_tdd = dd->diag_matrix_2_TDD(Smat, Index_set[gate_idx]);
+					break;
+				case 6:
+					temp_tdd = dd->diag_matrix_2_TDD(Sdgmat, Index_set[gate_idx]);
+					break;
+				case 7:
+					temp_tdd = dd->diag_matrix_2_TDD(Tmat, Index_set[gate_idx]);
+					break;
+				case 8:
+					temp_tdd = dd->diag_matrix_2_TDD(Tdgmat, Index_set[gate_idx]);
+					break;
+				default:
+					if (nam[0] == 'r' and nam[1] == 'z') {
+						regex pattern("rz\\((-?\\d.\\d+)\\)");
+						smatch result;
+						regex_match(nam, result, pattern);
+						float theta = stof(result[1]);
+						dd::Matrix2x2 Rzmat = { {{ 1, 0 }, { 0, 0 } }, {{ 0, 0 }, { cos(theta), sin(theta) } } };
+						temp_tdd = dd->diag_matrix_2_TDD(Rzmat, Index_set[gate_idx]);
+						break;
+					}
+					if (nam[0] == 'u' and nam[1] == '1') {
+						regex pattern("u1\\((-?\\d.\\d+)\\)");
+						smatch result;
+						regex_match(nam, result, pattern);
+						float theta = stof(result[1]);
+						dd::Matrix2x2 U1mat = { {{ 1, 0 }, { 0, 0 } }, {{ 0, 0 }, { cos(theta), sin(theta) } } };
+						temp_tdd = dd->diag_matrix_2_TDD(U1mat, Index_set[gate_idx]);
+						break;
+					}
+					if (nam[0] == 'u' and nam[1] == '3') {
+						regex pattern("u3\\((-?\\d.\\d+), ?(-?\\d.\\d+), ?(-?\\d.\\d+)\\)");
+						smatch result;
+						regex_match(nam, result, pattern);
+						float theta = stof(result[1]);
+						float phi = stof(result[2]);
+						float lambda = stof(result[3]);
+						dd::Matrix2x2 U3mat = { {{ cos(theta / 2), 0 }, { -cos(lambda) * sin(theta / 2),-sin(lambda) * sin(theta / 2)} }, {{ cos(phi) * sin(theta / 2),sin(phi) * sin(theta / 2) }, { cos(lambda + phi) * cos(theta / 2),sin(lambda + phi) * cos(theta / 2) } } };
+						temp_tdd = dd->Matrix2TDD(U3mat, Index_set[gate_idx]);
+						break;
+					}
+				}
+			}
+			temp_tdd1 = dd->cont(temp_tdd1, temp_tdd);
 		}
 
 
 		dd::TDD temp_tdd2 = { dd->DDone ,{} };
 		for (int k1 = 0; k1 < par[k][1].size(); k1++) {
+			dd::TDD temp_tdd;
 			int gate_idx = par[k][1][k1];
 			string nam = gate_set[gate_idx].name;
-			temp_tdd2 = apply(dd, temp_tdd2, nam, Index_set[gate_idx]);
+			if (nam == "cx") {
+				if (gate_set[gate_idx].qubits[0] > qubits_num / 2 && gate_set[gate_idx].qubits[1] > qubits_num / 2)
+				{
+					temp_tdd = dd->cnot_2_TDD(Index_set[gate_idx], 1);
+				}
+				else if (gate_set[gate_idx].qubits[0] > qubits_num / 2) {
+					temp_tdd = dd->cnot_2_TDD(Index_set[gate_idx], 2);
+				}
+				else {
+					temp_tdd = dd->cnot_2_TDD(Index_set[gate_idx], 3);
+				}
+			}
+			else {
+				switch (gate_type[nam]) {
+				case 1:
+					temp_tdd = dd->Matrix2TDD(Xmat, Index_set[gate_idx]);
+					break;
+				case 2:
+					temp_tdd = dd->Matrix2TDD(Ymat, Index_set[gate_idx]);
+					break;
+				case 3:
+					temp_tdd = dd->diag_matrix_2_TDD(Zmat, Index_set[gate_idx]);
+					break;
+				case 4:
+					temp_tdd = dd->Matrix2TDD(Hmat, Index_set[gate_idx]);
+					break;
+				case 5:
+					temp_tdd = dd->diag_matrix_2_TDD(Smat, Index_set[gate_idx]);
+					break;
+				case 6:
+					temp_tdd = dd->diag_matrix_2_TDD(Sdgmat, Index_set[gate_idx]);
+					break;
+				case 7:
+					temp_tdd = dd->diag_matrix_2_TDD(Tmat, Index_set[gate_idx]);
+					break;
+				case 8:
+					temp_tdd = dd->diag_matrix_2_TDD(Tdgmat, Index_set[gate_idx]);
+					break;
+				default:
+					if (nam[0] == 'r' and nam[1] == 'z') {
+						regex pattern("rz\\((-?\\d.\\d+)\\)");
+						smatch result;
+						regex_match(nam, result, pattern);
+						float theta = stof(result[1]);
+						dd::Matrix2x2 Rzmat = { {{ 1, 0 }, { 0, 0 } }, {{ 0, 0 }, { cos(theta), sin(theta) } } };
+						temp_tdd = dd->diag_matrix_2_TDD(Rzmat, Index_set[gate_idx]);
+						break;
+					}
+					if (nam[0] == 'u' and nam[1] == '1') {
+						regex pattern("u1\\((-?\\d.\\d+)\\)");
+						smatch result;
+						regex_match(nam, result, pattern);
+						float theta = stof(result[1]);
+						dd::Matrix2x2 U1mat = { {{ 1, 0 }, { 0, 0 } }, {{ 0, 0 }, { cos(theta), sin(theta) } } };
+						temp_tdd = dd->diag_matrix_2_TDD(U1mat, Index_set[gate_idx]);
+						break;
+					}
+					if (nam[0] == 'u' and nam[1] == '3') {
+						regex pattern("u3\\((-?\\d.\\d+), ?(-?\\d.\\d+), ?(-?\\d.\\d+)\\)");
+						smatch result;
+						regex_match(nam, result, pattern);
+						float theta = stof(result[1]);
+						float phi = stof(result[2]);
+						float lambda = stof(result[3]);
+						dd::Matrix2x2 U3mat = { {{ cos(theta / 2), 0 }, { -cos(lambda) * sin(theta / 2),-sin(lambda) * sin(theta / 2)} }, {{ cos(phi) * sin(theta / 2),sin(phi) * sin(theta / 2) }, { cos(lambda + phi) * cos(theta / 2),sin(lambda + phi) * cos(theta / 2) } } };
+						temp_tdd = dd->Matrix2TDD(U3mat, Index_set[gate_idx]);
+						break;
+					}
+				}
+			}
+			temp_tdd2 = dd->cont(temp_tdd2, temp_tdd);
 		}
 
 		dd::TDD temp_tdd3 = { dd->DDone ,{} };
 		for (int k1 = 0; k1 < par[k][2].size(); k1++) {
+			dd::TDD temp_tdd;
 			int gate_idx = par[k][2][k1];
 			string nam = gate_set[gate_idx].name;
-			temp_tdd3 = apply(dd, temp_tdd3, nam, Index_set[gate_idx]);
+			if (nam == "cx") {
+				temp_tdd = dd->cnot_2_TDD(Index_set[gate_idx], 1);
+			}
+			else {
+				switch (gate_type[nam]) {
+				case 1:
+					temp_tdd = dd->Matrix2TDD(Xmat, Index_set[gate_idx]);
+					break;
+				case 2:
+					temp_tdd = dd->Matrix2TDD(Ymat, Index_set[gate_idx]);
+					break;
+				case 3:
+					temp_tdd = dd->diag_matrix_2_TDD(Zmat, Index_set[gate_idx]);
+					break;
+				case 4:
+					temp_tdd = dd->Matrix2TDD(Hmat, Index_set[gate_idx]);
+					break;
+				case 5:
+					temp_tdd = dd->diag_matrix_2_TDD(Smat, Index_set[gate_idx]);
+					break;
+				case 6:
+					temp_tdd = dd->diag_matrix_2_TDD(Sdgmat, Index_set[gate_idx]);
+					break;
+				case 7:
+					temp_tdd = dd->diag_matrix_2_TDD(Tmat, Index_set[gate_idx]);
+					break;
+				case 8:
+					temp_tdd = dd->diag_matrix_2_TDD(Tdgmat, Index_set[gate_idx]);
+					break;
+				default:
+					if (nam[0] == 'r' and nam[1] == 'z') {
+						regex pattern("rz\\((-?\\d.\\d+)\\)");
+						smatch result;
+						regex_match(nam, result, pattern);
+						float theta = stof(result[1]);
+						dd::Matrix2x2 Rzmat = { {{ 1, 0 }, { 0, 0 } }, {{ 0, 0 }, { cos(theta), sin(theta) } } };
+						temp_tdd = dd->diag_matrix_2_TDD(Rzmat, Index_set[gate_idx]);
+						break;
+					}
+					if (nam[0] == 'u' and nam[1] == '1') {
+						regex pattern("u1\\((-?\\d.\\d+)\\)");
+						smatch result;
+						regex_match(nam, result, pattern);
+						float theta = stof(result[1]);
+						dd::Matrix2x2 U1mat = { {{ 1, 0 }, { 0, 0 } }, {{ 0, 0 }, { cos(theta), sin(theta) } } };
+						temp_tdd = dd->diag_matrix_2_TDD(U1mat, Index_set[gate_idx]);
+						break;
+					}
+					if (nam[0] == 'u' and nam[1] == '3') {
+						regex pattern("u3\\((-?\\d.\\d+), ?(-?\\d.\\d+), ?(-?\\d.\\d+)\\)");
+						smatch result;
+						regex_match(nam, result, pattern);
+						float theta = stof(result[1]);
+						float phi = stof(result[2]);
+						float lambda = stof(result[3]);
+						dd::Matrix2x2 U3mat = { {{ cos(theta / 2), 0 }, { -cos(lambda) * sin(theta / 2),-sin(lambda) * sin(theta / 2)} }, {{ cos(phi) * sin(theta / 2),sin(phi) * sin(theta / 2) }, { cos(lambda + phi) * cos(theta / 2),sin(lambda + phi) * cos(theta / 2) } } };
+						temp_tdd = dd->Matrix2TDD(U3mat, Index_set[gate_idx]);
+						break;
+					}
+				}
+			}
+			temp_tdd3 = dd->cont(temp_tdd3, temp_tdd);
 		}
 
 
 		dd::TDD temp_tdd = dd->cont(temp_tdd1, temp_tdd2);
 		temp_tdd = dd->cont(temp_tdd, temp_tdd3);
 		tdd = dd->cont(tdd, temp_tdd);
-
 		int node_num_max = dd->size(tdd.e);
 		if (node_num_max > nodes[0]) {
 			nodes[0] = node_num_max;
@@ -718,9 +1099,43 @@ int* Simulate_with_tdd(std::string path, std::string  file_name) {
 	nodes[0] = 0;
 	nodes[1] = 0;
 
+	std::map<std::string, int> gate_type;
+	gate_type["x"] = 1;
+	gate_type["y"] = 2;
+	gate_type["z"] = 3;
+	gate_type["h"] = 4;
+	gate_type["s"] = 5;
+	gate_type["sdg"] = 6;
+	gate_type["t"] = 7;
+	gate_type["tdg"] = 8;
+
 	std::map<std::string, int> var;
 
-	var = get_var_order();
+
+	//设置变量顺序
+	int order_num = 1;
+	for (int k = qubits_num - 1; k >= 0; k--) {
+		string idx_nam;
+		idx_nam = "x";
+		idx_nam += to_string(k);
+		var[idx_nam] = order_num;
+		order_num += 1;
+		for (int k2 = 0; k2 <= gates_num; k2++) {
+			idx_nam = "x";
+			idx_nam += to_string(k);
+			idx_nam += to_string(0);
+			idx_nam += to_string(k2);
+			var[idx_nam] = order_num;
+			order_num += 1;
+			//cout << idx_nam << endl;
+		}
+		idx_nam = "y";
+		idx_nam += to_string(k);
+		var[idx_nam] = order_num;
+		order_num += 1;
+	}
+
+	var["-1"] = dd::MAXIDX;
 
 	//开始仿真，每一步都要处理指标，生成当前门的temp_tdd,并与现有的结果收缩得到完整tdd
 	auto* dd = new dd::Package(var);
@@ -729,7 +1144,76 @@ int* Simulate_with_tdd(std::string path, std::string  file_name) {
 	start = clock();
 	for (int k = 0; k < gate_set.size(); k++) {
 		{
-			tdd = apply(dd, tdd, gate_set[k].name, Index_set[k]);
+			dd::TDD temp_tdd;
+			string nam = gate_set[k].name;
+			if (nam == "cx") {
+				temp_tdd = dd->cnot_2_TDD(Index_set[k], 1);
+			}
+			else {
+				switch (gate_type[nam]) {
+				case 1:
+					temp_tdd = dd->Matrix2TDD(Xmat, Index_set[k]);
+					break;
+				case 2:
+					temp_tdd = dd->Matrix2TDD(Ymat, Index_set[k]);
+					break;
+				case 3:
+					temp_tdd = dd->diag_matrix_2_TDD(Zmat, Index_set[k]);
+					break;
+				case 4:
+					temp_tdd = dd->Matrix2TDD(Hmat, Index_set[k]);
+					break;
+				case 5:
+					temp_tdd = dd->diag_matrix_2_TDD(Smat, Index_set[k]);
+					break;
+				case 6:
+					temp_tdd = dd->diag_matrix_2_TDD(Sdgmat, Index_set[k]);
+					break;
+				case 7:
+					temp_tdd = dd->diag_matrix_2_TDD(Tmat, Index_set[k]);
+					break;
+				case 8:
+					temp_tdd = dd->diag_matrix_2_TDD(Tdgmat, Index_set[k]);
+					break;
+				default:
+					if (nam[0] == 'r' and nam[1] == 'z') {
+						regex pattern("rz\\((-?\\d.\\d+)\\)");
+						smatch result;
+						regex_match(nam, result, pattern);
+						float theta = stof(result[1]);
+						dd::Matrix2x2 Rzmat = { {{ 1, 0 }, { 0, 0 } }, {{ 0, 0 }, { cos(theta), sin(theta) } } };
+						temp_tdd = dd->diag_matrix_2_TDD(Rzmat, Index_set[k]);
+						break;
+					}
+					if (nam[0] == 'u' and nam[1] == '1') {
+						regex pattern("u1\\((-?\\d.\\d+)\\)");
+						smatch result;
+						regex_match(nam, result, pattern);
+						float theta = stof(result[1]);
+						dd::Matrix2x2 U1mat = { {{ 1, 0 }, { 0, 0 } }, {{ 0, 0 }, { cos(theta), sin(theta) } } };
+						temp_tdd = dd->diag_matrix_2_TDD(U1mat, Index_set[k]);
+						break;
+					}
+					if (nam[0] == 'u' and nam[1] == '3') {
+						regex pattern("u3\\((-?\\d.\\d+), ?(-?\\d.\\d+), ?(-?\\d.\\d+)\\)");
+						smatch result;
+						regex_match(nam, result, pattern);
+						float theta = stof(result[1]);
+						float phi = stof(result[2]);
+						float lambda = stof(result[3]);
+						dd::Matrix2x2 U3mat = { {{ cos(theta / 2), 0 }, { -cos(lambda) * sin(theta / 2),-sin(lambda) * sin(theta / 2)} }, {{ cos(phi) * sin(theta / 2),sin(phi) * sin(theta / 2) }, { cos(lambda + phi) * cos(theta / 2),sin(lambda + phi) * cos(theta / 2) } } };
+						temp_tdd = dd->Matrix2TDD(U3mat, Index_set[k]);
+						break;
+					}
+				}
+			}
+			//int ttt = 0;
+			//if (k==4) {
+			//	ttt = 1;
+			//	dd->export2Dot(tdd.e, "tdd", false);
+			//	dd->export2Dot(temp_tdd.e, "temp_tdd", false);
+			//}
+			tdd = dd->cont(tdd, temp_tdd);
 			int node_num_max = dd->size(tdd.e);
 			if (node_num_max > nodes[0]) {
 				nodes[0] = node_num_max;
