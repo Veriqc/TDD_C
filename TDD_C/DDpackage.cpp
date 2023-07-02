@@ -19,6 +19,7 @@ namespace dd_package {
     const complex_value complex_zero = {0, 0};
     const long double sqrt_2 = 1.0L / std::sqrt(2.0L);
     int cache_num = 2000;
+    bool to_test = false;
 
     // NOT operations
     const DD_matrix Nm = {{complex_zero, complex_one},
@@ -831,7 +832,7 @@ namespace dd_package {
 
     inline unsigned long CThash2(DDnodePtr a, const complex_value aw, DDnodePtr b, const complex_value bw) {
         const uintptr_t node_pointer = ((uintptr_t)a+(uintptr_t)b)>>3u;
-        const uintptr_t weights = (uintptr_t)(aw.r*1000)+(uintptr_t)(aw.i*2000)+(uintptr_t)(bw.r*3000)+(uintptr_t)(bw.i*4000);
+        const uintptr_t weights = (uintptr_t)(aw.r*1000)+(uintptr_t)(aw.i*2000)+(uintptr_t)(bw.r*1000)+(uintptr_t)(bw.i*2000);
         return (node_pointer+weights) & CTMASK;
     }
 
@@ -853,26 +854,117 @@ namespace dd_package {
 
         const unsigned long i = CThash2(a.p, aw, b.p, bw);
 
+        //if (CTable1[i].a == a.p && CTable1[i].b == b.p) {
+        //    
+        //    if ((CTable1[i].aw.r * bw.r - CTable1[i].aw.i * bw.i) - (CTable1[i].bw.r * aw.r - CTable1[i].bw.i * aw.i)> COMPLEX_TOLERANCE) {
+        //        return r;
+        //    }
+        //    else if ((CTable1[i].aw.r * bw.i + CTable1[i].aw.i * bw.r) - (CTable1[i].bw.r * aw.i + CTable1[i].bw.i * aw.r)> COMPLEX_TOLERANCE) {
+        //        return r;
+        //    }
+        //    else {
+        //        float factor = (aw.r+aw.i)/(CTable1[i].aw.r+ CTable1[i].aw.i);
 
-        if (CTable1[i].a != a.p || !Ceq(CTable1[i].aw, aw)) return (r);
-        if (CTable1[i].b != b.p || !Ceq(CTable1[i].bw, bw)) return (r);
+        //        CThit[ad]++;
+        //        r.p = CTable1[i].r;
 
-         CThit[ad]++;
-         r.p = CTable1[i].r;
+        //        complex c;
+        //        c.r = ComplexCache_Avail;
+        //        c.i = ComplexCache_Avail->next;
+        //        c.r->val = CTable1[i].rw.r*factor;
+        //        c.i->val = CTable1[i].rw.i*factor;
 
-        complex c;
-        c.r = ComplexCache_Avail;
-        c.i = ComplexCache_Avail->next;
-        c.r->val = CTable1[i].rw.r;
-        c.i->val = CTable1[i].rw.i;
+        //        if (Ceq(c, COMPLEX_ZERO)) {
+        //            return DDzero;
+        //             }
+        //        else {
+        //            ComplexCache_Avail = c.i->next;
+        //            //cache_num -= 2;
+        //             r.w = c;
+        //         }
+        //        return r;
+        //    }
+        //}
 
-        if (Ceq(c, COMPLEX_ZERO)) {
-            return DDzero;
-        } else {
-            ComplexCache_Avail = c.i->next;
-            //cache_num -= 2;
-             r.w = c;
-         }
+        //if (CTable1[i].a == b.p && CTable1[i].b == a.p) {
+
+        //    if ( (CTable1[i].aw.r * aw.r - CTable1[i].aw.i * aw.i)- (CTable1[i].bw.r * bw.r - CTable1[i].bw.i * bw.i)> COMPLEX_TOLERANCE) {
+        //        return r;
+        //    }
+        //    else if ((CTable1[i].aw.r * aw.i + CTable1[i].aw.i * aw.r) - (CTable1[i].bw.r * bw.i + CTable1[i].bw.i * bw.r)> COMPLEX_TOLERANCE) {
+        //        return r;
+        //    }
+        //    else {
+        //        float factor = (aw.r + aw.i) / (CTable1[i].bw.r + CTable1[i].bw.i);
+
+        //        CThit[ad]++;
+        //        r.p = CTable1[i].r;
+
+        //        complex c;
+        //        c.r = ComplexCache_Avail;
+        //        c.i = ComplexCache_Avail->next;
+        //        c.r->val = CTable1[i].rw.r * factor;
+        //        c.i->val = CTable1[i].rw.i * factor;
+
+        //        if (Ceq(c, COMPLEX_ZERO)) {
+        //            return DDzero;
+        //        }
+        //        else {
+        //            ComplexCache_Avail = c.i->next;
+        //            //cache_num -= 2;
+        //            r.w = c;
+        //        }
+        //        return r;
+        //    }
+        //}
+
+
+        if (CTable1[i].a == a.p && Ceq(CTable1[i].aw, aw) && CTable1[i].b == b.p && Ceq(CTable1[i].bw, bw)) {
+
+            CThit[ad]++;
+            r.p = CTable1[i].r;
+
+            complex c;
+            c.r = ComplexCache_Avail;
+            c.i = ComplexCache_Avail->next;
+            c.r->val = CTable1[i].rw.r;
+            c.i->val = CTable1[i].rw.i;
+
+            if (Ceq(c, COMPLEX_ZERO)) {
+                return DDzero;
+            }
+            else {
+                ComplexCache_Avail = c.i->next;
+                //cache_num -= 2;
+                r.w = c;
+            }
+
+            return r;
+        
+        }
+
+        //if (CTable1[i].a == b.p && Ceq(CTable1[i].aw, bw) && CTable1[i].b == a.p && Ceq(CTable1[i].bw, aw)) {
+        //    CThit[ad]++;
+        //    r.p = CTable1[i].r;
+
+        //    complex c;
+        //    c.r = ComplexCache_Avail;
+        //    c.i = ComplexCache_Avail->next;
+        //    c.r->val = CTable1[i].rw.r;
+        //    c.i->val = CTable1[i].rw.i;
+
+        //    if (Ceq(c, COMPLEX_ZERO)) {
+        //        return DDzero;
+        //    }
+        //    else {
+        //        ComplexCache_Avail = c.i->next;
+        //        //cache_num -= 2;
+        //        r.w = c;
+        //    }
+
+        //    return r;
+
+        //}
 
         return r;
         
@@ -1142,7 +1234,10 @@ namespace dd_package {
     // adds two matrices represented by DD
     // the two DD should have the same variable set and ordering
     DDedge T_add2(DDedge x, DDedge y) {
-        //std::cout << "add  " << x.p->v << "," << y.p->v <<" "<<x.w <<" "<<y.w << std::endl;
+        
+        if (to_test) {
+            std::cout << "add  " << x.p->v << "," << y.p->v << " " << x.w << " " << y.w << " " << x.p << " " << y.p << std::endl;
+        }
         if (x.p == nullptr) {
             return y;  // handles partial matrices i.e.
         }
@@ -1195,9 +1290,38 @@ namespace dd_package {
 
             return r;
         }
+        //uintptr_t
+
+        if (x.p > y.p) {
+        
+            return T_add2(y, x);
+        }
+
+        const complex xweight=x.w;
+        const complex yweight = y.w;
+        complex temp;
+        if (xweight != COMPLEX_ONE) {
+            x.w = COMPLEX_ONE;
+            temp.r = ComplexCache_Avail;
+            temp.i = temp.r->next;
+            Cdiv(temp, y.w, xweight);
+            y.w = temp;
+            ComplexCache_Avail = temp.i->next;
+        }
+
+
 
         DDedge r = CTlookup(x, y);
         if (r.p != nullptr) {
+            if (xweight != COMPLEX_ONE) {
+                x.w = xweight;
+                y.w = yweight;
+                temp.i->next = ComplexCache_Avail;
+                ComplexCache_Avail = temp.r;
+            }
+            if (r.w != COMPLEX_ZERO) {
+                Cmul(r.w, r.w, xweight);
+            }
             return (r);
         }
 
@@ -1271,7 +1395,15 @@ namespace dd_package {
         r = DDmakeNonterminal(w, e, true);
 
         CTinsert(x, y, r);
-
+        if (xweight != COMPLEX_ONE) {
+            x.w = xweight;
+            y.w = yweight;
+            temp.i->next = ComplexCache_Avail;
+            ComplexCache_Avail = temp.r;
+        }
+        if (r.w != COMPLEX_ZERO) {
+            Cmul(r.w, r.w, xweight);
+        }
         return r;
     }
 
@@ -1290,7 +1422,9 @@ namespace dd_package {
 
     DDedge cont2(DDedge x, DDedge y, std::vector<float>* key_2_new_key1, std::vector<float>* key_2_new_key2, int var_num) {
         
-        //std::cout <<"cont" << x.p->v << "," << y.p->v << std::endl;
+        if (to_test) {
+            std::cout << "cont" << x.p->v << "," << y.p->v << std::endl;
+        }
 
         if (x.p == nullptr)
             return x;
@@ -1549,18 +1683,20 @@ namespace dd_package {
         int new_key = 0;
         int m1 = tdd1.key_2_index.size();
         int m2 = tdd2.key_2_index.size();
+        if (to_test) {
+            std::cout << "TDD1: ";
+            for (const auto& element : tdd1.key_2_index) {
+                std::cout << element << " ";
+            }
+            std::cout << std::endl;
 
-        //std::cout << "TDD1: ";
-        //for (const auto& element : tdd1.key_2_index) {
-        //    std::cout << element << " ";
-        //}
-        //std::cout << std::endl;
+            std::cout << "TDD2: ";
+            for (const auto& element : tdd2.key_2_index) {
+                std::cout << element << " ";
+            }
+            std::cout << std::endl;
+        }
 
-        //std::cout << "TDD2: ";
-        //for (const auto& element : tdd2.key_2_index) {
-        //    std::cout << element << " ";
-        //}
-        //std::cout << std::endl;
 
         //std::cout << m1 << "  " << m2<<std::endl;
 
@@ -1617,20 +1753,6 @@ namespace dd_package {
         TDD res;
         res.index_set = var_out;
         res.key_2_index = new_key_2_index;
-
-        //std::cout << "1563" << std::endl;
-
-        //std::cout << "Vector elements: ";
-        //for (const auto& element : key_2_new_key1) {
-        //    std::cout << element << " ";
-        //}
-        //std::cout << std::endl;
-
-        //std::cout << "Vector elements: ";
-        //for (const auto& element : key_2_new_key2) {
-        //    std::cout << element << " ";
-        //}
-        //std::cout << std::endl;
 
         //std::cout << cache_num << std::endl;
         res.e = cont2(tdd1.e, tdd2.e, &key_2_new_key1, &key_2_new_key2, var_cont.size());
