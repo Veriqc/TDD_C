@@ -832,7 +832,7 @@ namespace dd_package {
 
     inline unsigned long CThash2(DDnodePtr a, const complex_value aw, DDnodePtr b, const complex_value bw) {
         const uintptr_t node_pointer = ((uintptr_t)a+(uintptr_t)b)>>3u;
-        const uintptr_t weights = (uintptr_t)(aw.r*1000)+(uintptr_t)(aw.i*2000)+(uintptr_t)(bw.r*1000)+(uintptr_t)(bw.i*2000);
+        const uintptr_t weights = (uintptr_t)(aw.r*1000)+(uintptr_t)(aw.i*2000)+(uintptr_t)(bw.r*3000)+(uintptr_t)(bw.i*4000);
         return (node_pointer+weights) & CTMASK;
     }
 
