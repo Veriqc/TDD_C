@@ -37,7 +37,7 @@ namespace dd_package {
     const DD_matrix Im= { {complex_one, complex_zero }, { complex_zero, complex_one} };
 
 
-    const DD_matrix Ym = { {complex_zero, { 0, 1 } }, {{ 0, -1 }, complex_zero } };
+    const DD_matrix Ym = { {complex_zero, { 0, -1 } }, {{ 0, 1 }, complex_zero } };
 
     const DD_matrix Sdgm = { {complex_one, complex_zero }, {complex_zero, { 0, -1 } } };
     const DD_matrix Tm = { {complex_one, complex_zero }, {complex_zero, { sqrt_2, sqrt_2} } };
@@ -487,7 +487,7 @@ namespace dd_package {
             } else {
                 
                 sq=CmagSquared(e.p->e[i].w);
-                if (sq > sqmax) {
+                if (sq > sqmax+ COMPLEX_TOLERANCE) {
                     max = i;
                     sqmax = sq;
                 }
@@ -791,7 +791,8 @@ namespace dd_package {
     // counting number of unique nodes in a QMDD
     unsigned int DDnodeCount(const DDedge e, std::unordered_set<DDnodePtr>& visited) {
         visited.insert(e.p);
-
+        //bool a = (e.p == DDterminalNode);
+        //std::cout << e.w<<" "<<a<< std::endl;
         unsigned int sum = 1;
         if (!DDterminal(e)) {
             for (const auto & edge : e.p->e) {
@@ -852,71 +853,9 @@ namespace dd_package {
         bw.r = b.w.r->val;
         bw.i = b.w.i->val;
 
+        //std::cout << aw << "   " << bw << std::endl;
+
         const unsigned long i = CThash2(a.p, aw, b.p, bw);
-
-        //if (CTable1[i].a == a.p && CTable1[i].b == b.p) {
-        //    
-        //    if ((CTable1[i].aw.r * bw.r - CTable1[i].aw.i * bw.i) - (CTable1[i].bw.r * aw.r - CTable1[i].bw.i * aw.i)> COMPLEX_TOLERANCE) {
-        //        return r;
-        //    }
-        //    else if ((CTable1[i].aw.r * bw.i + CTable1[i].aw.i * bw.r) - (CTable1[i].bw.r * aw.i + CTable1[i].bw.i * aw.r)> COMPLEX_TOLERANCE) {
-        //        return r;
-        //    }
-        //    else {
-        //        float factor = (aw.r+aw.i)/(CTable1[i].aw.r+ CTable1[i].aw.i);
-
-        //        CThit[ad]++;
-        //        r.p = CTable1[i].r;
-
-        //        complex c;
-        //        c.r = ComplexCache_Avail;
-        //        c.i = ComplexCache_Avail->next;
-        //        c.r->val = CTable1[i].rw.r*factor;
-        //        c.i->val = CTable1[i].rw.i*factor;
-
-        //        if (Ceq(c, COMPLEX_ZERO)) {
-        //            return DDzero;
-        //             }
-        //        else {
-        //            ComplexCache_Avail = c.i->next;
-        //            //cache_num -= 2;
-        //             r.w = c;
-        //         }
-        //        return r;
-        //    }
-        //}
-
-        //if (CTable1[i].a == b.p && CTable1[i].b == a.p) {
-
-        //    if ( (CTable1[i].aw.r * aw.r - CTable1[i].aw.i * aw.i)- (CTable1[i].bw.r * bw.r - CTable1[i].bw.i * bw.i)> COMPLEX_TOLERANCE) {
-        //        return r;
-        //    }
-        //    else if ((CTable1[i].aw.r * aw.i + CTable1[i].aw.i * aw.r) - (CTable1[i].bw.r * bw.i + CTable1[i].bw.i * bw.r)> COMPLEX_TOLERANCE) {
-        //        return r;
-        //    }
-        //    else {
-        //        float factor = (aw.r + aw.i) / (CTable1[i].bw.r + CTable1[i].bw.i);
-
-        //        CThit[ad]++;
-        //        r.p = CTable1[i].r;
-
-        //        complex c;
-        //        c.r = ComplexCache_Avail;
-        //        c.i = ComplexCache_Avail->next;
-        //        c.r->val = CTable1[i].rw.r * factor;
-        //        c.i->val = CTable1[i].rw.i * factor;
-
-        //        if (Ceq(c, COMPLEX_ZERO)) {
-        //            return DDzero;
-        //        }
-        //        else {
-        //            ComplexCache_Avail = c.i->next;
-        //            //cache_num -= 2;
-        //            r.w = c;
-        //        }
-        //        return r;
-        //    }
-        //}
 
 
         if (CTable1[i].a == a.p && Ceq(CTable1[i].aw, aw) && CTable1[i].b == b.p && Ceq(CTable1[i].bw, bw)) {
@@ -994,7 +933,7 @@ namespace dd_package {
     }
 
 
-    DDedge CTlookup2(DDedge a, DDedge b, std::vector<float>* key_2_new_key1, std::vector<float>* key_2_new_key2)
+    DDedge CTlookup2(DDedge a, DDedge b, std::vector<float>* key_2_new_key1, std::vector<float>* key_2_new_key2,int cont_num)
     {
         DDedge r;
         r.p = nullptr;
@@ -1028,13 +967,20 @@ namespace dd_package {
                 //cache_num -= 2;
                 r.w = c;
             }
-
+            if (CTable2[i].cont_num != cont_num) {
+                    complex temp;
+                    temp.r = ComplexCache_Avail;
+                    temp.i = temp.r->next;
+                    temp.r->val = pow(2, cont_num- CTable2[i].cont_num);
+                    temp.i->val = 0;
+                    Cmul(r.w, r.w, temp);
+            }
             return r;
         }
         return r;
     }
 
-    void CTinsert2(DDedge a, DDedge b, DDedge r, std::vector<float>* key_2_new_key1, std::vector<float>* key_2_new_key2)
+    void CTinsert2(DDedge a, DDedge b, DDedge r, std::vector<float>* key_2_new_key1, std::vector<float>* key_2_new_key2, int cont_num)
     {
         
         const unsigned long i = CThash(a, b);
@@ -1046,6 +992,7 @@ namespace dd_package {
         CTable2[i].r = r.p;
         CTable2[i].rw.r = r.w.r->val;
         CTable2[i].rw.i = r.w.i->val;
+        CTable2[i].cont_num = cont_num;
     }
 
 
@@ -1122,11 +1069,16 @@ namespace dd_package {
     // node is not recreated if it already exists
     DDedge DDmakeNonterminal(short v, DDedge edge[MAXNEDGE], bool cached) {
 
-        //std::cout <<"509  " << e.p->v << "   " << e.p->e[0].p->v << std::endl;
+      // std::cout <<"509  " << edge[0].w <<"    "<<edge[0].p->v << "   " << edge[1].w << "    " << edge[0].p->v << std::endl;
 
         if (edge[0].p == edge[1].p && Ceq(edge[0].w, edge[1].w)) {
 
             //std::cout << "513  " << e.p->v << e.p->e[0].p->v << std::endl;
+
+            //if (Ceq(edge[0].w, COMPLEX_ZERO)&& edge[0].p!= DDterminalNode) {
+            //    std::cout << "aaaa" << std::endl;
+            //}
+
 
             if (cached) {
                 if (edge[1].w != COMPLEX_ZERO) {
@@ -1158,6 +1110,7 @@ namespace dd_package {
         memcpy(e.p->e, edge, Nedge * sizeof(DDedge));
         e = DDnormalize(e, cached); // normalize it
         e = DDutLookup(e);  // look it up in the unique tables
+        //std::cout << "1113  " << e.w << "    " << e.p->v << std::endl;
         return e;          // return result
     }
 
@@ -1235,9 +1188,9 @@ namespace dd_package {
     // the two DD should have the same variable set and ordering
     DDedge T_add2(DDedge x, DDedge y) {
         
-        if (to_test) {
-            std::cout << "add  " << x.p->v << "," << y.p->v << " " << x.w << " " << y.w << " " << x.p << " " << y.p << std::endl;
-        }
+        //if (to_test) {
+        //    std::cout << "add  " << x.p->v << "," << y.p->v << " " << x.w << " " << y.w << " " << x.p << " " << y.p << std::endl;
+        //}
         if (x.p == nullptr) {
             return y;  // handles partial matrices i.e.
         }
@@ -1297,7 +1250,7 @@ namespace dd_package {
             return T_add2(y, x);
         }
 
-        const complex xweight=x.w;
+        const complex xweight = x.w;
         const complex yweight = y.w;
         complex temp;
         if (xweight != COMPLEX_ONE) {
@@ -1322,7 +1275,7 @@ namespace dd_package {
             if (r.w != COMPLEX_ZERO) {
                 Cmul(r.w, r.w, xweight);
             }
-            return (r);
+            return r;
         }
 
         int w;
@@ -1404,6 +1357,7 @@ namespace dd_package {
         if (r.w != COMPLEX_ZERO) {
             Cmul(r.w, r.w, xweight);
         }
+
         return r;
     }
 
@@ -1423,7 +1377,7 @@ namespace dd_package {
     DDedge cont2(DDedge x, DDedge y, std::vector<float>* key_2_new_key1, std::vector<float>* key_2_new_key2, int var_num) {
         
         if (to_test) {
-            std::cout << "cont" << x.p->v << "," << y.p->v << std::endl;
+            std::cout << "cont " << x.p->v << " " << y.p->v <<"  :" << x.w  << " " << y.w << " , " << x.p->v << " " << y.p->v << std::endl;
         }
 
         if (x.p == nullptr)
@@ -1438,6 +1392,7 @@ namespace dd_package {
 
         if (x.p->v==-1 && y.p->v==-1)
         {
+            
             complex result;
             result.r = ComplexCache_Avail;
             result.i = result.r->next;
@@ -1452,11 +1407,15 @@ namespace dd_package {
                 temp.i->val = 0;
                 Cmul(result, result, temp);
             }
+            if (to_test) {
+                std::cout << "Case 1: " << result << std::endl;
+            }
             return DDmakeTerminal(result);
         }
 
 
         if (x.p->v == -1 && var_num == 0 && int(key_2_new_key2->at(y.p->v + 1)) == y.p->v) {
+            
             complex result;
             result.r = ComplexCache_Avail;
             result.i = result.r->next;
@@ -1464,6 +1423,9 @@ namespace dd_package {
             //cache_num -= 2;
             Cmul(result, x.w, y.w);
             DDedge res = { y.p ,result};
+            if (to_test) {
+                std::cout << "Case 2: " << res.w << " " << res.p->v << std::endl;
+            }
             return res;
         }
 
@@ -1475,6 +1437,9 @@ namespace dd_package {
             //cache_num -= 2;
             Cmul(result, x.w, y.w);
             DDedge res = { x.p ,result };
+            if (to_test) {
+                std::cout << "Case 3: " << res.w << " " << res.p->v << std::endl;
+            }
             return res;
         }
 
@@ -1491,13 +1456,17 @@ namespace dd_package {
         std::vector<float> key_2_new_key2_t(key_2_new_key2->begin(), key_2_new_key2->begin() + k2 + 1);
 
 
-        DDedge r = CTlookup2(x, y, &key_2_new_key1_t, &key_2_new_key2_t);
+        //DDedge r;
+        DDedge r = CTlookup2(x, y, &key_2_new_key1_t, &key_2_new_key2_t, var_num);
         if (r.p != nullptr) {
             x.w = xweight;
             y.w = yweight;
             if (r.w != COMPLEX_ZERO) {
                 Cmul(r.w, r.w, xweight);
                 Cmul(r.w, r.w, yweight);
+            }
+            if (to_test) {
+                std::cout << "Case 4: " << r.w << " " << r.p->v << std::endl;
             }
             return r;
         }
@@ -1539,6 +1508,9 @@ namespace dd_package {
                     e2 = y;
                     e[k] = cont2(e1, e2, &key_2_new_key1_t, key_2_new_key2, var_num);
                 }
+                if (to_test) {
+                    std::cout << "1499 " << short(newk1) << " " << e[0].w << " " << e[1].w << " " << e[0].p->v << " " << e[1].p->v << std::endl;
+                }
                 r = DDmakeNonterminal(short(newk1), e, true);
             }
         }
@@ -1574,7 +1546,13 @@ namespace dd_package {
                     e2 = y.p->e[k];
                     e[k] = cont2(e1, e2, key_2_new_key1, &key_2_new_key2_t, var_num);
                 }
+                if (to_test) {
+                    std::cout << "1535 " << short(newk2) << " " << e[0].w << " " << e[1].w << " " << e[0].p->v << " " << e[1].p->v << std::endl;
+                }
                 r = DDmakeNonterminal(short(newk2), e, true);
+                if (to_test) {
+                    std::cout << "1537 " << " " << r.w << " " << r.p->v << std::endl;
+                }
             }
 
         }
@@ -1609,11 +1587,18 @@ namespace dd_package {
                     e2 = y.p->e[k];
                     e[k] = cont2(e1, e2, &key_2_new_key1_t, &key_2_new_key2_t, var_num);
                 }
+                if (to_test) {
+                    std::cout << "1471 " << short(newk1) << " " << e[0].w << " " << e[1].w << " " << e[0].p->v << " " << e[1].p->v << std::endl;
+                }
                 r = DDmakeNonterminal(short(newk1), e, true);
             }
         }
 
-        CTinsert2(x, y, r, &key_2_new_key1_t, &key_2_new_key2_t);
+        //if (to_test) {
+        //    std::cout << "1574 " << x.w << "  " << x.p->v << "," << y.w << " " << y.p->v << " " << r.w << " " << r.p->v << std::endl;
+        //}
+
+        CTinsert2(x, y, r, &key_2_new_key1_t, &key_2_new_key2_t, var_num);
         x.w = xweight;
         y.w = yweight;
 
@@ -1621,6 +1606,9 @@ namespace dd_package {
             Cmul(r.w, r.w, xweight);
             Cmul(r.w, r.w, yweight);
 
+        }
+        if (to_test) {
+            std::cout << "Case 5: " << r.w << " " << r.p->v << std::endl;
         }
         return r;
     }
@@ -1635,9 +1623,12 @@ namespace dd_package {
 
         int k;
         int k1;
-
+        //std::cout <<"aaaaaaaaaaaaaaa" << std::endl;
         for (k = 0; k < tdd1.index_set.size(); ++k) {
             bool flag = true;
+
+            //std::cout << tdd1.index_set[k].idx << " " << tdd1.index_set[k].key << std::endl;
+
             for (k1 = 0; k1 < tdd2.index_set.size(); ++k1) {
                 if (tdd2.index_set[k1].idx == tdd1.index_set[k].idx && tdd2.index_set[k1].key == tdd1.index_set[k].key) {
                     var_cont_temp.push_back(tdd1.index_set[k].key);
@@ -1651,8 +1642,10 @@ namespace dd_package {
                 var_out_key.push_back(tdd1.index_set[k].key);
             }
         }
+        //std::cout << "bbbbbbbbbbbbbbbbbb" << std::endl;
         for (k = 0; k < tdd2.index_set.size(); ++k) {
             bool flag = true;
+            //std::cout << tdd2.index_set[k].idx << " " << tdd2.index_set[k].key << std::endl;
             for (k1 = 0; k1 < tdd1.index_set.size(); ++k1) {
                 if (tdd1.index_set[k1].idx == tdd2.index_set[k].idx && tdd1.index_set[k1].key == tdd2.index_set[k].key) {
                     flag = false;
@@ -1664,16 +1657,15 @@ namespace dd_package {
                 var_out_key.push_back(tdd2.index_set[k].key);
             }
         }
-
+        //std::cout << "ccccccc" << std::endl;
         for (k = 0; k < var_cont_temp.size(); ++k) {
             if (find(var_out_key.begin(), var_out_key.end(), var_cont_temp[k]) == var_out_key.end()) {
                 if (find(var_cont.begin(), var_cont.end(), var_cont_temp[k]) == var_cont.end()) {
                     var_cont.push_back(var_cont_temp[k]);
-
+                    //std::cout << var_cont_temp[k] << std::endl;
                 }
             }
         }
-
 
         std::vector<float> key_2_new_key1 = { -1 };
         std::vector<float> key_2_new_key2 = { -1 };
@@ -1683,21 +1675,8 @@ namespace dd_package {
         int new_key = 0;
         int m1 = tdd1.key_2_index.size();
         int m2 = tdd2.key_2_index.size();
-        if (to_test) {
-            std::cout << "TDD1: ";
-            for (const auto& element : tdd1.key_2_index) {
-                std::cout << element << " ";
-            }
-            std::cout << std::endl;
-
-            std::cout << "TDD2: ";
-            for (const auto& element : tdd2.key_2_index) {
-                std::cout << element << " ";
-            }
-            std::cout << std::endl;
-        }
-
-
+        int repeat_time = 1;
+        float last_cont_idx = 0;
         //std::cout << m1 << "  " << m2<<std::endl;
 
         while (k1 < m1 || k2 < m2) {
@@ -1734,11 +1713,23 @@ namespace dd_package {
                 k2++;
             }
             else if (find(var_out_key.begin(), var_out_key.end(), tdd1.key_2_index[k1]) == var_out_key.end()) {
+                if (new_key - last_cont_idx <= 0.5) {
+                    last_cont_idx = last_cont_idx+pow(10,-repeat_time);
+                    repeat_time += 1;
+                    key_2_new_key1.push_back(last_cont_idx);
+                    key_2_new_key2.push_back(last_cont_idx);
+                    k1++;
+                    k2++;
+                }
+                else {
+                    key_2_new_key1.push_back(new_key - 0.5);
+                    key_2_new_key2.push_back(new_key - 0.5);
+                    last_cont_idx = new_key - 0.5;
+                    repeat_time = 1;
+                    k1++;
+                    k2++;
+                }
 
-                key_2_new_key1.push_back(new_key - 0.5);
-                key_2_new_key2.push_back(new_key - 0.5);
-                k1++;
-                k2++;
             }
             else {
                 key_2_new_key1.push_back(new_key);
@@ -1754,8 +1745,49 @@ namespace dd_package {
         res.index_set = var_out;
         res.key_2_index = new_key_2_index;
 
+        if (to_test) {
+            std::cout << "TDD1: ";
+            for (const auto& element : tdd1.key_2_index) {
+                std::cout << element << " ";
+            }
+            std::cout << std::endl;
+
+            std::cout << "TDD2: ";
+            for (const auto& element : tdd2.key_2_index) {
+                std::cout << element << " ";
+            }
+            std::cout << std::endl;
+        }
+
+
+        if (to_test) {
+            std::cout << "key_2_new_key11: ";
+            for (const auto& element : key_2_new_key1) {
+                std::cout << element << " ";
+            }
+            std::cout << std::endl;
+
+            std::cout << "key_2_new_key12: ";
+            for (const auto& element : key_2_new_key2) {
+                std::cout << element << " ";
+            }
+            std::cout << std::endl;
+        }
+
+
+
         //std::cout << cache_num << std::endl;
         res.e = cont2(tdd1.e, tdd2.e, &key_2_new_key1, &key_2_new_key2, var_cont.size());
+
+
+        if (to_test) {
+            std::cout << "TDD: ";
+            for (const auto& element : res.key_2_index) {
+                std::cout << element << " ";
+            }
+            std::cout << std::endl;
+
+        }
 
         var_out.clear();
         var_cont_temp.clear();

@@ -96,6 +96,7 @@ namespace dd_package {
         std::vector<float> key_2_new_key1;
         std::vector<float> key_2_new_key2;
         complex_value rw;
+        int cont_num;
     };
 
 
@@ -213,8 +214,8 @@ namespace dd_package {
 
     DDedge CTlookup(DDedge, DDedge);
     void CTinsert(DDedge, DDedge, DDedge);
-    DDedge CTlookup2(DDedge, DDedge, std::vector<float>* key_2_new_key1, std::vector<float>* key_2_new_key2);
-    void CTinsert2(DDedge, DDedge, DDedge, std::vector<float>* key_2_new_key1, std::vector<float>* key_2_new_key2);
+    DDedge CTlookup2(DDedge, DDedge, std::vector<float>* key_2_new_key1, std::vector<float>* key_2_new_key2, int cont_num);
+    void CTinsert2(DDedge, DDedge, DDedge, std::vector<float>* key_2_new_key1, std::vector<float>* key_2_new_key2, int cont_num);
 
 
     //TDD的运算
