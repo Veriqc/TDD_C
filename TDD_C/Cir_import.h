@@ -37,9 +37,10 @@ int gates_num = 0;
 clock_t   start, finish;
 void print_index_set(std::vector<dd::Index> index_set) {
 	for (int k = 0; k < index_set.size(); k++) {
-		std::cout << index_set[k].key << "   " << index_set[k].idx << std::endl;
+		std::cout << "(" << index_set[k].key << ", " << index_set[k].idx << ") ,";
 
 	}
+	std::cout<<std::endl;
 }
 //是为了从qasm文件的行条目中提取出门的name和qubit
 vector<std::string> split(const std::string& s, const std::string& seperator) {
@@ -246,6 +247,7 @@ std::map<int, std::vector<dd::Index>> get_index(std::map<int, gate> gate_set, st
 				Index_set[k] = { {targ_idx1,hyper_idx[targ_idx1]},{targ_idx2,hyper_idx[targ_idx2]} };
 			}
 		}
+		//std::cout << k << " ";
 		//print_index_set(Index_set[k]);
 	}
 	return Index_set;
@@ -342,6 +344,7 @@ std::map<int, map<int, std::vector<int>>>  cir_partition2(std::map<int, gate> ga
 	for (int k = 0; k < gates_num; k++)
 	{
 		std::string nam = gate_set[k].name;
+
 		if (cx_cut <= cx_cut_max) {
 
 			if (nam != "cx") {
@@ -360,7 +363,7 @@ std::map<int, map<int, std::vector<int>>>  cir_partition2(std::map<int, gate> ga
 					par[block][1].push_back(k);
 				}
 				else {
-					if (gate_set[k].qubits[1] >= qubits_num / 2) {
+					if (gate_set[k].qubits[1] > qubits_num / 2) {
 						par[block][1].push_back(k);
 					}
 					else {
@@ -408,7 +411,7 @@ std::map<int, map<int, std::vector<int>>>  cir_partition2(std::map<int, gate> ga
 						par[block][1].push_back(k);
 					}
 					else {
-						if (gate_set[k].qubits[1] >= qubits_num / 2) {
+						if (gate_set[k].qubits[1] > qubits_num / 2) {
 							par[block][1].push_back(k);
 						}
 						else {
@@ -420,11 +423,27 @@ std::map<int, map<int, std::vector<int>>>  cir_partition2(std::map<int, gate> ga
 				else {
 					par[block][2].push_back(k);
 					c_part_min = temp_c_min;
-					temp_c_max = temp_c_max;
+					c_part_max = temp_c_max;
 				}
 			}
 		}
 	}
+
+	//for (int k = 0; k < 1; k++) {
+	//for (int k1 = 0; k1 < par[k][0].size(); k1++) {
+	//	cout << par[k][0][k1] << "  ";
+	//}
+	//cout << endl;
+	//for (int k1 = 0; k1 < par[k][1].size(); k1++) {
+	//	cout << par[k][1][k1] << "  ";
+	//}
+	//cout << endl;
+	//for (int k1 = 0; k1 < par[k][2].size(); k1++) {
+	//	cout << par[k][2][k1] << "  ";
+	//}
+	//cout << endl;
+	//cout << "--------" << endl;
+    //}
 	return par;
 }
 
@@ -657,15 +676,17 @@ int* Simulate_with_partition2(std::string path, std::string  file_name) {
 
 	start = clock();
 	int node_num_max = 0;
-	for (int k = 0; k < par.size(); k++) {
 
+	std::cout << par.size() << std::endl;
+
+	for (int k = 0; k < par.size(); k++) {
+		//std::cout << k << std::endl;
 		dd::TDD temp_tdd1 = { dd::DDone ,{} };
 		for (int k1 = 0; k1 < par[k][0].size(); k1++) {
 			int gate_idx = par[k][0][k1];
 			string nam = gate_set[gate_idx].name;
 			temp_tdd1 = apply(temp_tdd1, nam, Index_set[gate_idx]);
 		}
-
 
 		dd::TDD temp_tdd2 = { dd::DDone ,{} };
 		for (int k1 = 0; k1 < par[k][1].size(); k1++) {
@@ -680,7 +701,6 @@ int* Simulate_with_partition2(std::string path, std::string  file_name) {
 			string nam = gate_set[gate_idx].name;
 			temp_tdd3 = apply(temp_tdd3, nam, Index_set[gate_idx]);
 		}
-
 
 		dd::TDD temp_tdd = dd::cont(temp_tdd1, temp_tdd2);
 		temp_tdd = dd::cont(temp_tdd, temp_tdd3);
@@ -828,7 +848,7 @@ int* Simulate_with_tdd(std::string path, std::string  file_name) {
 
 
 
-	//std::cout << tdd.e.w << std::endl;
+	std::cout << tdd.e.w << std::endl;
 	//std::cout << "TDD: ";
 	//for (const auto& element : tdd.key_2_index) {
 	//	std::cout << element << " ";
