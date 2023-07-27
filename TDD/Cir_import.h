@@ -1,4 +1,3 @@
-#pragma once
 
 #include "DDpackage.h"
 #include "DDcomplex.h"
@@ -220,8 +219,11 @@ std::map<int, std::vector<dd::Index>> get_index(std::map<int, gate> gate_set, st
 			targ_idx2 += to_string(tar_q);
 			targ_idx2 += to_string(0);
 			targ_idx2 += to_string(qubit_idx[tar_q]);
-			Index_set[k] = { {cont_idx,hyper_idx[cont_idx]},{cont_idx,hyper_idx[cont_idx] + 1},{cont_idx,hyper_idx[cont_idx] + 2},{targ_idx1,hyper_idx[targ_idx1]},{targ_idx2,hyper_idx[targ_idx2]} };
-			//std::cout << cont_idx<<" " << hyper_idx[cont_idx] << " " << cont_idx << " " << hyper_idx[cont_idx] + 1 << " " << cont_idx << " " << hyper_idx[cont_idx] + 2 << " " << targ_idx1 << " " << hyper_idx[targ_idx1] << " " << targ_idx2 << " " <<hyper_idx[targ_idx2] << " " << std::endl;
+			Index_set[k] = {{cont_idx,hyper_idx[cont_idx]},{cont_idx,static_cast<short>(hyper_idx[cont_idx] + 1)},
+			{cont_idx,static_cast<short>(hyper_idx[cont_idx] + 2)},{targ_idx1,hyper_idx[targ_idx1]},{targ_idx2,hyper_idx[targ_idx2]}};
+
+
+
 			hyper_idx[cont_idx] += 2;
 
 		}
@@ -239,7 +241,7 @@ std::map<int, std::vector<dd::Index>> get_index(std::map<int, gate> gate_set, st
 			targ_idx2 += to_string(qubit_idx[tar_q]);
 			Index_set[k] = { {targ_idx1,hyper_idx[targ_idx1]},{targ_idx2,hyper_idx[targ_idx2]} };
 			if (nam == "z" || nam == "s" || nam == "sdg" || nam == "t" || nam == "tdg" || (nam[0] == 'u' && nam[1] == '1') || (nam[0] == 'r' && nam[1] == 'z')) {
-				Index_set[k] = { {targ_idx1,hyper_idx[targ_idx1]},{targ_idx1,hyper_idx[targ_idx1] + 1} };
+				Index_set[k] = { {targ_idx1,hyper_idx[targ_idx1]},{targ_idx1,static_cast<short>(hyper_idx[targ_idx1] + 1)} };
 				qubit_idx[tar_q] -= 1;
 				hyper_idx[targ_idx1] += 1;
 			}
@@ -494,7 +496,7 @@ dd::TDD apply(dd::TDD tdd, std::string nam, std::vector<dd::Index> index_set) {
 			temp_tdd = dd::diag_matrix_2_TDD(dd::Tdgm, index_set);
 			break;
 		default:
-			if (nam[0] == 'r' and nam[1] == 'z') {
+			if (nam[0] == 'r' && nam[1] == 'z') {
 				regex pattern("rz\\((-?\\d.\\d+)\\)");
 				smatch result;
 				regex_match(nam, result, pattern);
@@ -503,7 +505,7 @@ dd::TDD apply(dd::TDD tdd, std::string nam, std::vector<dd::Index> index_set) {
 				temp_tdd = dd::diag_matrix_2_TDD(Rzmat, index_set);
 				break;
 			}
-			if (nam[0] == 'u' and nam[1] == '1') {
+			if (nam[0] == 'u' && nam[1] == '1') {
 				//regex pattern("u1\\((-?\\d.\\d+)\\)");
 				//smatch result;
 				//regex_match(nam, result, pattern);
@@ -519,7 +521,7 @@ dd::TDD apply(dd::TDD tdd, std::string nam, std::vector<dd::Index> index_set) {
 				temp_tdd = dd::diag_matrix_2_TDD(U1mat, index_set);
 				break;
 			}
-			if (nam[0] == 'u' and nam[1] == '3') {
+			if (nam[0] == 'u' && nam[1] == '3') {
 				//regex pattern("u3\\((-?\\d.\\d+), ?(-?\\d.\\d+), ?(-?\\d.\\d+)\\)");
 				//smatch result;
 				//regex_match(nam, result, pattern);

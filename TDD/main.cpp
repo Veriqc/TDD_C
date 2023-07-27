@@ -51,7 +51,7 @@ int main() {
 	//std::cout << "===================================" << std::endl;
 
 	//main2();
-    system("pause");
+    //system("pause");
 
 }
 

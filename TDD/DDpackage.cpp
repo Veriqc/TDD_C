@@ -12,6 +12,7 @@
 #include <fstream>
 #include <cstring>
 #include <cmath>
+#include <algorithm>
 
 namespace dd_package {
     constexpr unsigned int NODECOUNT_BUCKETS = 2000000;
@@ -1659,8 +1660,8 @@ namespace dd_package {
         }
         //std::cout << "ccccccc" << std::endl;
         for (k = 0; k < var_cont_temp.size(); ++k) {
-            if (find(var_out_key.begin(), var_out_key.end(), var_cont_temp[k]) == var_out_key.end()) {
-                if (find(var_cont.begin(), var_cont.end(), var_cont_temp[k]) == var_cont.end()) {
+            if (std::find(var_out_key.begin(), var_out_key.end(), var_cont_temp[k]) == var_out_key.end()) {
+                if (std::find(var_cont.begin(), var_cont.end(), var_cont_temp[k]) == var_cont.end()) {
                     var_cont.push_back(var_cont_temp[k]);
                     //std::cout << var_cont_temp[k] << std::endl;
                 }
@@ -1847,19 +1848,19 @@ namespace dd_package {
         }
 
 
-        if (e_low[0].p==e_low[1].p and e_low[0].w == e_low[1].w) {
+        if (e_low[0].p==e_low[1].p && e_low[0].w == e_low[1].w) {
             low.e = e_low[0];
         }
         else {
             low.e = DDmakeNonterminal(0, e_low, false);
         }
-        if (e_high[0].p == e_high[1].p and e_high[0].w == e_high[1].w) {
+        if (e_high[0].p == e_high[1].p && e_high[0].w == e_high[1].w) {
             high.e = e_high[0];
         }
         else {
             high.e = DDmakeNonterminal(0, e_high, false);
         }
-        if (low.e.p== high.e.p and low.e.w==high.e.w) {
+        if (low.e.p== high.e.p && low.e.w==high.e.w) {
             res.e = low.e;
         }
         else {
