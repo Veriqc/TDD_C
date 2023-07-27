@@ -40,7 +40,7 @@ void print_index_set(std::vector<dd::Index> index_set) {
 		std::cout << "(" << index_set[k].key << ", " << index_set[k].idx << ") ,";
 
 	}
-	std::cout<<std::endl;
+	std::cout << std::endl;
 }
 //是为了从qasm文件的行条目中提取出门的name和qubit
 vector<std::string> split(const std::string& s, const std::string& seperator) {
@@ -262,7 +262,7 @@ std::map<int, map<int, std::vector<int>>>  cir_partition1(std::map<int, gate> ga
 	{
 		std::string nam = gate_set[k].name;
 		if (nam != "cx") {
-			if (gate_set[k].qubits[0] < qubits_num / 2) {
+			if (gate_set[k].qubits[0] <= qubits_num / 2) {
 				par[block][0].push_back(k);
 			}
 			else {
@@ -270,15 +270,15 @@ std::map<int, map<int, std::vector<int>>>  cir_partition1(std::map<int, gate> ga
 			}
 		}
 		else {
-			if (gate_set[k].qubits[0] < qubits_num / 2 && gate_set[k].qubits[1] < qubits_num / 2) {
+			if (gate_set[k].qubits[0] <= qubits_num / 2 && gate_set[k].qubits[1] <= qubits_num / 2) {
 				par[block][0].push_back(k);
 			}
-			else if (gate_set[k].qubits[0] >= qubits_num / 2 && gate_set[k].qubits[1] >= qubits_num / 2) {
+			else if (gate_set[k].qubits[0] > qubits_num / 2 && gate_set[k].qubits[1] > qubits_num / 2) {
 				par[block][1].push_back(k);
 			}
 			else {
-				if (cx_cut < cx_cut_max) {
-					if (gate_set[k].qubits[1] >= qubits_num / 2) {
+				if (cx_cut <= cx_cut_max) {
+					if (gate_set[k].qubits[1] > qubits_num / 2) {
 						par[block][1].push_back(k);
 					}
 					else {
@@ -289,7 +289,7 @@ std::map<int, map<int, std::vector<int>>>  cir_partition1(std::map<int, gate> ga
 				else {
 					block += 1;
 					cx_cut = 1;
-					if (gate_set[k].qubits[1] >= qubits_num / 2) {
+					if (gate_set[k].qubits[1] > qubits_num / 2) {
 						par[block][1].push_back(k);
 					}
 					else {
@@ -443,7 +443,7 @@ std::map<int, map<int, std::vector<int>>>  cir_partition2(std::map<int, gate> ga
 	//}
 	//cout << endl;
 	//cout << "--------" << endl;
-    //}
+	//}
 	return par;
 }
 
@@ -513,7 +513,7 @@ dd::TDD apply(dd::TDD tdd, std::string nam, std::vector<dd::Index> index_set) {
 				smatch result;
 				regex_match(nam, result, para);
 				float theta = match_a_string(result[1]);
-				
+
 				dd::DD_matrix U1mat = { {{ 1, 0 }, { 0, 0 } }, {{ 0, 0 }, { cos(theta), sin(theta) } } };
 
 				temp_tdd = dd::diag_matrix_2_TDD(U1mat, index_set);
@@ -541,7 +541,7 @@ dd::TDD apply(dd::TDD tdd, std::string nam, std::vector<dd::Index> index_set) {
 		}
 	}
 
-	
+
 	tdd = dd::cont(tdd, temp_tdd);
 
 	return tdd;
@@ -561,7 +561,7 @@ std::map<std::string, int> get_var_order() {
 		idx_nam += to_string(k);
 		var[idx_nam] = order_num;
 		order_num -= 1;
-		for (int k2 = gates_num; k2 >=0; k2--) {
+		for (int k2 = gates_num; k2 >= 0; k2--) {
 			idx_nam = "x";
 			idx_nam += to_string(k);
 			idx_nam += to_string(0);
@@ -592,7 +592,7 @@ std::map<std::string, int> get_var_order() {
 int* Simulate_with_partition1(std::string path, std::string  file_name) {
 	dd::DDinit(false);
 	std::map<int, gate> gate_set = import_circuit(path + file_name);
-	
+
 	int cx_cut_max = qubits_num / 2 + 1;
 	std::map<int, map<int, std::vector<int>>>  par = cir_partition1(gate_set, cx_cut_max);
 
@@ -604,14 +604,14 @@ int* Simulate_with_partition1(std::string path, std::string  file_name) {
 
 	var = get_var_order();
 
-	std::map<int, std::vector<dd::Index>> Index_set = get_index(gate_set,var);
+	std::map<int, std::vector<dd::Index>> Index_set = get_index(gate_set, var);
 
 	dd::varOrder = var;
 
 	dd::TDD tdd = { dd::DDone ,{} };
 
 	start = clock();
-	int node_num_max=0;
+	int node_num_max = 0;
 	for (int k = 0; k < par.size(); k++) {
 		//std::cout << "block:" << k << std::endl;
 		dd::TDD temp_tdd1 = { dd::DDone ,{} };
@@ -630,15 +630,11 @@ int* Simulate_with_partition1(std::string path, std::string  file_name) {
 
 		dd::TDD temp_tdd = dd::cont(temp_tdd1, temp_tdd2);
 		tdd = dd::cont(tdd, temp_tdd);
-		// node_num_max= dd::DDsize(tdd.e);
+		node_num_max = dd::DDsize(tdd.e);
 		if (node_num_max > nodes[0]) {
 			nodes[0] = node_num_max;
 		}
-		finish = clock();
-		double time = (double)(finish - start) / CLOCKS_PER_SEC;
-		if (time > 1800) {
-			return nodes;
-		}
+
 	}
 
 	int node_num_final = dd::DDsize(tdd.e);
@@ -668,16 +664,16 @@ int* Simulate_with_partition2(std::string path, std::string  file_name) {
 
 	var = get_var_order();
 
-	std::map<int, std::vector<dd::Index>> Index_set = get_index(gate_set,var);
+	std::map<int, std::vector<dd::Index>> Index_set = get_index(gate_set, var);
 
 	dd::varOrder = var;
 
-	dd::TDD tdd = { dd::DDone ,{}};
+	dd::TDD tdd = { dd::DDone ,{} };
 
 	start = clock();
 	int node_num_max = 0;
 
-	std::cout << par.size() << std::endl;
+	//std::cout << par.size() << std::endl;
 
 	for (int k = 0; k < par.size(); k++) {
 		//std::cout << k << std::endl;
@@ -706,15 +702,11 @@ int* Simulate_with_partition2(std::string path, std::string  file_name) {
 		temp_tdd = dd::cont(temp_tdd, temp_tdd3);
 		tdd = dd::cont(tdd, temp_tdd);
 
-		//node_num_max = dd::DDsize(tdd.e);
+		node_num_max = dd::DDsize(tdd.e);
 		if (node_num_max > nodes[0]) {
 			nodes[0] = node_num_max;
 		}
-		finish = clock();
-		double time = (double)(finish - start) / CLOCKS_PER_SEC;
-		if (time > 1800) {
-			return nodes;
-		}
+
 	}
 
 	int node_num_final = dd::DDsize(tdd.e);
@@ -832,17 +824,12 @@ int* Simulate_with_tdd(std::string path, std::string  file_name) {
 	for (int k = 0; k < gate_set.size(); k++) {
 		{
 			tdd = apply(tdd, gate_set[k].name, Index_set[k]);
-			//std::cout << tdd.e.w << std::endl;
+
 			//node_num_max = dd::DDsize(tdd.e);
-			if (node_num_max > nodes[0]) {
-				nodes[0] = node_num_max;
-			}
-			//finish = clock();
-			//double time = (double)(finish - start) / CLOCKS_PER_SEC;
-			//if (time > 1800) {
-			//	return nodes;
+			//if (node_num_max > nodes[0]) {
+			//	nodes[0] = node_num_max;
 			//}
-			//std::cout << time << std::endl;
+
 		}
 	}
 
@@ -854,14 +841,14 @@ int* Simulate_with_tdd(std::string path, std::string  file_name) {
 	//	std::cout << element << " ";
 	//}
 	//std::cout << std::endl;
-		int node_num_final = dd::DDsize(tdd.e);
-		nodes[1] = node_num_final;
-		//nodes[2] = 0;
-		//dd::DDdotExportMatrix(tdd.e, "hh");
-		//dd::export2Dot(tdd.e, "tdd", false);
-		//dd::DDstatistics();
-		dd::DDgarbageCollect();
+	int node_num_final = dd::DDsize(tdd.e);
+	nodes[1] = node_num_final;
+	//nodes[2] = 0;
+	//dd::DDdotExportMatrix(tdd.e, "hh");
+	//dd::export2Dot(tdd.e, "tdd", false);
+	dd::DDstatistics();
+	dd::DDgarbageCollect();
 
-		std::cout << "Done!!!" << std::endl;
-		return nodes;
-	}
+	std::cout << "Done!!!" << std::endl;
+	return nodes;
+}
