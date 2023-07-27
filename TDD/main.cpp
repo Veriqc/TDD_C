@@ -12,7 +12,7 @@ int main() {
 
     std::string path = "Benchmarks/";
 
-	std::string file_name = "test3.qasm";
+	std::string file_name = "test.qasm";
     int* nodes;
     int n = get_qubits_num(path + file_name);
     clock_t   start_t, finish_t;
