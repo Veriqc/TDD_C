@@ -33,15 +33,6 @@ template <class Node> struct Edge {
   [[nodiscard]] bool isZeroTerminal() const;
   [[nodiscard]] bool isOneTerminal() const;
 
-  // Functions only related to density matrices
-  [[maybe_unused]] static void setDensityConjugateTrue(Edge& e);
-  [[maybe_unused]] static void setFirstEdgeDensityPathTrue(Edge& e);
-  static void setDensityMatrixTrue(Edge& e);
-  static void alignDensityEdge(Edge& e);
-  static void revertDmChangesToEdges(Edge& x, Edge& y);
-  static void revertDmChangesToEdge(Edge& x);
-  static void applyDmChangesToEdges(Edge& x, Edge& y);
-  static void applyDmChangesToEdge(Edge& x);
 };
 
 template <class Node>
