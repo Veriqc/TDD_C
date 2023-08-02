@@ -265,7 +265,7 @@ std::map<int, map<int, std::vector<int>>>  cir_partition1(std::map<int, gate> ga
 	{
 		std::string nam = gate_set[k].name;
 		if (nam != "cx") {
-			if (gate_set[k].qubits[0] < qubits_num / 2) {
+			if (gate_set[k].qubits[0] <= qubits_num / 2) {
 				par[block][0].push_back(k);
 			}
 			else {
