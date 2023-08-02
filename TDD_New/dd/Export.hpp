@@ -311,33 +311,7 @@ namespace dd {
 			<< "\"]\n";
 		return os;
 	}
-	[[maybe_unused]] static std::ostream&
-		modernNode(const vEdge& e, std::ostream& os, bool formatAsPolar = true) {
-		auto nodelabel = (reinterpret_cast<std::uintptr_t>(e.p) & 0x001fffffU) >>
-			1U; // this allows for 2^20 (roughly 1e6) unique nodes
-		os << nodelabel << "[label=<";
-		os << R"(<font point-size="8"><table border="1" cellspacing="0" cellpadding="0" style="rounded">)";
-		os << R"(<tr><td colspan="2" border="0" cellpadding="1"><font point-size="20">q<sub><font point-size="12">)"
-			<< static_cast<std::size_t>(e.p->v)
-			<< R"(</font></sub></font></td></tr><tr>)";
-		os << R"(<td height="6" width="14" port="0" tooltip=")"
-			<< conditionalFormat(e.p->e[0].w, formatAsPolar)
-			<< R"(" href="javascript:;" sides="RT">)"
-			<< (e.p->e[0].w.approximatelyZero()
-				? "&nbsp;0 "
-				: R"(<font color="white">&nbsp;0 </font>)")
-			<< "</td>";
-		os << R"(<td height="6" width="14" port="1" tooltip=")"
-			<< conditionalFormat(e.p->e[1].w, formatAsPolar)
-			<< R"(" href="javascript:;" sides="LT">)"
-			<< (e.p->e[1].w.approximatelyZero()
-				? "&nbsp;0 "
-				: R"(<font color="white">&nbsp;0 </font>)")
-			<< "</td>";
-		os << "</tr></table></font>>,tooltip=\"q" << static_cast<std::size_t>(e.p->v)
-			<< "\"]\n";
-		return os;
-	}
+
 	[[maybe_unused]] static std::ostream&
 		classicNode(const mEdge& e, std::ostream& os, bool formatAsPolar = true) {
 		auto nodelabel = (reinterpret_cast<std::uintptr_t>(e.p) & 0x001fffffU) >>
@@ -393,39 +367,7 @@ namespace dd {
 			<< static_cast<std::size_t>(e.p->v) << "\"]\n";
 		return os;
 	}
-	[[maybe_unused]] static std::ostream&
-		classicNode(const vEdge& e, std::ostream& os, bool formatAsPolar = true) {
-		auto nodelabel = (reinterpret_cast<std::uintptr_t>(e.p) & 0x001fffffU) >>
-			1U; // this allows for 2^20 (roughly 1e6) unique nodes
-		os << nodelabel << "[shape=circle, width=0.46, fixedsize=true, label=<";
-		os << R"(<font point-size="6"><table border="0" cellspacing="0" cellpadding="0">)";
-		os << R"(<tr><td colspan="2"><font point-size="18">q<sub><font point-size="10">)"
-			<< static_cast<std::size_t>(e.p->v)
-			<< R"(</font></sub></font></td></tr><tr>)";
-		os << R"(<td port="0" tooltip=")"
-			<< conditionalFormat(e.p->e[0].w, formatAsPolar)
-			<< R"(" href="javascript:;">)";
-		if (e.p->e[0].w.approximatelyZero()) {
-			os << R"(<font point-size="10">&nbsp;0 </font>)";
-		}
-		else {
-			os << R"(<font color="white">&nbsp;0 </font>)";
-		}
-		os << "</td>";
-		os << R"(<td port="1" tooltip=")"
-			<< conditionalFormat(e.p->e[1].w, formatAsPolar)
-			<< R"(" href="javascript:;">)";
-		if (e.p->e[1].w.approximatelyZero()) {
-			os << R"(<font point-size="10">&nbsp;0 </font>)";
-		}
-		else {
-			os << R"(<font color="white">&nbsp;0 </font>)";
-		}
-		os << "</td>";
-		os << "</tr></table></font>>,tooltip=\"q" << static_cast<std::size_t>(e.p->v)
-			<< "\"]\n";
-		return os;
-	}
+
 	template <class Edge>
 	static std::ostream& memoryNode(const Edge& e, std::ostream& os) {
 		constexpr std::size_t n = std::tuple_size_v<decltype(e.p->e)>;
@@ -509,37 +451,7 @@ namespace dd {
 
 		return os;
 	}
-	[[maybe_unused]] static std::ostream&
-		bwEdge(const vEdge& from, const vEdge& to, std::uint16_t idx, std::ostream& os,
-			bool edgeLabels = false, [[maybe_unused]] bool classic = false,
-			bool formatAsPolar = true) {
-		auto fromlabel =
-			(reinterpret_cast<std::uintptr_t>(from.p) & 0x001fffffU) >> 1U;
-		auto tolabel = (reinterpret_cast<std::uintptr_t>(to.p) & 0x001fffffU) >> 1U;
 
-		os << fromlabel << ":" << idx << ":";
-		os << (idx == 0 ? "sw" : "se") << "->";
-		if (to.isTerminal()) {
-			os << "t";
-		}
-		else {
-			os << tolabel;
-		}
-
-		auto mag = thicknessFromMagnitude(to.w);
-		os << "[penwidth=\"" << mag << "\",tooltip=\""
-			<< conditionalFormat(to.w, formatAsPolar) << "\"";
-		if (!to.w.approximatelyOne()) {
-			os << ",style=dashed";
-		}
-		if (edgeLabels) {
-			os << ",label=<<font point-size=\"8\">&nbsp;"
-				<< conditionalFormat(to.w, formatAsPolar) << "</font>>";
-		}
-		os << "]\n";
-
-		return os;
-	}
 	[[maybe_unused]] static std::ostream&
 		coloredEdge(const mEdge& from, const mEdge& to, std::uint16_t idx,
 			std::ostream& os, bool edgeLabels = false, bool classic = false,
@@ -592,36 +504,7 @@ namespace dd {
 
 		return os;
 	}
-	[[maybe_unused]] static std::ostream&
-		coloredEdge(const vEdge& from, const vEdge& to, std::uint16_t idx,
-			std::ostream& os, bool edgeLabels = false,
-			[[maybe_unused]] bool classic = false, bool formatAsPolar = true) {
-		auto fromlabel =
-			(reinterpret_cast<std::uintptr_t>(from.p) & 0x001fffffU) >> 1U;
-		auto tolabel = (reinterpret_cast<std::uintptr_t>(to.p) & 0x001fffffU) >> 1U;
 
-		os << fromlabel << ":" << idx << ":";
-		os << (idx == 0 ? "sw" : "se") << "->";
-		if (to.isTerminal()) {
-			os << "t";
-		}
-		else {
-			os << tolabel;
-		}
-
-		auto mag = thicknessFromMagnitude(to.w);
-		auto color = colorFromPhase(to.w);
-		os << "[penwidth=\"" << mag << "\",tooltip=\""
-			<< conditionalFormat(to.w, formatAsPolar) << "\" color=\"" << color
-			<< "\"";
-		if (edgeLabels) {
-			os << ",label=<<font point-size=\"8\">&nbsp;"
-				<< conditionalFormat(to.w, formatAsPolar) << "</font>>";
-		}
-		os << "]\n";
-
-		return os;
-	}
 	template <class Edge>
 	static std::ostream& memoryEdge(const Edge& from, const Edge& to,
 		std::uint16_t idx, std::ostream& os,
@@ -792,116 +675,6 @@ namespace dd {
 	/// Note: do not rely on the binary format being portable across different
 	/// architectures/platforms
 	///
-
-	[[maybe_unused]] static void serialize(const vEdge& basic, std::ostream& os,
-		bool writeBinary = false) {
-		if (writeBinary) {
-			os.write(reinterpret_cast<const char*>(&SERIALIZATION_VERSION),
-				sizeof(decltype(SERIALIZATION_VERSION)));
-			basic.w.writeBinary(os);
-		}
-		else {
-			os << SERIALIZATION_VERSION << "\n";
-			os << basic.w.toString(false, 16) << "\n";
-		}
-		std::int64_t nextIndex = 0;
-		std::unordered_map<vNode*, std::int64_t> nodeIndex{};
-
-		// POST ORDER TRAVERSAL USING ONE STACK
-		// https://www.geeksforgeeks.org/iterative-postorder-traversal-using-stack/
-		std::stack<const vEdge*> stack{};
-
-		const auto* node = &basic;
-		if (!node->isTerminal()) {
-			// NOLINTNEXTLINE(cppcoreguidelines-avoid-do-while)
-			do {
-				while (node != nullptr && !node->isTerminal()) {
-					for (auto i = static_cast<std::size_t>(RADIX - 1); i > 0; --i) {
-						auto& edge = node->p->e.at(i);
-						if (edge.isTerminal()) {
-							continue;
-						}
-						if (edge.w.approximatelyZero()) {
-							continue;
-						}
-						if (nodeIndex.find(edge.p) != nodeIndex.end()) {
-							continue;
-						}
-
-						// non-zero edge to be included
-						stack.push(&edge);
-					}
-					stack.push(node);
-					node = &node->p->e[0]; // NOLINT(readability-container-data-pointer)
-				}
-				node = stack.top();
-				stack.pop();
-
-				bool hasChild = false;
-				for (auto i = 1U; i < RADIX && !hasChild; ++i) {
-					auto& edge = node->p->e.at(i);
-					if (edge.w.approximatelyZero()) {
-						continue;
-					}
-					if (nodeIndex.find(edge.p) != nodeIndex.end()) {
-						continue;
-					}
-					if (!stack.empty()) {
-						hasChild = edge.p == stack.top()->p;
-					}
-				}
-
-				if (hasChild) {
-					const auto* const temp = stack.top();
-					stack.pop();
-					stack.push(node);
-					node = temp;
-				}
-				else {
-					if (nodeIndex.find(node->p) != nodeIndex.end()) {
-						node = nullptr;
-						continue;
-					}
-					nodeIndex[node->p] = nextIndex;
-					nextIndex++;
-
-					if (writeBinary) {
-						os.write(reinterpret_cast<const char*>(&nodeIndex[node->p]),
-							sizeof(decltype(nodeIndex[node->p])));
-						os.write(reinterpret_cast<const char*>(&node->p->v),
-							sizeof(decltype(node->p->v)));
-
-						// iterate over edges in reverse to guarantee correct processing order
-						for (auto i = 0U; i < RADIX; ++i) {
-							auto& edge = node->p->e.at(i);
-							std::int64_t edgeIdx = edge.isTerminal() ? -1 : nodeIndex[edge.p];
-							os.write(reinterpret_cast<const char*>(&edgeIdx),
-								sizeof(decltype(edgeIdx)));
-							edge.w.writeBinary(os);
-						}
-					}
-					else {
-						os << nodeIndex[node->p] << " "
-							<< static_cast<std::size_t>(node->p->v);
-
-						// iterate over edges in reverse to guarantee correct processing order
-						for (auto i = 0U; i < RADIX; ++i) {
-							os << " (";
-							auto& edge = node->p->e.at(i);
-							if (!edge.w.approximatelyZero()) {
-								const std::int64_t edgeIdx =
-									edge.isTerminal() ? -1 : nodeIndex[edge.p];
-								os << edgeIdx << " " << edge.w.toString(false, 16);
-							}
-							os << ")";
-						}
-						os << "\n";
-					}
-					node = nullptr;
-				}
-			} while (!stack.empty());
-		}
-	}
 
 	static void serializeMatrix(const mEdge& basic, std::int64_t& idx,
 		std::unordered_map<mNode*, std::int64_t>& nodeIndex,

@@ -10,21 +10,7 @@
 #include <utility>
 
 namespace dd {
-	// NOLINTNEXTLINE(readability-identifier-naming)
-	struct vNode {
-		std::array<Edge<vNode>, RADIX> e{}; // edges out of this node
-		vNode* next{};                      // used to link nodes in unique table
-		RefCount ref{};                     // reference count
-		Qubit v{}; // variable index (nonterminal) value (-1 for terminal)
 
-		// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables
-		static vNode terminal;
-
-		static constexpr bool isTerminal(const vNode* p) { return p == &terminal; }
-		static constexpr vNode* getTerminal() { return &terminal; }
-	};
-	using vEdge = Edge<vNode>;
-	using vCachedEdge = CachedEdge<vNode>;
 
 	// NOLINTNEXTLINE(readability-identifier-naming)
 	struct mNode {
@@ -49,23 +35,6 @@ namespace dd {
 	};
 	using mEdge = Edge<mNode>;
 	using mCachedEdge = CachedEdge<mNode>;
-
-	// NOLINTNEXTLINE(readability-identifier-naming)
-	struct dNode {
-		std::array<Edge<dNode>, NEDGE> e{}; // edges out of this node
-		dNode* next{};                      // used to link nodes in unique table
-		RefCount ref{};                     // reference count
-		Qubit v{}; // variable index (nonterminal) value (-1 for terminal)
-		std::uint8_t flags = 0;
-		static dNode terminal;
-
-		static constexpr bool isTerminal(const dNode* p) { return p == &terminal; }
-		static constexpr dNode* getTerminal() { return &terminal; }
-
-	};
-	using dEdge = Edge<dNode>;
-	using dCachedEdge = CachedEdge<dNode>;
-
 
 } // namespace dd
 

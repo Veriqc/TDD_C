@@ -25,8 +25,8 @@ template <class Node> bool Edge<Node>::isOneTerminal() const {
 
 
 // Explicit instantiations
-template struct Edge<vNode>;
+
 template struct Edge<mNode>;
-template struct Edge<dNode>;
+
 
 } // namespace dd
