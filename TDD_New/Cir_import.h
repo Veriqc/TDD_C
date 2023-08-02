@@ -1,3 +1,4 @@
+#pragma once
 
 //#include "DDpackage.h"
 //#include "DDcomplex.h"
@@ -29,7 +30,7 @@ using namespace std;
 constexpr long double PI = 3.14159265358979323846264338327950288419716939937510L;
 
 bool release = true;
-bool get_max_node = false;
+bool get_max_node = true;
 
 struct gate {
 	std::string name;
@@ -222,11 +223,8 @@ std::map<int, std::vector<dd::Index>> get_index(std::map<int, gate> gate_set, st
 			targ_idx2 += to_string(tar_q);
 			targ_idx2 += to_string(0);
 			targ_idx2 += to_string(qubit_idx[tar_q]);
-			Index_set[k] = {{cont_idx,hyper_idx[cont_idx]},{cont_idx,static_cast<short>(hyper_idx[cont_idx] + 1)},
-			{cont_idx,static_cast<short>(hyper_idx[cont_idx] + 2)},{targ_idx1,hyper_idx[targ_idx1]},{targ_idx2,hyper_idx[targ_idx2]}};
-
-
-
+			Index_set[k] = { {cont_idx,hyper_idx[cont_idx]},{cont_idx,hyper_idx[cont_idx] + 1},{cont_idx,hyper_idx[cont_idx] + 2},{targ_idx1,hyper_idx[targ_idx1]},{targ_idx2,hyper_idx[targ_idx2]} };
+			//std::cout << cont_idx<<" " << hyper_idx[cont_idx] << " " << cont_idx << " " << hyper_idx[cont_idx] + 1 << " " << cont_idx << " " << hyper_idx[cont_idx] + 2 << " " << targ_idx1 << " " << hyper_idx[targ_idx1] << " " << targ_idx2 << " " <<hyper_idx[targ_idx2] << " " << std::endl;
 			hyper_idx[cont_idx] += 2;
 
 		}
@@ -244,7 +242,7 @@ std::map<int, std::vector<dd::Index>> get_index(std::map<int, gate> gate_set, st
 			targ_idx2 += to_string(qubit_idx[tar_q]);
 			Index_set[k] = { {targ_idx1,hyper_idx[targ_idx1]},{targ_idx2,hyper_idx[targ_idx2]} };
 			if (nam == "z" || nam == "s" || nam == "sdg" || nam == "t" || nam == "tdg" || (nam[0] == 'u' && nam[1] == '1') || (nam[0] == 'r' && nam[1] == 'z')) {
-				Index_set[k] = { {targ_idx1,hyper_idx[targ_idx1]},{targ_idx1,static_cast<short>(hyper_idx[targ_idx1] + 1)} };
+				Index_set[k] = { {targ_idx1,hyper_idx[targ_idx1]},{targ_idx1,hyper_idx[targ_idx1] + 1} };
 				qubit_idx[tar_q] -= 1;
 				hyper_idx[targ_idx1] += 1;
 			}
@@ -504,7 +502,7 @@ dd::TDD<Node> apply(dd::TDD<Node> tdd, std::string nam, std::vector<dd::Index> i
 			temp_tdd = dd->diag_matrix_2_TDD<Node>(dd::Tdagmat, index_set);
 			break;
 		default:
-			if (nam[0] == 'r' && nam[1] == 'z') {
+			if (nam[0] == 'r' and nam[1] == 'z') {
 				regex pattern("rz\\((-?\\d.\\d+)\\)");
 				smatch result;
 				regex_match(nam, result, pattern);
@@ -513,7 +511,7 @@ dd::TDD<Node> apply(dd::TDD<Node> tdd, std::string nam, std::vector<dd::Index> i
 				temp_tdd = dd->diag_matrix_2_TDD<Node>(dd::Phasemat(theta), index_set);
 				break;
 			}
-			if (nam[0] == 'u' && nam[1] == '1') {
+			if (nam[0] == 'u' and nam[1] == '1') {
 				//regex pattern("u1\\((-?\\d.\\d+)\\)");
 				//smatch result;
 				//regex_match(nam, result, pattern);
@@ -523,18 +521,13 @@ dd::TDD<Node> apply(dd::TDD<Node> tdd, std::string nam, std::vector<dd::Index> i
 				smatch result;
 				regex_match(nam, result, para);
 				float theta = match_a_string(result[1]);
-<<<<<<<< HEAD:TDD_Non_Oop/Cir_import.h
-
-				dd::DD_matrix U1mat = { {{ 1, 0 }, { 0, 0 } }, {{ 0, 0 }, { cos(theta), sin(theta) } } };
-========
->>>>>>>> 913454b2b0dde2e03cdb429f4fadbf087a756e8a:TDD_New/Cir_import.h
 
 				//dd::GateMatrix  U1mat = { { 1, 0 }, { 0, 0 } , { 0, 0 }, { cos(theta), sin(theta) }  };
 
 				temp_tdd = dd->diag_matrix_2_TDD<Node>(dd::Phasemat(theta), index_set);
 				break;
 			}
-			if (nam[0] == 'u' && nam[1] == '3') {
+			if (nam[0] == 'u' and nam[1] == '3') {
 				//regex pattern("u3\\((-?\\d.\\d+), ?(-?\\d.\\d+), ?(-?\\d.\\d+)\\)");
 				//smatch result;
 				//regex_match(nam, result, pattern);
@@ -557,9 +550,6 @@ dd::TDD<Node> apply(dd::TDD<Node> tdd, std::string nam, std::vector<dd::Index> i
 	}
 
 
-<<<<<<<< HEAD:TDD_Non_Oop/Cir_import.h
-	tdd = dd::cont(tdd, temp_tdd);
-========
 	if (release) {
 		auto tmp = dd->cont(tdd, temp_tdd);
 		dd->incRef(tmp.e);
@@ -572,7 +562,6 @@ dd::TDD<Node> apply(dd::TDD<Node> tdd, std::string nam, std::vector<dd::Index> i
 	}
 
 
->>>>>>>> 913454b2b0dde2e03cdb429f4fadbf087a756e8a:TDD_New/Cir_import.h
 
 	return tdd;
 }
@@ -666,7 +655,7 @@ int* Simulate_with_partition1(std::string path, std::string  file_name, std::uni
 			temp_tdd2 = apply(temp_tdd2, nam, Index_set[gate_idx], dd);
 		}
 		if (release) {
-			dd::TDD<Node> temp_tdd = dd->cont(temp_tdd1, temp_tdd2);
+			auto temp_tdd = dd->cont(temp_tdd1, temp_tdd2);
 			dd->decRef(temp_tdd1.e);
 			dd->decRef(temp_tdd2.e);
 			auto tmp = dd->cont(tdd, temp_tdd);
@@ -680,15 +669,6 @@ int* Simulate_with_partition1(std::string path, std::string  file_name, std::uni
 			tdd = dd->cont(tdd, temp_tdd);
 		}
 
-<<<<<<<< HEAD:TDD_Non_Oop/Cir_import.h
-		dd::TDD temp_tdd = dd::cont(temp_tdd1, temp_tdd2);
-		tdd = dd::cont(tdd, temp_tdd);
-		node_num_max = dd::DDsize(tdd.e);
-		if (node_num_max > nodes[0]) {
-			nodes[0] = node_num_max;
-		}
-
-========
 
 		if (get_max_node) {
 			node_num_max = dd->size(tdd.e);
@@ -696,7 +676,6 @@ int* Simulate_with_partition1(std::string path, std::string  file_name, std::uni
 				nodes[0] = node_num_max;
 			}
 		}
->>>>>>>> 913454b2b0dde2e03cdb429f4fadbf087a756e8a:TDD_New/Cir_import.h
 	}
 
 	int node_num_final = dd->size(tdd.e);
@@ -733,15 +712,11 @@ int* Simulate_with_partition2(std::string path, std::string  file_name, std::uni
 
 	dd->varOrder = var;
 
-<<<<<<<< HEAD:TDD_Non_Oop/Cir_import.h
-	dd::TDD tdd = { dd::DDone ,{} };
-========
 	dd::TDD<Node> tdd = { dd::Edge<Node>::one ,{} };
 
 	if (release) {
 		dd->incRef(tdd.e);
 	}
->>>>>>>> 913454b2b0dde2e03cdb429f4fadbf087a756e8a:TDD_New/Cir_import.h
 
 	start = clock();
 	int node_num_max = 0;
@@ -780,17 +755,6 @@ int* Simulate_with_partition2(std::string path, std::string  file_name, std::uni
 			temp_tdd3 = apply(temp_tdd3, nam, Index_set[gate_idx], dd);
 		}
 
-<<<<<<<< HEAD:TDD_Non_Oop/Cir_import.h
-		dd::TDD temp_tdd = dd::cont(temp_tdd1, temp_tdd2);
-		temp_tdd = dd::cont(temp_tdd, temp_tdd3);
-		tdd = dd::cont(tdd, temp_tdd);
-
-		node_num_max = dd::DDsize(tdd.e);
-		if (node_num_max > nodes[0]) {
-			nodes[0] = node_num_max;
-		}
-
-========
 		if (release) {
 			dd::TDD<Node> temp_tdd = dd->cont(temp_tdd1, temp_tdd2);
 			dd->decRef(temp_tdd1.e);
@@ -816,7 +780,6 @@ int* Simulate_with_partition2(std::string path, std::string  file_name, std::uni
 				nodes[0] = node_num_max;
 			}
 		}
->>>>>>>> 913454b2b0dde2e03cdb429f4fadbf087a756e8a:TDD_New/Cir_import.h
 	}
 
 	int node_num_final = dd->size(tdd.e);
@@ -937,14 +900,6 @@ int* Simulate_with_tdd(std::string path, std::string  file_name, std::unique_ptr
 
 	for (int k = 0; k < gate_set.size(); k++) {
 		{
-<<<<<<<< HEAD:TDD_Non_Oop/Cir_import.h
-			tdd = apply(tdd, gate_set[k].name, Index_set[k]);
-
-			//node_num_max = dd::DDsize(tdd.e);
-			//if (node_num_max > nodes[0]) {
-			//	nodes[0] = node_num_max;
-			//}
-========
 			tdd = apply(tdd, gate_set[k].name, Index_set[k], dd);
 			if (get_max_node) {
 				node_num_max = dd->size(tdd.e);
@@ -952,7 +907,6 @@ int* Simulate_with_tdd(std::string path, std::string  file_name, std::unique_ptr
 					nodes[0] = node_num_max;
 				}
 			}
->>>>>>>> 913454b2b0dde2e03cdb429f4fadbf087a756e8a:TDD_New/Cir_import.h
 
 		}
 	}
@@ -965,20 +919,10 @@ int* Simulate_with_tdd(std::string path, std::string  file_name, std::unique_ptr
 	//	std::cout << element << " ";
 	//}
 	//std::cout << std::endl;
-<<<<<<<< HEAD:TDD_Non_Oop/Cir_import.h
-	int node_num_final = dd::DDsize(tdd.e);
-	nodes[1] = node_num_final;
-	//nodes[2] = 0;
-	//dd::DDdotExportMatrix(tdd.e, "hh");
-	//dd::export2Dot(tdd.e, "tdd", false);
-	dd::DDstatistics();
-	dd::DDgarbageCollect();
-
-========
 
 	int node_num_final = dd->size(tdd.e);
 	nodes[1] = node_num_final;
-	dd->statistics();
+	//dd->statistics();
 	//dd::export2Dot(tdd.e, "tdd1");
 
 
@@ -987,7 +931,6 @@ int* Simulate_with_tdd(std::string path, std::string  file_name, std::unique_ptr
 	}
 	dd->garbageCollect();
 
->>>>>>>> 913454b2b0dde2e03cdb429f4fadbf087a756e8a:TDD_New/Cir_import.h
 	std::cout << "Done!!!" << std::endl;
 	return nodes;
 }
