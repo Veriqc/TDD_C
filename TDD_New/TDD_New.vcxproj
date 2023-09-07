@@ -154,7 +154,6 @@
     <ClInclude Include="dd\Package.hpp" />
     <ClInclude Include="dd\Package_fwd.hpp" />
     <ClInclude Include="dd\Tdd.hpp" />
-    <ClInclude Include="dd\Tensor.hpp" />
     <ClInclude Include="dd\UniqueTable.hpp" />
     <ClInclude Include="Definitions.hpp" />
     <ClInclude Include="operations\ClassicControlledOperation.hpp" />

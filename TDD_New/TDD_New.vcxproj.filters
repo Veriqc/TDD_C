@@ -144,9 +144,6 @@
     <ClInclude Include="QuantumComputation.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="dd\Tensor.hpp">
-      <Filter>头文件\dd</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dd\Edge.cpp">
