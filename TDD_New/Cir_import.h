@@ -450,8 +450,8 @@ std::map<int, map<int, std::vector<int>>>  cir_partition2(std::map<int, gate> ga
 	return par;
 }
 
-template <class Node>
-dd::TDD<Node> apply(dd::TDD<Node> tdd, std::string nam, std::vector<dd::Index> index_set, std::unique_ptr<dd::Package<>>& dd) {
+
+dd::TDD apply(dd::TDD tdd, std::string nam, std::vector<dd::Index> index_set, std::unique_ptr<dd::Package<>>& dd) {
 
 	//std::cout << nam << std::endl;
 
@@ -465,18 +465,18 @@ dd::TDD<Node> apply(dd::TDD<Node> tdd, std::string nam, std::vector<dd::Index> i
 	gate_type["t"] = 7;
 	gate_type["tdg"] = 8;
 
-	dd::TDD<Node> temp_tdd;
+	dd::TDD temp_tdd;
 
 	if (nam == "cx") {
-		temp_tdd = dd->cnot_2_TDD<Node>(index_set, 1);
+		temp_tdd = dd->cnot_2_TDD(index_set, 1);
 	}
 	else {
 		switch (gate_type[nam]) {
 		case 1:
-			temp_tdd = dd->Matrix2TDD<Node>(dd::Xmat, index_set);
+			temp_tdd = dd->Matrix2TDD(dd::Xmat, index_set);
 			break;
 		case 2:
-			temp_tdd = dd->Matrix2TDD<Node>(dd::Ymat, index_set);
+			temp_tdd = dd->Matrix2TDD(dd::Ymat, index_set);
 
 			//std::cout << temp_tdd.e.w << " " << int(temp_tdd.e.p->v) << std::endl;
 			//std::cout << temp_tdd.e.p->e[0].w << " " << int(temp_tdd.e.p->e[0].p->v) << std::endl;
@@ -484,22 +484,22 @@ dd::TDD<Node> apply(dd::TDD<Node> tdd, std::string nam, std::vector<dd::Index> i
 
 			break;
 		case 3:
-			temp_tdd = dd->diag_matrix_2_TDD<Node>(dd::Zmat, index_set);
+			temp_tdd = dd->diag_matrix_2_TDD(dd::Zmat, index_set);
 			break;
 		case 4:
-			temp_tdd = dd->Matrix2TDD<Node>(dd::Hmat, index_set);
+			temp_tdd = dd->Matrix2TDD(dd::Hmat, index_set);
 			break;
 		case 5:
-			temp_tdd = dd->diag_matrix_2_TDD<Node>(dd::Smat, index_set);
+			temp_tdd = dd->diag_matrix_2_TDD(dd::Smat, index_set);
 			break;
 		case 6:
-			temp_tdd = dd->diag_matrix_2_TDD<Node>(dd::Sdagmat, index_set);
+			temp_tdd = dd->diag_matrix_2_TDD(dd::Sdagmat, index_set);
 			break;
 		case 7:
-			temp_tdd = dd->diag_matrix_2_TDD<Node>(dd::Tmat, index_set);
+			temp_tdd = dd->diag_matrix_2_TDD(dd::Tmat, index_set);
 			break;
 		case 8:
-			temp_tdd = dd->diag_matrix_2_TDD<Node>(dd::Tdagmat, index_set);
+			temp_tdd = dd->diag_matrix_2_TDD(dd::Tdagmat, index_set);
 			break;
 		default:
 			if (nam[0] == 'r' and nam[1] == 'z') {
@@ -508,7 +508,7 @@ dd::TDD<Node> apply(dd::TDD<Node> tdd, std::string nam, std::vector<dd::Index> i
 				regex_match(nam, result, pattern);
 				float theta = stof(result[1]);
 				//dd::GateMatrix Rzmat = { { 1, 0 }, { 0, 0 } , { 0, 0 }, { cos(theta), sin(theta) } };
-				temp_tdd = dd->diag_matrix_2_TDD<Node>(dd::Phasemat(theta), index_set);
+				temp_tdd = dd->diag_matrix_2_TDD(dd::Phasemat(theta), index_set);
 				break;
 			}
 			if (nam[0] == 'u' and nam[1] == '1') {
@@ -524,7 +524,7 @@ dd::TDD<Node> apply(dd::TDD<Node> tdd, std::string nam, std::vector<dd::Index> i
 
 				//dd::GateMatrix  U1mat = { { 1, 0 }, { 0, 0 } , { 0, 0 }, { cos(theta), sin(theta) }  };
 
-				temp_tdd = dd->diag_matrix_2_TDD<Node>(dd::Phasemat(theta), index_set);
+				temp_tdd = dd->diag_matrix_2_TDD(dd::Phasemat(theta), index_set);
 				break;
 			}
 			if (nam[0] == 'u' and nam[1] == '3') {
@@ -543,7 +543,7 @@ dd::TDD<Node> apply(dd::TDD<Node> tdd, std::string nam, std::vector<dd::Index> i
 				float phi = match_a_string(para2[1]);
 				float lambda = match_a_string(para2[2]);
 				//dd::GateMatrix  U3mat = { { cos(theta / 2), 0 }, { -cos(lambda) * sin(theta / 2),-sin(lambda) * sin(theta / 2)} , { cos(phi) * sin(theta / 2),sin(phi) * sin(theta / 2) }, { cos(lambda + phi) * cos(theta / 2),sin(lambda + phi) * cos(theta / 2) }  };
-				temp_tdd = dd->Matrix2TDD<Node>(dd::U3mat(lambda, phi, theta), index_set);
+				temp_tdd = dd->Matrix2TDD(dd::U3mat(lambda, phi, theta), index_set);
 				break;
 			}
 		}
@@ -607,7 +607,7 @@ std::map<std::string, int> get_var_order() {
 	return var;
 }
 
-template <class Node>
+
 int* Simulate_with_partition1(std::string path, std::string  file_name, std::unique_ptr<dd::Package<>>& dd) {
 
 	std::map<int, gate> gate_set = import_circuit(path + file_name);
@@ -627,7 +627,7 @@ int* Simulate_with_partition1(std::string path, std::string  file_name, std::uni
 
 	dd->varOrder = var;
 
-	dd::TDD<Node> tdd = { dd::Edge<Node>::one ,{} };
+	dd::TDD tdd = { dd::Edge<dd::mNode>::one ,{} };
 	if (release) {
 		dd->incRef(tdd.e);
 	}
@@ -635,7 +635,7 @@ int* Simulate_with_partition1(std::string path, std::string  file_name, std::uni
 	int node_num_max = 0;
 	for (int k = 0; k < par.size(); k++) {
 		//std::cout << "block:" << k << std::endl;
-		dd::TDD<Node> temp_tdd1 = { dd::Edge<Node>::one ,{} };
+		dd::TDD temp_tdd1 = { dd::Edge<dd::mNode>::one ,{} };
 		if (release) {
 			dd->incRef(temp_tdd1.e);
 		}
@@ -645,7 +645,7 @@ int* Simulate_with_partition1(std::string path, std::string  file_name, std::uni
 			temp_tdd1 = apply(temp_tdd1, nam, Index_set[gate_idx], dd);
 		}
 
-		dd::TDD<Node> temp_tdd2 = { dd::Edge<Node>::one ,{} };
+		dd::TDD temp_tdd2 = { dd::Edge<dd::mNode>::one ,{} };
 		if (release) {
 			dd->incRef(temp_tdd2.e);
 		}
@@ -665,7 +665,7 @@ int* Simulate_with_partition1(std::string path, std::string  file_name, std::uni
 			dd->garbageCollect();
 		}
 		else {
-			dd::TDD<Node> temp_tdd = dd->cont(temp_tdd1, temp_tdd2);
+			dd::TDD temp_tdd = dd->cont(temp_tdd1, temp_tdd2);
 			tdd = dd->cont(tdd, temp_tdd);
 		}
 
@@ -692,7 +692,7 @@ int* Simulate_with_partition1(std::string path, std::string  file_name, std::uni
 	return nodes;
 }
 
-template <class Node>
+
 int* Simulate_with_partition2(std::string path, std::string  file_name, std::unique_ptr<dd::Package<>>& dd) {
 
 	std::map<int, gate> gate_set = import_circuit(path + file_name);
@@ -712,7 +712,7 @@ int* Simulate_with_partition2(std::string path, std::string  file_name, std::uni
 
 	dd->varOrder = var;
 
-	dd::TDD<Node> tdd = { dd::Edge<Node>::one ,{} };
+	dd::TDD tdd = { dd::Edge<dd::mNode>::one ,{} };
 
 	if (release) {
 		dd->incRef(tdd.e);
@@ -725,7 +725,7 @@ int* Simulate_with_partition2(std::string path, std::string  file_name, std::uni
 
 	for (int k = 0; k < par.size(); k++) {
 		//std::cout << k << std::endl;
-		dd::TDD<Node> temp_tdd1 = { dd::Edge<Node>::one ,{} };
+		dd::TDD temp_tdd1 = { dd::Edge<dd::mNode>::one ,{} };
 		if (release) {
 			dd->incRef(temp_tdd1.e);
 		}
@@ -735,7 +735,7 @@ int* Simulate_with_partition2(std::string path, std::string  file_name, std::uni
 			temp_tdd1 = apply(temp_tdd1, nam, Index_set[gate_idx], dd);
 		}
 
-		dd::TDD<Node> temp_tdd2 = { dd::Edge<Node>::one ,{} };
+		dd::TDD temp_tdd2 = { dd::Edge<dd::mNode>::one ,{} };
 		if (release) {
 			dd->incRef(temp_tdd2.e);
 		}
@@ -745,7 +745,7 @@ int* Simulate_with_partition2(std::string path, std::string  file_name, std::uni
 			temp_tdd2 = apply(temp_tdd2, nam, Index_set[gate_idx], dd);
 		}
 
-		dd::TDD<Node> temp_tdd3 = { dd::Edge<Node>::one ,{} };
+		dd::TDD temp_tdd3 = { dd::Edge<dd::mNode>::one ,{} };
 		if (release) {
 			dd->incRef(temp_tdd3.e);
 		}
@@ -756,7 +756,7 @@ int* Simulate_with_partition2(std::string path, std::string  file_name, std::uni
 		}
 
 		if (release) {
-			dd::TDD<Node> temp_tdd = dd->cont(temp_tdd1, temp_tdd2);
+			dd::TDD temp_tdd = dd->cont(temp_tdd1, temp_tdd2);
 			dd->decRef(temp_tdd1.e);
 			dd->decRef(temp_tdd2.e);
 			temp_tdd = dd->cont(temp_tdd, temp_tdd3);
@@ -768,7 +768,7 @@ int* Simulate_with_partition2(std::string path, std::string  file_name, std::uni
 			dd->garbageCollect();
 		}
 		else {
-			dd::TDD<Node> temp_tdd = dd->cont(temp_tdd1, temp_tdd2);
+			dd::TDD temp_tdd = dd->cont(temp_tdd1, temp_tdd2);
 			temp_tdd = dd->cont(temp_tdd, temp_tdd3);
 			tdd = dd->cont(tdd, temp_tdd);
 		}
@@ -871,7 +871,6 @@ int get_gates_num(std::string  file_name) {
 }
 
 //计算一个电路的tdd
-template <class Node>
 int* Simulate_with_tdd(std::string path, std::string  file_name, std::unique_ptr<dd::Package<>>& dd) {
 
 	std::map<int, gate> gate_set = import_circuit(path + file_name);
@@ -889,7 +888,7 @@ int* Simulate_with_tdd(std::string path, std::string  file_name, std::unique_ptr
 	//开始仿真，每一步都要处理指标，生成当前门的temp_tdd,并与现有的结果收缩得到完整tdd
 
 
-	dd::TDD<Node> tdd = { dd::Edge<Node>::one ,{} };
+	dd::TDD tdd = { dd::Edge<dd::mNode>::one ,{} };
 
 	if (release) {
 		dd->incRef(tdd.e);

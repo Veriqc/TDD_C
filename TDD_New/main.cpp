@@ -32,7 +32,7 @@ int main() {
     double time_t;
     std::cout << "File name:" << file_name << std::endl;
     start_t = clock();
-    nodes = Simulate_with_tdd<dd::mNode>(path2, file_name,dd);
+    nodes = Simulate_with_tdd(path2, file_name,dd);
     finish_t = clock();
     time_t = (double)(finish_t - start_t) / CLOCKS_PER_SEC;
     std::cout << "Time:" << time_t << std::endl;
@@ -44,7 +44,7 @@ int main() {
 	//std::cout << "File name:" << file_name << std::endl;
 	//auto dd2 = std::make_unique<dd::Package<>>(3 * n);
 	//start_t = clock();
-	//nodes = Simulate_with_partition1<dd::mNode>(path2, file_name,dd2);
+	//nodes = Simulate_with_partition1(path2, file_name,dd2);
 	//finish_t = clock();
 	//time_t = (double)(finish_t - start_t) / CLOCKS_PER_SEC;
 
@@ -56,7 +56,7 @@ int main() {
 	//std::cout << "File name:" << file_name << std::endl;
 	//auto dd3 = std::make_unique<dd::Package<>>(3 * n);
 	//start_t = clock();
-	//nodes = Simulate_with_partition2<dd::mNode>(path2, file_name, dd3);
+	//nodes = Simulate_with_partition2(path2, file_name, dd3);
 	//finish_t = clock();
 	//time_t = (double)(finish_t - start_t) / CLOCKS_PER_SEC;
 
@@ -92,7 +92,7 @@ int save_data() {
 		int n = get_qubits_num(path2 + line2);
 		auto dd = std::make_unique<dd::Package<>>(3 * n);
 		start2 = clock();
-		nodes2 = Simulate_with_tdd<dd::mNode>(path2, line2,dd);
+		nodes2 = Simulate_with_tdd(path2, line2,dd);
 		finish2 = clock();
 		time2 = (double)(finish2 - start2) / CLOCKS_PER_SEC;
 		std::cout << "time:" << time2 << std::endl;
@@ -113,7 +113,7 @@ int save_data() {
 		int n = get_qubits_num(path2 + line2);
 		auto dd = std::make_unique<dd::Package<>>(3 * n);
 		start2 = clock();
-		nodes2 = Simulate_with_partition1<dd::mNode>(path2, line2, dd);
+		nodes2 = Simulate_with_partition1(path2, line2, dd);
 		finish2 = clock();
 		time2 = (double)(finish2 - start2) / CLOCKS_PER_SEC;
 		std::cout << "time:" << time2 << std::endl;
@@ -133,7 +133,7 @@ int save_data() {
 		int n = get_qubits_num(path2 + line2);
 		auto dd = std::make_unique<dd::Package<>>(3 * n);
 		start2 = clock();
-		nodes2 = Simulate_with_partition2<dd::mNode>(path2, line2, dd);
+		nodes2 = Simulate_with_partition2(path2, line2, dd);
 		finish2 = clock();
 		time2 = (double)(finish2 - start2) / CLOCKS_PER_SEC;
 		std::cout << "time:" << time2 << std::endl;

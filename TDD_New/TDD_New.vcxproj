@@ -73,6 +73,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>C:\Users\23626\Documents\GitHub\TDD_C\TDD_New;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>C:\Users\23626\Documents\GitHub\TDD_C\TDD_New;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -107,6 +110,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -150,6 +154,7 @@
     <ClInclude Include="dd\Package.hpp" />
     <ClInclude Include="dd\Package_fwd.hpp" />
     <ClInclude Include="dd\Tdd.hpp" />
+    <ClInclude Include="dd\Tensor.hpp" />
     <ClInclude Include="dd\UniqueTable.hpp" />
     <ClInclude Include="Definitions.hpp" />
     <ClInclude Include="operations\ClassicControlledOperation.hpp" />

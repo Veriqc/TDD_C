@@ -4,6 +4,7 @@
 #include "Definitions.hpp"
 #include "Edge.hpp"
 #include "Node.hpp"
+
 #include <map>
 
 namespace dd {
@@ -14,9 +15,9 @@ namespace dd {
     };
 
 
-    template <class Node> struct TDD {
+    struct TDD {
 
-        Edge<Node> e;
+        Edge<mNode> e;
         std::vector<Index> index_set;
         std::vector<std::string> key_2_index;
 

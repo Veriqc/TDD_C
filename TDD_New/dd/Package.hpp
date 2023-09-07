@@ -88,7 +88,7 @@ namespace dd {
 					"package with a wider Qubit type!");
 			}
 			nqubits = nq;
-			UniqueTable.resize(nqubits);
+			nodeUniqueTable.resize(nqubits);
 		}
 
 		// reset package state
@@ -111,27 +111,27 @@ namespace dd {
 
 
 		//==========================================我写的========================================
-		template <class Node>
-		TDD<Node> Matrix2TDD(const GateMatrix mat, std::vector<Index> var_out)
+		//template <class Node>
+		TDD Matrix2TDD(const GateMatrix mat, std::vector<Index> var_out)
 		{
 
-			TDD<Node> low, high, res;
-			Edge<Node> e_temp[4];
+			TDD low, high, res;
+			Edge<mNode> e_temp[4];
 
-			std::array<Edge<Node>, 2> e_low{}, e_high{}, e{};
+			std::array<Edge<mNode>, 2> e_low{}, e_high{}, e{};
 
 			int Radix = 2;
 
 			for (int i = 0; i < Radix; i++) {
 				for (int j = 0; j < Radix; j++) {
 					if (mat[2 * i + j] == complex_zero) {
-						e_temp[i * Radix + j] = Edge<Node>::zero;
+						e_temp[i * Radix + j] = Edge<mNode>::zero;
 					}
 					else if (mat[2 * i + j] == complex_one) {
-						e_temp[i * Radix + j] = Edge<Node>::one;
+						e_temp[i * Radix + j] = Edge<mNode>::one;
 					}
 					else {
-						e_temp[i * Radix + j] = Edge<Node>::terminal(cn.lookup(mat[2 * i + j]));
+						e_temp[i * Radix + j] = Edge<mNode>::terminal(cn.lookup(mat[2 * i + j]));
 					}
 				}
 			}
@@ -178,25 +178,25 @@ namespace dd {
 			res.key_2_index = key_2_index;
 			return res;
 		}
-		template <class Node>
-		TDD<Node> diag_matrix_2_TDD(const GateMatrix mat, std::vector<Index> var_out)
+		//template <class Node>
+		TDD diag_matrix_2_TDD(const GateMatrix mat, std::vector<Index> var_out)
 		{
 
-			TDD<Node> res;
+			TDD res;
 			int Radix = 2;
 
-			std::array<Edge<Node>, 2> e_temp{};
+			std::array<Edge<mNode>, 2> e_temp{};
 			for (int i = 0; i < Radix; i++) {
 
 				if (mat[2 * i + i] == complex_zero) {
-					e_temp[i] = Edge<Node>::zero;
+					e_temp[i] = Edge<mNode>::zero;
 				}
 				else {
 					if (mat[2 * i + i] == complex_one) {
-						e_temp[i] = Edge<Node>::one;
+						e_temp[i] = Edge<mNode>::one;
 					}
 					else {
-						e_temp[i] = Edge<Node>::terminal(cn.lookup(mat[2 * i + i]));
+						e_temp[i] = Edge<mNode>::terminal(cn.lookup(mat[2 * i + i]));
 					}
 				}
 			}
@@ -207,16 +207,16 @@ namespace dd {
 			return res;
 		}
 
-		template <class Node>
-		TDD<Node> cnot_2_TDD(std::vector<Index> var, int ca = 1) {
+		//template <class Node>
+		TDD cnot_2_TDD(std::vector<Index> var, int ca = 1) {
 
 
-			TDD<Node> low, high, res;
-			std::array<Edge<Node>, 2> e{};
+			TDD low, high, res;
+			std::array<Edge<mNode>, 2> e{};
 			if (ca == 1) {
 				if (varOrder[var[0].key] > varOrder[var[3].key] && varOrder[var[0].key] > varOrder[var[4].key]) {
-					low = Matrix2TDD<Node>(Imat, { var[3] ,var[4] });
-					high = Matrix2TDD<Node>(Xmat, { var[3] ,var[4] });
+					low = Matrix2TDD(Imat, { var[3] ,var[4] });
+					high = Matrix2TDD(Xmat, { var[3] ,var[4] });
 					e[0] = low.e;
 					e[1] = high.e;
 					res.e = makeDDNode(2, e, false);
@@ -225,8 +225,8 @@ namespace dd {
 					res.key_2_index = low.key_2_index;
 				}
 				else if (varOrder[var[3].key] > varOrder[var[0].key] && varOrder[var[3].key] > varOrder[var[4].key]) {
-					low = Matrix2TDD<Node>(Imat, { var[0] ,var[4] });
-					high = Matrix2TDD<Node>(Xmat, { var[0] ,var[4] });
+					low = Matrix2TDD(Imat, { var[0] ,var[4] });
+					high = Matrix2TDD(Xmat, { var[0] ,var[4] });
 					e[0] = low.e;
 					e[1] = high.e;
 					res.e = makeDDNode(2, e, false);
@@ -235,8 +235,8 @@ namespace dd {
 					res.key_2_index = low.key_2_index;
 				}
 				else {
-					low = Matrix2TDD<Node>(Imat, { var[0] ,var[3] });
-					high = Matrix2TDD<Node>(Xmat, { var[0] ,var[3] });
+					low = Matrix2TDD(Imat, { var[0] ,var[3] });
+					high = Matrix2TDD(Xmat, { var[0] ,var[3] });
 					e[0] = low.e;
 					e[1] = high.e;
 					res.e = makeDDNode(2, e, false);
@@ -360,7 +360,7 @@ namespace dd {
 	public:
 		// unique tables
 		template <class Node> [[nodiscard]] auto& getUniqueTable() {
-			return UniqueTable;
+			return nodeUniqueTable;
 		}
 
 		template <class Node> void incRef(const Edge<Node>& e) {
@@ -370,13 +370,12 @@ namespace dd {
 			getUniqueTable<Node>().decRef(e);
 		}
 
-		UniqueTable<mNode, Config::UT_MAT_NBUCKET, Config::UT_MAT_INITIAL_ALLOCATION_SIZE>	UniqueTable{nqubits};
-
+		UniqueTable<mNode, Config::UT_MAT_NBUCKET, Config::UT_MAT_INITIAL_ALLOCATION_SIZE>	nodeUniqueTable{nqubits};
 
 		bool garbageCollect(bool force = false) {
 			// return immediately if no table needs collection
 			if (!force &&
-				!UniqueTable.possiblyNeedsCollection() &&
+				!nodeUniqueTable.possiblyNeedsCollection() &&
 				!cn.complexTable.possiblyNeedsCollection()) {
 				return false;
 			}
@@ -388,7 +387,7 @@ namespace dd {
 				force = true;
 			}
 
-			auto mCollect = UniqueTable.garbageCollect(force);
+			auto mCollect = nodeUniqueTable.garbageCollect(force);
 
 			// invalidate all compute tables where any component of the entry contains
 			// numbers from the complex table if any complex numbers were collected
@@ -401,7 +400,7 @@ namespace dd {
 		}
 
 		void clearUniqueTables() {
-			UniqueTable.clear();
+			nodeUniqueTable.clear();
 
 		}
 
@@ -487,10 +486,10 @@ namespace dd {
 		}
 
 
-		template <class LeftOperand, class RightOperand>
-		RightOperand cont(LeftOperand tdd1, RightOperand tdd2) {
+		//template <class LeftOperand, class RightOperand>
+		TDD cont(TDD tdd1, TDD tdd2) {
 
-			RightOperand res;
+			TDD res;
 
 			std::vector<Index> var_out;
 			std::vector<std::string> var_cont_temp;
@@ -794,12 +793,12 @@ namespace dd {
 			return e;
 		}
 
-		template <class LeftOperandNode, class RightOperandNode>
-		Edge<RightOperandNode> cont2(const Edge<LeftOperandNode>& x, const Edge<RightOperandNode>& y, key_2_new_key_node* key_2_new_key1, key_2_new_key_node* key_2_new_key2, const int var_num) {
+		//template <class LeftOperandNode, class RightOperandNode>
+		Edge<mNode> cont2(const Edge<mNode>& x, const Edge<mNode>& y, key_2_new_key_node* key_2_new_key1, key_2_new_key_node* key_2_new_key2, const int var_num) {
 
 			//std::cout <<"838 " << x.w << " " << y.w << " " << int(x.p->v) << " " << int(y.p->v) << std::endl;
 
-			using ResultEdge = Edge<RightOperandNode>;
+			using ResultEdge = Edge<mNode>;
 
 			if (x.p == nullptr) {
 				return { nullptr, Complex::zero };
@@ -1052,7 +1051,7 @@ namespace dd {
 		void statistics() {
 			std::cout << "DD statistics:\n";
 			std::cout << "[UniqueTable] ";
-			UniqueTable.printStatistics();
+			nodeUniqueTable.printStatistics();
 			std::cout << "[Add] ";
 			addTable.printStatistics();
 			std::cout << "[Cont] ";
