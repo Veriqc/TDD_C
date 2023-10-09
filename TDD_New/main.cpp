@@ -15,6 +15,8 @@ int save_data();
 #include <xtensor/xio.hpp>
 #include <xtensor/xview.hpp>
 #include <xtensor/xarray.hpp>
+#include <xtensor/xfixed.hpp>
+#include <xtensor/xtensor.hpp>
 
 int main(int argc, char* argv[])
 {
