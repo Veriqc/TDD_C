@@ -72,6 +72,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>C:\Users\23626\Documents\GitHub\TDD_C\TDD_New;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <ExternalIncludePath>C:\Users\23626\.conda\pkgs\xtl-0.7.4-h5362a0b_0\Library\include;C:\Users\23626\.conda\pkgs\xtensor-0.24.0-h5362a0b_0\Library\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>C:\Users\23626\Documents\GitHub\TDD_C\TDD_New;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
@@ -154,6 +155,7 @@
     <ClInclude Include="dd\Package.hpp" />
     <ClInclude Include="dd\Package_fwd.hpp" />
     <ClInclude Include="dd\Tdd.hpp" />
+    <ClInclude Include="dd\Tensor.hpp" />
     <ClInclude Include="dd\UniqueTable.hpp" />
     <ClInclude Include="Definitions.hpp" />
     <ClInclude Include="operations\ClassicControlledOperation.hpp" />

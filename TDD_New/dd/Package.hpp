@@ -15,7 +15,7 @@
 #include "UniqueTable.hpp"
 
 #include "Tdd.hpp"
-
+#include "Tensor.hpp"
 
 
 #include <algorithm>
@@ -112,13 +112,27 @@ namespace dd {
 
 		//==========================================我写的========================================
 		//template <class Node>
+
+		//TDD Tensor_2_TDD(const Tensor tn)
+		//{
+
+		//	TDD res;
+
+		//	if()
+
+
+
+
+		//	return res;
+		//}
+
 		TDD Matrix2TDD(const GateMatrix mat, std::vector<Index> var_out)
 		{
 
 			TDD low, high, res;
 			Edge<mNode> e_temp[4];
 
-			std::array<Edge<mNode>, 2> e_low{}, e_high{}, e{};
+			std::vector<Edge<mNode>> e_low(2), e_high(2), e(2);
 
 			int Radix = 2;
 
@@ -185,7 +199,7 @@ namespace dd {
 			TDD res;
 			int Radix = 2;
 
-			std::array<Edge<mNode>, 2> e_temp{};
+			std::vector<Edge<mNode>> e_temp(2);
 			for (int i = 0; i < Radix; i++) {
 
 				if (mat[2 * i + i] == complex_zero) {
@@ -212,7 +226,7 @@ namespace dd {
 
 
 			TDD low, high, res;
-			std::array<Edge<mNode>, 2> e{};
+			std::vector<Edge<mNode>> e(2);
 			if (ca == 1) {
 				if (varOrder[var[0].key] > varOrder[var[3].key] && varOrder[var[0].key] > varOrder[var[4].key]) {
 					low = Matrix2TDD(Imat, { var[3] ,var[4] });
@@ -259,12 +273,17 @@ namespace dd {
 
 			auto argmax = -1;
 
-			auto zero = std::array{	e.p->e[0].w.approximatelyZero(), e.p->e[1].w.approximatelyZero()};
+			//auto zero = std::array{	e.p->e[0].w.approximatelyZero(), e.p->e[1].w.approximatelyZero()};
+			int R = e.p->e.size();
+			std::vector<bool> zero;
+			for (int k = 0; k < R; k++) {
+				zero.push_back(e.p->e[k].w.approximatelyZero());
+			}
 
 			// make sure to release cached numbers approximately zero, but not exactly
 			// zero
 			if (cached) {
-				for (auto i = 0U; i < RADIX; i++) {
+				for (auto i = 0U; i < R; i++) {
 					if (zero[i] && e.p->e[i].w != Complex::zero) {
 						cn.returnToCache(e.p->e[i].w);
 						e.p->e[i] = Edge<Node>::zero;
@@ -275,7 +294,7 @@ namespace dd {
 			fp max = 0;
 			auto maxc = Complex::one;
 			// determine max amplitude
-			for (auto i = 0U; i < RADIX; ++i) {
+			for (auto i = 0U; i < R; ++i) {
 				if (zero[i]) {
 					continue;
 				}
@@ -306,7 +325,7 @@ namespace dd {
 
 			auto r = e;
 			// divide each entry by max
-			for (auto i = 0U; i < RADIX; ++i) {
+			for (auto i = 0U; i < R; ++i) {
 				if (static_cast<decltype(argmax)>(i) == argmax) {
 					if (cached) {
 						if (r.w.exactlyOne()) {
@@ -409,7 +428,7 @@ namespace dd {
 		template <class Node>
 		Edge<Node> makeDDNode(
 			Qubit var,
-			const std::array<Edge<Node>, std::tuple_size_v<decltype(Node::e)>>& edges,
+			const std::vector<Edge<Node>>& edges,
 			bool cached = false) {
 
 			auto& uniqueTable = getUniqueTable<Node>();
@@ -739,8 +758,9 @@ namespace dd {
 				? y.p->v
 				: x.p->v;
 
-			constexpr std::size_t n = std::tuple_size_v<decltype(x.p->e)>;
-			std::array<Edge<Node>, n> edge{};
+			int n = (x.p->v != w)? y.p->e.size() : x.p->e.size();
+
+			std::vector<Edge<Node>> edge(n);
 			for (std::size_t i = 0U; i < n; i++) {
 				Edge<Node> e1{};
 				if (!x.isTerminal() && x.p->v == w) {
@@ -861,7 +881,7 @@ namespace dd {
 					return ResultEdge::zero;
 				}
 				if (res.cont_num != var_num) {
-					ComplexNumbers::mul(e.w, e.w, cn.getTemporary(pow(2, var_num - res.cont_num), 0));
+					ComplexNumbers::mul(e.w, e.w, cn.getTemporary(pow(2, var_num - res.cont_num), 0));//对于一般形状的tensor,以2为底数可能有问题
 				}
 				return e;
 			}
@@ -873,67 +893,64 @@ namespace dd {
 
 			ResultEdge e1{}, e2{}, r{};
 
-			std::array<ResultEdge, 2> e{};
-
 			if (newk1 > newk2) {
 				if (int(newk1 * 2) % 2 == 1) {
-					for (int k = 0; k < 2; ++k) {
+					r = ResultEdge::zero;
+					ResultEdge etemp{};
+					for (int k = 0; k < x.p->e.size(); ++k) {
 						e1 = x.p->e[k];
 						e2 = yCopy;
-						e[k] = cont2(e1, e2, temp_key_2_new_key1, temp_key_2_new_key2, var_num - 1);
-					}
-					if (e[0].w.exactlyZero() && e[1].w.exactlyZero()) {
-						r = ResultEdge::zero;
-					}
-					else if (e[0].w.exactlyZero()) {
-						r = e[1];
-					}
-					else if (e[1].w.exactlyZero()) {
-						r = e[0];
-					}
-					else {
-						r = T_add2(e[0], e[1]);
-						cn.returnToCache(e[0].w);
-						cn.returnToCache(e[1].w);
+						etemp = cont2(e1, e2, temp_key_2_new_key1, temp_key_2_new_key2, var_num - 1);
+						if (!etemp.w.exactlyZero()) {
+							if (r != ResultEdge::zero) {
+								auto temp = r.w;
+								r = T_add2(r, etemp);
+								cn.returnToCache(temp);
+								cn.returnToCache(etemp.w);
+							}
+							else {
+								r = etemp;
+							}
+						}
 					}
 				}
 				else {
-					for (int k = 0; k < 2; ++k) {
+					std::vector<ResultEdge> e;
+					for (int k = 0; k < x.p->e.size(); ++k) {
 						e1 = x.p->e[k];
 						e2 = yCopy;
-						e[k] = cont2(e1, e2, temp_key_2_new_key1, temp_key_2_new_key2, var_num);
+						e.push_back(cont2(e1, e2, temp_key_2_new_key1, temp_key_2_new_key2, var_num));
 					}
 					r = makeDDNode(Qubit(newk1), e, true);
 				}
 			}
 			else if (newk1 < newk2) {
-
 				if (int(newk2 * 2) % 2 == 1) {
-					for (int k = 0; k < 2; ++k) {
+					r = ResultEdge::zero;
+					ResultEdge etemp{};
+					for (int k = 0; k < y.p->e.size(); ++k) {
 						e1 = xCopy;
 						e2 = y.p->e[k];
-						e[k] = cont2(e1, e2, temp_key_2_new_key1, temp_key_2_new_key2, var_num - 1);
-					}
-					if (e[0].w.exactlyZero() && e[1].w.exactlyZero()) {
-						r = ResultEdge::zero;
-					}
-					else if (e[0].w.exactlyZero()) {
-						r = e[1];
-					}
-					else if (e[1].w.exactlyZero()) {
-						r = e[0];
-					}
-					else {
-						r = T_add2(e[0], e[1]);
-						cn.returnToCache(e[0].w);
-						cn.returnToCache(e[1].w);
+						etemp = cont2(e1, e2, temp_key_2_new_key1, temp_key_2_new_key2, var_num - 1);
+						if (!etemp.w.exactlyZero()) {
+							if (r != ResultEdge::zero) {
+								auto temp = r.w;
+								r = T_add2(r, etemp);
+								cn.returnToCache(temp);
+								cn.returnToCache(etemp.w);
+							}
+							else {
+								r = etemp;
+							}
+						}
 					}
 				}
 				else {
-					for (int k = 0; k < 2; ++k) {
+					std::vector<ResultEdge> e;
+					for (int k = 0; k < y.p->e.size(); ++k) {
 						e1 = xCopy;
 						e2 = y.p->e[k];
-						e[k] = cont2(e1, e2, temp_key_2_new_key1, temp_key_2_new_key2, var_num);
+						e.push_back(cont2(e1, e2, temp_key_2_new_key1, temp_key_2_new_key2, var_num));
 					}
 					r = makeDDNode(Qubit(newk2), e, true);
 				}
@@ -941,31 +958,31 @@ namespace dd {
 			}
 			else {
 				if (int(newk2 * 2) % 2 == 1) {
-					for (int k = 0; k < 2; ++k) {
+					r = ResultEdge::zero;
+					ResultEdge etemp{};
+					for (int k = 0; k < x.p->e.size(); ++k) {
 						e1 = x.p->e[k];
 						e2 = y.p->e[k];
-						e[k] = cont2(e1, e2, temp_key_2_new_key1, temp_key_2_new_key2, var_num - 1);
-					}
-					if (e[0].w.exactlyZero() && e[1].w.exactlyZero()) {
-						r = ResultEdge::zero;
-					}
-					else if (e[0].w.exactlyZero()) {
-						r = e[1];
-					}
-					else if (e[1].w.exactlyZero()) {
-						r = e[0];
-					}
-					else {
-						r = T_add2(e[0], e[1]);
-						cn.returnToCache(e[0].w);
-						cn.returnToCache(e[1].w);
+						etemp = cont2(e1, e2, temp_key_2_new_key1, temp_key_2_new_key2, var_num - 1);
+						if (!etemp.w.exactlyZero()) {
+							if (r != ResultEdge::zero) {
+								auto temp = r.w;
+								r = T_add2(r, etemp);
+								cn.returnToCache(temp);
+								cn.returnToCache(etemp.w);
+							}
+							else {
+								r = etemp;
+							}
+						}
 					}
 				}
 				else {
-					for (int k = 0; k < 2; ++k) {
+					std::vector<ResultEdge> e;
+					for (int k = 0; k < x.p->e.size(); ++k) {
 						e1 = x.p->e[k];
 						e2 = y.p->e[k];
-						e[k] = cont2(e1, e2, temp_key_2_new_key1, temp_key_2_new_key2, var_num);
+						e.push_back(cont2(e1, e2, temp_key_2_new_key1, temp_key_2_new_key2, var_num));
 					}
 					r = makeDDNode(Qubit(newk1), e, true);
 				}
