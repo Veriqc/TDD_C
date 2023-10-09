@@ -14,7 +14,7 @@ namespace dd {
 
         std::vector<Index> index_set;
 
-        std::string name="";
+        std::string name=NULL;
 
     };
 
