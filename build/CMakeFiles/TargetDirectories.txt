@@ -1,0 +1,3 @@
+/home/gaodc/code/TDD_C/build/CMakeFiles/TDD_C.dir
+/home/gaodc/code/TDD_C/build/CMakeFiles/edit_cache.dir
+/home/gaodc/code/TDD_C/build/CMakeFiles/rebuild_cache.dir
