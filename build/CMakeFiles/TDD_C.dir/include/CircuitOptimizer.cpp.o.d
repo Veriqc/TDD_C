@@ -1,9 +1,9 @@
 CMakeFiles/TDD_C.dir/include/CircuitOptimizer.cpp.o: \
- /home/gaodc/code/TDD_C/include/CircuitOptimizer.cpp \
+ /home/gaodc/TDD_C/include/CircuitOptimizer.cpp \
  /usr/include/stdc-predef.h \
- /home/gaodc/code/TDD_C/include/CircuitOptimizer.hpp \
- /home/gaodc/code/TDD_C/include/Definitions.hpp \
- /home/gaodc/code/TDD_C/include/operations/Expression.hpp \
+ /home/gaodc/TDD_C/include/CircuitOptimizer.hpp \
+ /home/gaodc/TDD_C/include/Definitions.hpp \
+ /home/gaodc/TDD_C/include/operations/Expression.hpp \
  /usr/include/c++/11/algorithm /usr/include/c++/11/utility \
  /usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/11/bits/os_defines.h \
@@ -211,14 +211,14 @@ CMakeFiles/TDD_C.dir/include/CircuitOptimizer.cpp.o: \
  /usr/include/c++/11/backward/auto_ptr.h \
  /usr/include/c++/11/pstl/glue_memory_defs.h /usr/include/c++/11/variant \
  /usr/include/c++/11/bits/parse_numbers.h \
- /home/gaodc/code/TDD_C/include/QuantumComputation.hpp \
- /home/gaodc/code/TDD_C/include/operations/ClassicControlledOperation.hpp \
- /home/gaodc/code/TDD_C/include/operations/Operation.hpp \
- /home/gaodc/code/TDD_C/include/operations/OpType.hpp \
+ /home/gaodc/TDD_C/include/QuantumComputation.hpp \
+ /home/gaodc/TDD_C/include/operations/ClassicControlledOperation.hpp \
+ /home/gaodc/TDD_C/include/operations/Operation.hpp \
+ /home/gaodc/TDD_C/include/operations/OpType.hpp \
  /usr/include/c++/11/iostream /usr/include/c++/11/istream \
  /usr/include/c++/11/bits/istream.tcc \
- /home/gaodc/code/TDD_C/include/operations/../Permutation.hpp \
- /home/gaodc/code/TDD_C/include/operations/../operations/Control.hpp \
+ /home/gaodc/TDD_C/include/operations/../Permutation.hpp \
+ /home/gaodc/TDD_C/include/operations/../operations/Control.hpp \
  /usr/include/c++/11/set /usr/include/c++/11/bits/stl_set.h \
  /usr/include/c++/11/bits/stl_multiset.h /usr/include/c++/11/cstring \
  /usr/include/string.h /usr/include/strings.h /usr/include/c++/11/fstream \
@@ -234,17 +234,17 @@ CMakeFiles/TDD_C.dir/include/CircuitOptimizer.cpp.o: \
  /usr/include/c++/11/bits/locale_conv.h \
  /usr/include/c++/11/bits/quoted_string.h /usr/include/c++/11/sstream \
  /usr/include/c++/11/bits/sstream.tcc \
- /home/gaodc/code/TDD_C/include/operations/NonUnitaryOperation.hpp \
- /home/gaodc/code/TDD_C/include/operations/StandardOperation.hpp \
- /home/gaodc/code/TDD_C/include/operations/SymbolicOperation.hpp \
+ /home/gaodc/TDD_C/include/operations/NonUnitaryOperation.hpp \
+ /home/gaodc/TDD_C/include/operations/StandardOperation.hpp \
+ /home/gaodc/TDD_C/include/operations/SymbolicOperation.hpp \
  /usr/include/c++/11/cstddef /usr/include/c++/11/optional \
  /usr/include/c++/11/unordered_set \
  /usr/include/c++/11/bits/unordered_set.h \
- /home/gaodc/code/TDD_C/include/parsers/qasm_parser/Parser.hpp \
- /home/gaodc/code/TDD_C/include/parsers/qasm_parser/Scanner.hpp \
- /home/gaodc/code/TDD_C/include/parsers/qasm_parser/Token.hpp \
+ /home/gaodc/TDD_C/include/parsers/qasm_parser/Parser.hpp \
+ /home/gaodc/TDD_C/include/parsers/qasm_parser/Scanner.hpp \
+ /home/gaodc/TDD_C/include/parsers/qasm_parser/Token.hpp \
  /usr/include/c++/11/stack /usr/include/c++/11/bits/stl_stack.h \
- /home/gaodc/code/TDD_C/include/parsers/qasm_parser/../../operations/CompoundOperation.hpp \
+ /home/gaodc/TDD_C/include/parsers/qasm_parser/../../operations/CompoundOperation.hpp \
  /usr/include/c++/11/regex /usr/include/c++/11/iterator \
  /usr/include/c++/11/bits/stream_iterator.h \
  /usr/include/c++/11/bits/regex_constants.h \

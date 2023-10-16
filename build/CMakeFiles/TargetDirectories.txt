@@ -1,3 +1,6 @@
-/home/gaodc/code/TDD_C/build/CMakeFiles/TDD_C.dir
-/home/gaodc/code/TDD_C/build/CMakeFiles/edit_cache.dir
-/home/gaodc/code/TDD_C/build/CMakeFiles/rebuild_cache.dir
+/home/gaodc/TDD_C/build/CMakeFiles/TDD_C.dir
+/home/gaodc/TDD_C/build/CMakeFiles/edit_cache.dir
+/home/gaodc/TDD_C/build/CMakeFiles/rebuild_cache.dir
+/home/gaodc/TDD_C/build/test/CMakeFiles/test.dir
+/home/gaodc/TDD_C/build/test/CMakeFiles/edit_cache.dir
+/home/gaodc/TDD_C/build/test/CMakeFiles/rebuild_cache.dir

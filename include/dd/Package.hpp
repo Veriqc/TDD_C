@@ -43,6 +43,12 @@
 #include <unordered_set>
 #include <vector>
 
+#include <xtensor/xarray.hpp>
+#include <xtensor/xshape.hpp>
+#include <xtensor/xio.hpp>
+#include <xtensor/xslice.hpp>
+#include <xtensor/xfixed.hpp>
+#include <xtensor/xview.hpp>
 namespace dd {
 
 	template <class Config> class Package {
@@ -104,9 +110,64 @@ namespace dd {
 	private:
 		std::size_t nqubits;
 
-		///
-		/// Vector nodes, edges and quantum states
-		///
+	public:
+		Edge<mNode> array_2_edge (const xt::xarray<ComplexValue> array, Qubit n) {
+			int node_num = array.shape(0);
+			std::vector<Edge<mNode>> edges(node_num);
+
+			if (array.dim() == 1) {
+				for (int i = 0; i < node_num; i++) {
+					if (array.at(i) == complex_zero) {
+						edges[i] = makeDDnode(n - 1, Edge<mNode>::zero, false);
+					}
+					elif(array.at(i) == complex_one) {
+						edges[i] = makeDDnode(n - 1, Edge<mNode>::one, false);
+					}
+					else {
+						edges[i] = makeDDnode(n - 1, Edge<mNode>::terminal(cn.lookup(array.at(i))), false);
+					}
+				}
+			}
+			else {
+				for (int i = 0; i < node_num; i++) {
+					edges[i] = array_2_edge(xt::view(original_array, i, xt::all()), n - 1);
+				}
+			}
+					//or check the elements in tensor
+			if (check_edges_equal(edges)) {
+				return edges[0];
+			}
+			else {
+				return makeDDnode(n, edges, false).e;
+			}
+		}
+	public:
+		TDD Tensor_2_TDD(const Tensor tn){
+			
+			if (tn.data.dim == tn.index_set.size()) {
+				throw "action non definies";
+			}
+			TDD res;
+			Qubit n = tn.index_set.size()+1;
+			int edge_num = tn.data.shape(0);
+			std::vector<Edge<mNode>> edges(edge_num);
+
+			for (int i = 0; i < edge_num; i++) {
+				edges.push_back(array_2_edge(xt::view(original_array, i, xt::all()), n-1));
+			}
+
+			if (check_edges_equal(edges)) {
+				res.e = edges[0];
+			}
+			else {
+				res.e = makeDDnode(n, edges, false);
+			}
+			res.index_set = tn.index_set;
+			res.key_2_index = generate_key(tn.index_set);
+			return res;
+		}
+
+		
 	public:
 
 

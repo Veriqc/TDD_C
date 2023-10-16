@@ -1,9 +1,7 @@
 CMakeFiles/TDD_C.dir/include/dd/Operations.cpp.o: \
- /home/gaodc/code/TDD_C/include/dd/Operations.cpp \
- /usr/include/stdc-predef.h \
- /home/gaodc/code/TDD_C/include/dd/Operations.hpp \
- /home/gaodc/code/TDD_C/include/dd/Definitions.hpp \
- /usr/include/c++/11/complex \
+ /home/gaodc/TDD_C/include/dd/Operations.cpp /usr/include/stdc-predef.h \
+ /home/gaodc/TDD_C/include/dd/Operations.hpp \
+ /home/gaodc/TDD_C/include/dd/Definitions.hpp /usr/include/c++/11/complex \
  /usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/11/bits/os_defines.h \
  /usr/include/features.h /usr/include/features-time64.h \
@@ -188,9 +186,9 @@ CMakeFiles/TDD_C.dir/include/dd/Operations.cpp.o: \
  /usr/include/c++/11/bits/stl_vector.h \
  /usr/include/c++/11/bits/stl_bvector.h \
  /usr/include/c++/11/bits/vector.tcc \
- /home/gaodc/code/TDD_C/include/dd/GateMatrixDefinitions.hpp \
- /home/gaodc/code/TDD_C/include/dd/ComplexValue.hpp \
- /home/gaodc/code/TDD_C/include/dd/ComplexTable.hpp \
+ /home/gaodc/TDD_C/include/dd/GateMatrixDefinitions.hpp \
+ /home/gaodc/TDD_C/include/dd/ComplexValue.hpp \
+ /home/gaodc/TDD_C/include/dd/ComplexTable.hpp \
  /usr/include/c++/11/algorithm /usr/include/c++/11/bits/stl_algo.h \
  /usr/include/c++/11/bits/algorithmfwd.h \
  /usr/include/c++/11/bits/stl_heap.h \
@@ -213,23 +211,23 @@ CMakeFiles/TDD_C.dir/include/dd/Operations.cpp.o: \
  /usr/include/c++/11/map /usr/include/c++/11/bits/stl_tree.h \
  /usr/include/c++/11/bits/stl_map.h \
  /usr/include/c++/11/bits/stl_multimap.h /usr/include/c++/11/cstddef \
- /home/gaodc/code/TDD_C/include/dd/Package.hpp \
- /home/gaodc/code/TDD_C/include/dd/Complex.hpp \
- /home/gaodc/code/TDD_C/include/dd/ComplexCache.hpp \
- /home/gaodc/code/TDD_C/include/dd/ComplexNumbers.hpp \
- /home/gaodc/code/TDD_C/include/dd/ComputeTable.hpp \
- /home/gaodc/code/TDD_C/include/dd/Tdd.hpp \
- /home/gaodc/code/TDD_C/include/dd/Edge.hpp \
- /home/gaodc/code/TDD_C/include/dd/Node.hpp \
- /home/gaodc/code/TDD_C/include/dd/Control.hpp /usr/include/c++/11/set \
+ /home/gaodc/TDD_C/include/dd/Package.hpp \
+ /home/gaodc/TDD_C/include/dd/Complex.hpp \
+ /home/gaodc/TDD_C/include/dd/ComplexCache.hpp \
+ /home/gaodc/TDD_C/include/dd/ComplexNumbers.hpp \
+ /home/gaodc/TDD_C/include/dd/ComputeTable.hpp \
+ /home/gaodc/TDD_C/include/dd/Tdd.hpp \
+ /home/gaodc/TDD_C/include/dd/Edge.hpp \
+ /home/gaodc/TDD_C/include/dd/Node.hpp \
+ /home/gaodc/TDD_C/include/dd/Control.hpp /usr/include/c++/11/set \
  /usr/include/c++/11/bits/stl_set.h \
  /usr/include/c++/11/bits/stl_multiset.h \
- /home/gaodc/code/TDD_C/include/dd/Package_fwd.hpp \
- /home/gaodc/code/TDD_C/include/dd/DDpackageConfig.hpp \
- /home/gaodc/code/TDD_C/include/dd/UniqueTable.hpp \
- /usr/include/c++/11/numeric /usr/include/c++/11/bits/stl_numeric.h \
- /usr/include/c++/11/bit /usr/include/c++/11/pstl/glue_numeric_defs.h \
- /usr/include/c++/11/bitset /usr/include/c++/11/fstream \
+ /home/gaodc/TDD_C/include/dd/Package_fwd.hpp \
+ /home/gaodc/TDD_C/include/dd/DDpackageConfig.hpp \
+ /home/gaodc/TDD_C/include/dd/UniqueTable.hpp /usr/include/c++/11/numeric \
+ /usr/include/c++/11/bits/stl_numeric.h /usr/include/c++/11/bit \
+ /usr/include/c++/11/pstl/glue_numeric_defs.h /usr/include/c++/11/bitset \
+ /usr/include/c++/11/fstream \
  /usr/include/x86_64-linux-gnu/c++/11/bits/basic_file.h \
  /usr/include/x86_64-linux-gnu/c++/11/bits/c++io.h \
  /usr/include/c++/11/bits/fstream.tcc /usr/include/c++/11/queue \
@@ -265,14 +263,93 @@ CMakeFiles/TDD_C.dir/include/dd/Operations.cpp.o: \
  /usr/include/c++/11/bits/regex_executor.tcc \
  /usr/include/c++/11/unordered_set \
  /usr/include/c++/11/bits/unordered_set.h \
- /home/gaodc/code/TDD_C/include/dd/../operations/ClassicControlledOperation.hpp \
- /home/gaodc/code/TDD_C/include/dd/../operations/Operation.hpp \
- /home/gaodc/code/TDD_C/include/dd/../operations/../Definitions.hpp \
- /home/gaodc/code/TDD_C/include/dd/../operations/../operations/Expression.hpp \
- /usr/include/c++/11/variant /usr/include/c++/11/bits/parse_numbers.h \
- /home/gaodc/code/TDD_C/include/dd/../operations/OpType.hpp \
- /home/gaodc/code/TDD_C/include/dd/../operations/../Permutation.hpp \
- /home/gaodc/code/TDD_C/include/dd/../operations/../operations/Control.hpp \
- /home/gaodc/code/TDD_C/include/dd/../operations/CompoundOperation.hpp \
- /home/gaodc/code/TDD_C/include/dd/../operations/NonUnitaryOperation.hpp \
- /home/gaodc/code/TDD_C/include/dd/../operations/StandardOperation.hpp
+ /home/gaodc/TDD_C/include/xtensor/xarray.hpp \
+ /home/gaodc/TDD_C/include/xtl/xsequence.hpp \
+ /home/gaodc/TDD_C/include/xtl/xtl_config.hpp \
+ /home/gaodc/TDD_C/include/xtl/xmeta_utils.hpp \
+ /home/gaodc/TDD_C/include/xtl/xfunctional.hpp \
+ /home/gaodc/TDD_C/include/xtl/xtype_traits.hpp \
+ /usr/include/c++/11/chrono /usr/include/c++/11/ratio \
+ /usr/include/c++/11/bits/parse_numbers.h \
+ /home/gaodc/TDD_C/include/xtensor/xbuffer_adaptor.hpp \
+ /home/gaodc/TDD_C/include/xtl/xclosure.hpp \
+ /home/gaodc/TDD_C/include/xtensor/xstorage.hpp \
+ /home/gaodc/TDD_C/include/xtensor/xexception.hpp \
+ /home/gaodc/TDD_C/include/xtl/xcompare.hpp \
+ /home/gaodc/TDD_C/include/xtl/xspan_impl.hpp \
+ /home/gaodc/TDD_C/include/xtensor/xtensor_config.hpp \
+ /home/gaodc/TDD_C/include/xtensor/xtensor_simd.hpp \
+ /home/gaodc/TDD_C/include/xtl/xdynamic_bitset.hpp \
+ /usr/include/c++/11/climits \
+ /usr/lib/gcc/x86_64-linux-gnu/11/include/limits.h \
+ /usr/lib/gcc/x86_64-linux-gnu/11/include/syslimits.h \
+ /usr/include/limits.h /usr/include/x86_64-linux-gnu/bits/posix1_lim.h \
+ /usr/include/x86_64-linux-gnu/bits/local_lim.h \
+ /usr/include/linux/limits.h \
+ /usr/include/x86_64-linux-gnu/bits/posix2_lim.h \
+ /usr/include/x86_64-linux-gnu/bits/xopen_lim.h \
+ /usr/include/x86_64-linux-gnu/bits/uio_lim.h \
+ /home/gaodc/TDD_C/include/xtl/xclosure.hpp \
+ /home/gaodc/TDD_C/include/xtl/xspan.hpp \
+ /home/gaodc/TDD_C/include/xtl/xspan_impl.hpp \
+ /home/gaodc/TDD_C/include/xtl/xiterator_base.hpp \
+ /home/gaodc/TDD_C/include/xtensor/xutils.hpp \
+ /home/gaodc/TDD_C/include/xtl/xfunctional.hpp \
+ /home/gaodc/TDD_C/include/xtl/xmeta_utils.hpp \
+ /home/gaodc/TDD_C/include/xtl/xtype_traits.hpp \
+ /home/gaodc/TDD_C/include/xtensor/xcontainer.hpp \
+ /home/gaodc/TDD_C/include/xtensor/xaccessible.hpp \
+ /home/gaodc/TDD_C/include/xtensor/xstrides.hpp \
+ /home/gaodc/TDD_C/include/xtensor/xshape.hpp \
+ /home/gaodc/TDD_C/include/xtensor/xlayout.hpp \
+ /home/gaodc/TDD_C/include/xtensor/xtensor_forward.hpp \
+ /home/gaodc/TDD_C/include/xtl/xoptional_sequence.hpp \
+ /home/gaodc/TDD_C/include/xtl/xdynamic_bitset.hpp \
+ /home/gaodc/TDD_C/include/xtl/xoptional.hpp \
+ /home/gaodc/TDD_C/include/xtl/xoptional_meta.hpp \
+ /home/gaodc/TDD_C/include/xtl/xmasked_value_meta.hpp \
+ /home/gaodc/TDD_C/include/xtl/xsequence.hpp \
+ /home/gaodc/TDD_C/include/xtensor/xiterable.hpp \
+ /home/gaodc/TDD_C/include/xtensor/xiterator.hpp \
+ /home/gaodc/TDD_C/include/xtl/xiterator_base.hpp \
+ /home/gaodc/TDD_C/include/xtensor/xmath.hpp \
+ /home/gaodc/TDD_C/include/xtl/xcomplex.hpp \
+ /home/gaodc/TDD_C/include/xtensor/xaccumulator.hpp \
+ /home/gaodc/TDD_C/include/xtensor/xexpression.hpp \
+ /home/gaodc/TDD_C/include/xtensor/xeval.hpp \
+ /home/gaodc/TDD_C/include/xtensor/xexpression_traits.hpp \
+ /home/gaodc/TDD_C/include/xtensor/xmanipulation.hpp \
+ /home/gaodc/TDD_C/include/xtensor/xbuilder.hpp \
+ /home/gaodc/TDD_C/include/xtensor/xbroadcast.hpp \
+ /home/gaodc/TDD_C/include/xtensor/xscalar.hpp \
+ /home/gaodc/TDD_C/include/xtensor/xfunction.hpp \
+ /home/gaodc/TDD_C/include/xtensor/xgenerator.hpp \
+ /home/gaodc/TDD_C/include/xtensor/xstrided_view.hpp \
+ /home/gaodc/TDD_C/include/xtl/xvariant.hpp \
+ /home/gaodc/TDD_C/include/xtl/xvariant_impl.hpp \
+ /home/gaodc/TDD_C/include/xtensor/xsemantic.hpp \
+ /home/gaodc/TDD_C/include/xtensor/xassign.hpp \
+ /home/gaodc/TDD_C/include/xtensor/xstrided_view_base.hpp \
+ /home/gaodc/TDD_C/include/xtensor/xslice.hpp \
+ /home/gaodc/TDD_C/include/xtensor/xoperation.hpp \
+ /home/gaodc/TDD_C/include/xtensor/xrepeat.hpp \
+ /home/gaodc/TDD_C/include/xtensor/xreducer.hpp \
+ /home/gaodc/TDD_C/include/xtensor/xshape.hpp \
+ /home/gaodc/TDD_C/include/xtensor/xio.hpp \
+ /home/gaodc/TDD_C/include/xtensor/xslice.hpp \
+ /home/gaodc/TDD_C/include/xtensor/xfixed.hpp \
+ /home/gaodc/TDD_C/include/xtensor/xview.hpp \
+ /home/gaodc/TDD_C/include/xtensor/xarray.hpp \
+ /home/gaodc/TDD_C/include/xtensor/xtensor.hpp \
+ /home/gaodc/TDD_C/include/xtensor/xview_utils.hpp \
+ /home/gaodc/TDD_C/include/dd/../operations/ClassicControlledOperation.hpp \
+ /home/gaodc/TDD_C/include/dd/../operations/Operation.hpp \
+ /home/gaodc/TDD_C/include/dd/../operations/../Definitions.hpp \
+ /home/gaodc/TDD_C/include/dd/../operations/../operations/Expression.hpp \
+ /usr/include/c++/11/variant \
+ /home/gaodc/TDD_C/include/dd/../operations/OpType.hpp \
+ /home/gaodc/TDD_C/include/dd/../operations/../Permutation.hpp \
+ /home/gaodc/TDD_C/include/dd/../operations/../operations/Control.hpp \
+ /home/gaodc/TDD_C/include/dd/../operations/CompoundOperation.hpp \
+ /home/gaodc/TDD_C/include/dd/../operations/NonUnitaryOperation.hpp \
+ /home/gaodc/TDD_C/include/dd/../operations/StandardOperation.hpp

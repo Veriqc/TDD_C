@@ -57,10 +57,10 @@ RM = /usr/local/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/gaodc/code/TDD_C
+CMAKE_SOURCE_DIR = /home/gaodc/TDD_C
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/gaodc/code/TDD_C/build
+CMAKE_BINARY_DIR = /home/gaodc/TDD_C/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -87,9 +87,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/gaodc/code/TDD_C/build/CMakeFiles /home/gaodc/code/TDD_C/build//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/gaodc/TDD_C/build/CMakeFiles /home/gaodc/TDD_C/build//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/gaodc/code/TDD_C/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/gaodc/TDD_C/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -128,6 +128,19 @@ TDD_C: cmake_check_build_system
 TDD_C/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/TDD_C.dir/build.make CMakeFiles/TDD_C.dir/build
 .PHONY : TDD_C/fast
+
+#=============================================================================
+# Target rules for targets named test
+
+# Build rule for target.
+test: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test
+.PHONY : test
+
+# fast build rule for target.
+test/fast:
+	$(MAKE) $(MAKESILENT) -f test/CMakeFiles/test.dir/build.make test/CMakeFiles/test.dir/build
+.PHONY : test/fast
 
 include/CircuitOptimizer.o: include/CircuitOptimizer.cpp.o
 .PHONY : include/CircuitOptimizer.o
@@ -570,6 +583,7 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... TDD_C"
+	@echo "... test"
 	@echo "... include/CircuitOptimizer.o"
 	@echo "... include/CircuitOptimizer.i"
 	@echo "... include/CircuitOptimizer.s"

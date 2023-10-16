@@ -79,32 +79,6 @@ include(CMake/GlobalSettingsInclude.cmake OPTIONAL)
 ################################################################################
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 set(PROJECT_NAME TDD_C)
 
 ################################################################################
@@ -130,6 +104,7 @@ set(Header_Files
     "include/dd/Package.hpp"
     "include/dd/Package_fwd.hpp"
     "include/dd/Tdd.hpp"
+    "include/dd/Tensor.hpp"
     "include/dd/UniqueTable.hpp"
     "include/Definitions.hpp"
     "include/operations/ClassicControlledOperation.hpp"
@@ -361,3 +336,4 @@ if(MSVC)
     endif()
 endif()
 
+add_subdirectory(test)

@@ -13,6 +13,7 @@ set(CMAKE_MAKEFILE_DEPENDS
   "../CMakeLists.txt"
   "CMakeFiles/3.23.0/CMakeCXXCompiler.cmake"
   "CMakeFiles/3.23.0/CMakeSystem.cmake"
+  "../test/CMakeLists.txt"
   "/usr/local/share/cmake-3.23/Modules/CMakeCXXCompiler.cmake.in"
   "/usr/local/share/cmake-3.23/Modules/CMakeCXXCompilerABI.cpp"
   "/usr/local/share/cmake-3.23/Modules/CMakeCXXInformation.cmake"
@@ -97,9 +98,11 @@ set(CMAKE_MAKEFILE_PRODUCTS
   "CMakeFiles/3.23.0/CMakeCXXCompiler.cmake"
   "CMakeFiles/3.23.0/CMakeCXXCompiler.cmake"
   "CMakeFiles/CMakeDirectoryInformation.cmake"
+  "test/CMakeFiles/CMakeDirectoryInformation.cmake"
   )
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/TDD_C.dir/DependInfo.cmake"
+  "test/CMakeFiles/test.dir/DependInfo.cmake"
   )
