@@ -133,16 +133,16 @@ namespace dd {
 		}
 	public:
 		Edge<mNode> xarray_2_edge(
-			const xt::xarray<ComplexValue>& ar, 
+			const xt::xarray<ComplexValue>& array, 
 			const std::vector<std::size_t>& order ={})
 		{
-			std::size_t sum_of_dim = std::accumulate(ar.shape().begin(),
-													ar.shape().end(),
+			std::size_t sum_of_dim = std::accumulate(array.shape().begin(),
+													array.shape().end(),
 													0);
 
-			if(sum_of_dim == ar.dimension()){
+			if(sum_of_dim == array.dimension()){
 				std::vector<Edge<mNode>> edges;
-				for(auto num: ar){
+				for(auto num: array){
 					if (num == complex_zero) {
 						edges.push_back(Edge<mNode>::zero);
 					}
@@ -158,20 +158,20 @@ namespace dd {
 					return edges[0];
 				}
 				else{
-					return makeDDnode(0, edges, false);
+					return makeDDnode_( (Qubit)0, edges, false);
 				}
 			}
 
 			if(order.empty()){
 				// list(range(dim))
-				std::vector<Qubit> order(ar.dimension()) ;
+				std::vector<std::size_t> order(array.dimension()) ;
 				std::iota(order.begin(),order.end(), 0);
 			}
 			
-			Qubit x = std::max_element(order.begin(), order.end());
-			auto split_pos = std::distance(order.begin(), x);
+			auto split_pos = std::max_element(order.begin(), order.end()) - order.begin();
+			Qubit x = order[split_pos];
 			order[split_pos] = -1;
-			std::vector<xt::xarray<ComplexValue>> split_U = xt::split(ar, ar.shape(split_pos), split_pos);
+			std::vector<xt::xarray<ComplexValue>> split_U = xt::split(array, array.shape(split_pos), split_pos);
 
 			
 			std::vector<Edge<mNode>> edges;
@@ -183,7 +183,7 @@ namespace dd {
 				return edges[0];
 			}
 			else {
-				return makeDDnode( x+1, edges, false);
+				return makeDDNode_( (Qubit)x+1, edges, false);
 			}
 		}
 
@@ -502,7 +502,7 @@ namespace dd {
 		template <class Node>
 		Edge<Node> makeDDNode(
 			Qubit var,
-			const std::array<Edge<Node>, std::tuple_size_v<decltype(Node::e)>>& edges,
+			const std::vector<Edge<Node>>, std::array<Edge<Node>, std::tuple_size_v<decltype(Node::e)>>& edges,
 			bool cached = false) {
 
 			auto& uniqueTable = getUniqueTable<Node>();
@@ -542,7 +542,7 @@ namespace dd {
 		template <class Node>
 		Edge<Node> makeDDNode(
 			Qubit var,
-			const std::vector<Edge<mNode>> edges,
+			const std::vector<Edge<Node>> edges,
 			bool cached = false) {
 			if(edges.size() > 2){
 				throw "action non definies";
