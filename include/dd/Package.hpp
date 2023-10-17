@@ -132,21 +132,28 @@ namespace dd {
 			return res;
 		}
 	public:
-		Edge<mNode> xarray_2_edge(const xt::xarray<ComplexValue>& ar, const std::vector<std::size_t>& order ={}){
-			if(std::accumulate(ar.shape().begin(), ar.shape().end(),0) == ar.dimension()){
-				int len = ar.size() ;
-				std::array<Edge<mNode>, len> edges;
-				for(int i ; i < ar.size(); i++){
-					if (ar[i] == complex_zero) {
-						edges[i] = Edge<mNode>::zero;
+		Edge<mNode> xarray_2_edge(
+			const xt::xarray<ComplexValue>& ar, 
+			const std::vector<std::size_t>& order ={})
+		{
+			std::size_t sum_of_dim = std::accumulate(ar.shape().begin(),
+													ar.shape().end(),
+													0);
+
+			if(sum_of_dim == ar.dimension()){
+				std::vector<Edge<mNode>> edges;
+				for(auto num: ar){
+					if (num == complex_zero) {
+						edges.push_back(Edge<mNode>::zero);
 					}
-					else if (ar[i] == complex_one) {
-						edges[i] = Edge<mNode>::one;
+					else if (num == complex_one) {
+						edges.push_back(Edge<mNode>::one);
 					}
 					else {
-						edges[i] = Edge<mNode>::terminal(cn.lookup(ar[i]));
+						edges.push_back(Edge<mNode>::terminal(cn.lookup(num)));
 					}
 				}
+
 				if(check_edges_equal){
 					return edges[0];
 				}
@@ -154,28 +161,29 @@ namespace dd {
 					return makeDDnode(0, edges, false);
 				}
 			}
+
 			if(order.empty()){
 				// list(range(dim))
-				std::vector<std::size_t> order(ar.dimension()) ;
+				std::vector<Qubit> order(ar.dimension()) ;
 				std::iota(order.begin(),order.end(), 0);
 			}
 			
-			auto x = std::max_element(order.begin(), order.end());
+			Qubit x = std::max_element(order.begin(), order.end());
 			auto split_pos = std::distance(order.begin(), x);
 			order[split_pos] = -1;
-			auto split_U = xt::split(ar, ar.shape(split_pos), split_pos);
+			std::vector<xt::xarray<ComplexValue>> split_U = xt::split(ar, ar.shape(split_pos), split_pos);
 
 			
-			std::array<Edge<mNode>,split_U.size()> edges;
-			for (int i = 0; i < split_U.size() ; i ++ ) {
-				edges[i] = xarray_2_edge(split_U[i],order);
+			std::vector<Edge<mNode>> edges;
+			for (auto u: split_U) {
+				edges.push_back(xarray_2_edge(u,order));
 			}
 
 			if (check_edges_equal(edges)) {
 				return edges[0];
 			}
 			else {
-				return makeDDnode((Qubit)x+1, edges, false);
+				return makeDDnode( x+1, edges, false);
 			}
 		}
 
@@ -524,6 +532,49 @@ namespace dd {
 
 			// look it up in the unique tables
 			auto l = uniqueTable.lookup(e, false);
+
+			assert(l.p->v == var || l.isTerminal());
+
+			return l;
+		}
+
+
+		template <class Node>
+		Edge<Node> makeDDNode(
+			Qubit var,
+			const std::vector<Edge<mNode>> edges,
+			bool cached = false) {
+			if(edges.size() > 2){
+				throw "action non definies";
+			}
+
+			auto& uniqueTable = getUniqueTable<Node>();
+			Edge<Node> edge{uniqueTable.getNode(), Complex::one};
+			edge.p->v = var;
+			edge.p->e = edges;
+
+			assert(edge.p->ref == 0);
+
+			// Le code doit être modifié pour prendre en compte des dimensions plus élevées.
+			if (edges[0].p == edges[1].p && edge.p->e[0].w.approximatelyEquals(edge.p->e[1].w)) {
+				if (cached) {
+					if (edge.p->e[1].w != Complex::zero) {
+						cn.returnToCache(edge.p->e[1].w);
+						return edges[0];
+					}
+
+					return edges[0];
+
+				}
+				return edges[0];
+			}
+
+			edge = normalize(edge, cached);
+
+			assert(edge.p->v == var || edge.isTerminal());
+
+			// look it up in the unique tables
+			auto l = uniqueTable.lookup(edge, false);
 
 			assert(l.p->v == var || l.isTerminal());
 
