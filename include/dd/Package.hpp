@@ -13,10 +13,8 @@
 #include "Package_fwd.hpp"
 
 #include "UniqueTable.hpp"
-
+#include "Tensor.hpp"
 #include "Tdd.hpp"
-
-
 
 #include <algorithm>
 #include <array>
@@ -42,6 +40,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+#include <numeric>
 
 #include <xtensor/xarray.hpp>
 #include <xtensor/xshape.hpp>
@@ -109,65 +108,90 @@ namespace dd {
 
 	private:
 		std::size_t nqubits;
+	private:
+		bool check_edges_equal(std::vector<Edge<mNode>> edges) {
+			auto verify_p = edges[0].p;
+			auto verify_w = edges[0].w;
 
+			for (auto &edge: edges) {
+				if (edge.p != verify_p) {
+					return false;
+				}
+				if (edge.w != verify_w) {
+					return false;
+				}
+			}
+			return true;
+		}
+	private:
+		std::vector<std::string> generate_key(std::vector<Index> var) {
+			std::vector<std::string> res(var.size());
+			for (auto &index: var) {
+				res.push_back(index.key);
+			}
+			return res;
+		}
 	public:
-		Edge<mNode> array_2_edge (const xt::xarray<ComplexValue> array, Qubit n) {
-			int node_num = array.shape(0);
-			std::vector<Edge<mNode>> edges(node_num);
-
-			if (array.dim() == 1) {
-				for (int i = 0; i < node_num; i++) {
-					if (array.at(i) == complex_zero) {
-						edges[i] = makeDDnode(n - 1, Edge<mNode>::zero, false);
+		Edge<mNode> xarray_2_edge(const xt::xarray<ComplexValue>& ar, const std::vector<std::size_t>& order ={}){
+			if(std::accumulate(ar.shape().begin(), ar.shape().end(),0) == ar.dimension()){
+				int len = ar.size() ;
+				std::array<Edge<mNode>, len> edges;
+				for(int i ; i < ar.size(); i++){
+					if (ar[i] == complex_zero) {
+						edges[i] = Edge<mNode>::zero;
 					}
-					elif(array.at(i) == complex_one) {
-						edges[i] = makeDDnode(n - 1, Edge<mNode>::one, false);
+					else if (ar[i] == complex_one) {
+						edges[i] = Edge<mNode>::one;
 					}
 					else {
-						edges[i] = makeDDnode(n - 1, Edge<mNode>::terminal(cn.lookup(array.at(i))), false);
+						edges[i] = Edge<mNode>::terminal(cn.lookup(ar[i]));
 					}
 				}
-			}
-			else {
-				for (int i = 0; i < node_num; i++) {
-					edges[i] = array_2_edge(xt::view(original_array, i, xt::all()), n - 1);
+				if(check_edges_equal){
+					return edges[0];
+				}
+				else{
+					return makeDDnode(0, edges, false);
 				}
 			}
-					//or check the elements in tensor
+			if(order.empty()){
+				// list(range(dim))
+				std::vector<std::size_t> order(ar.dimension()) ;
+				std::iota(order.begin(),order.end(), 0);
+			}
+			
+			auto x = std::max_element(order.begin(), order.end());
+			auto split_pos = std::distance(order.begin(), x);
+			order[split_pos] = -1;
+			auto split_U = xt::split(ar, ar.shape(split_pos), split_pos);
+
+			
+			std::array<Edge<mNode>,split_U.size()> edges;
+			for (int i = 0; i < split_U.size() ; i ++ ) {
+				edges[i] = xarray_2_edge(split_U[i],order);
+			}
+
 			if (check_edges_equal(edges)) {
 				return edges[0];
 			}
 			else {
-				return makeDDnode(n, edges, false).e;
+				return makeDDnode((Qubit)x+1, edges, false);
 			}
 		}
+
 	public:
 		TDD Tensor_2_TDD(const Tensor tn){
-			
-			if (tn.data.dim == tn.index_set.size()) {
+			if (tn.data.dimension() != tn.index_set.size()) {
 				throw "action non definies";
 			}
+
 			TDD res;
-			Qubit n = tn.index_set.size()+1;
-			int edge_num = tn.data.shape(0);
-			std::vector<Edge<mNode>> edges(edge_num);
-
-			for (int i = 0; i < edge_num; i++) {
-				edges.push_back(array_2_edge(xt::view(original_array, i, xt::all()), n-1));
-			}
-
-			if (check_edges_equal(edges)) {
-				res.e = edges[0];
-			}
-			else {
-				res.e = makeDDnode(n, edges, false);
-			}
+			res.e = xarray_2_edge(tn.data);
 			res.index_set = tn.index_set;
 			res.key_2_index = generate_key(tn.index_set);
+
 			return res;
 		}
-
-		
 	public:
 
 
@@ -176,23 +200,23 @@ namespace dd {
 		TDD Matrix2TDD(const GateMatrix mat, std::vector<Index> var_out)
 		{
 
-			TDD low, high, res;
-			Edge<mNode> e_temp[4];
+			TDD low_dd, high_dd, res;
+			Edge<mNode> edge_temp[4];
 
-			std::array<Edge<mNode>, 2> e_low{}, e_high{}, e{};
+			std::array<Edge<mNode>, 2> low_edges{}, high_edges{}, edges{};
 
 			int Radix = 2;
 
 			for (int i = 0; i < Radix; i++) {
 				for (int j = 0; j < Radix; j++) {
 					if (mat[2 * i + j] == complex_zero) {
-						e_temp[i * Radix + j] = Edge<mNode>::zero;
+						edge_temp[i * Radix + j] = Edge<mNode>::zero;
 					}
 					else if (mat[2 * i + j] == complex_one) {
-						e_temp[i * Radix + j] = Edge<mNode>::one;
+						edge_temp[i * Radix + j] = Edge<mNode>::one;
 					}
 					else {
-						e_temp[i * Radix + j] = Edge<mNode>::terminal(cn.lookup(mat[2 * i + j]));
+						edge_temp[i * Radix + j] = Edge<mNode>::terminal(cn.lookup(mat[2 * i + j]));
 					}
 				}
 			}
@@ -200,40 +224,40 @@ namespace dd {
 
 			std::vector<std::string> key_2_index;
 			if (varOrder[var_out[0].key] < varOrder[var_out[1].key]) {
-				e_low[0] = e_temp[0];
-				e_low[1] = e_temp[1];
-				e_high[0] = e_temp[2];
-				e_high[1] = e_temp[3];
+				low_edges[0] = edge_temp[0];
+				low_edges[1] = edge_temp[1];
+				high_edges[0] = edge_temp[2];
+				high_edges[1] = edge_temp[3];
 				key_2_index = { var_out[0].key,var_out[1].key };
 			}
 			else {
-				e_low[0] = e_temp[0];
-				e_low[1] = e_temp[2];
-				e_high[0] = e_temp[1];
-				e_high[1] = e_temp[3];
+				low_edges[0] = edge_temp[0];
+				low_edges[1] = edge_temp[2];
+				high_edges[0] = edge_temp[1];
+				high_edges[1] = edge_temp[3];
 				key_2_index = { var_out[1].key,var_out[0].key };
 			}
 
 
-			if (e_low[0].p == e_low[1].p and e_low[0].w == e_low[1].w) {
-				low.e = e_low[0];
+			if (low_edges[0].p == low_edges[1].p and low_edges[0].w == low_edges[1].w) {
+				low_dd.e = low_edges[0];
 			}
 			else {
-				low.e = makeDDNode(0, e_low, false);
+				low_dd.e = makeDDNode(0, low_edges, false);
 			}
-			if (e_high[0].p == e_high[1].p and e_high[0].w == e_high[1].w) {
-				high.e = e_high[0];
-			}
-			else {
-				high.e = makeDDNode(0, e_high, false);
-			}
-			if (low.e.p == high.e.p and low.e.w == high.e.w) {
-				res.e = low.e;
+			if (high_edges[0].p == high_edges[1].p and high_edges[0].w == high_edges[1].w) {
+				high_dd.e = high_edges[0];
 			}
 			else {
-				e[0] = low.e;
-				e[1] = high.e;
-				res.e = makeDDNode(1, e, false); ;
+				high_dd.e = makeDDNode(0, high_edges, false);
+			}
+			if (low_dd.e.p == high_dd.e.p and low_dd.e.w == high_dd.e.w) {
+				res.e = low_dd.e;
+			}
+			else {
+				edges[0] = low_dd.e;
+				edges[1] = high_dd.e;
+				res.e = makeDDNode(1, edges, false); ;
 			}
 			res.index_set = var_out;
 			res.key_2_index = key_2_index;

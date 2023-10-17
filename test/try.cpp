@@ -12,7 +12,7 @@ int main(int argc, char* argv[])
        {2.0, 5.0, 7.0}};
 
 
-    dd::array_2_edge(arr,5);
+    // dd::array_2_edge(arr,5);
 
     return 0;
 }
