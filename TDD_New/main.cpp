@@ -44,14 +44,14 @@ int main(int argc, char* argv[])
 
     std::cout << arr2.size() << std::endl;
 
-	auto dd = std::make_unique<dd::Package<>>(10);
+	//auto dd = std::make_unique<dd::Package<>>(10);
 
-	xt::xarray<int> U = { {{{1, 0}, {0, 1}}, {{0, 0}, {0, 0}}}, {{{0, 0}, {0, 0}}, {{0, 1}, {1, 0}}} };
+	//xt::xarray<int> U = { {{{1, 0}, {0, 1}}, {{0, 0}, {0, 0}}}, {{{0, 0}, {0, 0}}, {{0, 1}, {1, 0}}} };
 
-	dd::Tensor ts = { U,{} };
+	//dd::Tensor ts = { U,{} };
 
-	auto tdd = dd->Tensor_2_TDD(ts);
-	dd::export2Dot(tdd.e, "tdd1");
+	//auto tdd = dd->Tensor_2_TDD(ts);
+	//dd::export2Dot(tdd.e, "tdd1");
 
 
 }

@@ -152,7 +152,8 @@ namespace dd {
 
 		Edge<mNode> xarray_2_edge(
 			const xt::xarray<ComplexValue>& array,
-			std::vector<int>& order){
+			const std::vector<std::size_t>& order = {})
+{
 			std::size_t sum_of_dim = std::accumulate(array.shape().begin(),
 				array.shape().end(),
 				0);
@@ -176,7 +177,7 @@ namespace dd {
 
 			if (order.empty()) {
 				// list(range(dim))
-				std::vector<int> order(array.dimension());
+				std::vector<std::size_t> order(array.dimension());
 				std::iota(order.begin(), order.end(), 0);
 			}
 
@@ -204,13 +205,12 @@ namespace dd {
 		}
 
 		TDD Tensor_2_TDD(const Tensor tn) {
-			//if (tn.data.dimension() != tn.index_set.size()) {
-			//	throw "action non definies";
-			//}
+			if (tn.data.dimension() != tn.index_set.size()) {
+				throw "action non definies";
+			}
 
 			TDD res;
-			std::vector<int> order = {};
-			res.e = xarray_2_edge(tn.data, &order);
+			res.e = xarray_2_edge(tn.data);
 			res.index_set = tn.index_set;
 			res.key_2_index = generate_key(tn.index_set);
 
