@@ -76,7 +76,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>C:\Users\23626\Documents\GitHub\TDD_C\TDD_New;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
-    <ExternalIncludePath>$(SolutionDir)\TDD_New;$(ExternalIncludePath)</ExternalIncludePath>
+    <ExternalIncludePath>C:\Users\23626\.conda\pkgs\xtl-0.7.4-h5362a0b_0\Library\include;C:\Users\23626\.conda\pkgs\xtensor-0.24.0-h5362a0b_0\Library\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</ExternalIncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

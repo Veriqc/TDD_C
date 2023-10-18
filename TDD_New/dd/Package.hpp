@@ -43,6 +43,15 @@
 #include <unordered_set>
 #include <vector>
 
+#include <numeric>
+
+#include <xtensor/xarray.hpp>
+#include <xtensor/xshape.hpp>
+#include <xtensor/xio.hpp>
+#include <xtensor/xslice.hpp>
+#include <xtensor/xfixed.hpp>
+#include <xtensor/xview.hpp>
+
 namespace dd {
 
 	template <class Config> class Package {
@@ -125,6 +134,90 @@ namespace dd {
 
 		//	return res;
 		//}
+
+		//bool check_edges_equal(std::vector<Edge<mNode>> edges) {
+		//	auto verify_p = edges[0].p;
+		//	auto verify_w = edges[0].w;
+
+		//	for (auto& edge : edges) {
+		//		if (edge.p != verify_p) {
+		//			return false;
+		//		}
+		//		if (edge.w != verify_w) {
+		//			return false;
+		//		}
+		//	}
+		//	return true;
+		//}
+
+		Edge<mNode> xarray_2_edge(
+			const xt::xarray<ComplexValue>& array,
+			std::vector<int>& order){
+			std::size_t sum_of_dim = std::accumulate(array.shape().begin(),
+				array.shape().end(),
+				0);
+
+			if (sum_of_dim == array.dimension()) {
+				std::vector<Edge<mNode>> edges;
+				for (auto num : array) {
+					if (num == complex_zero) {
+						edges.push_back(Edge<mNode>::zero);
+					}
+					else if (num == complex_one) {
+						edges.push_back(Edge<mNode>::one);
+					}
+					else {
+						edges.push_back(Edge<mNode>::terminal(cn.lookup(num)));
+					}
+				}
+			return makeDDNode(0, edges, false);
+
+			}
+
+			if (order.empty()) {
+				// list(range(dim))
+				std::vector<int> order(array.dimension());
+				std::iota(order.begin(), order.end(), 0);
+			}
+
+			auto split_pos = std::max_element(order.begin(), order.end()) - order.begin();
+			Qubit x = order[split_pos];
+			order[split_pos] = -1;
+			std::vector<xt::xarray<ComplexValue>> split_U = xt::split(array, array.shape(split_pos), split_pos);
+
+
+			std::vector<Edge<mNode>> edges;
+			for (auto u : split_U) {
+				edges.push_back(xarray_2_edge(u, order));
+			}
+
+			return makeDDNode((Qubit)x + 1, edges, false);
+
+		}
+
+		std::vector<std::string> generate_key(std::vector<Index> var) {
+			std::vector<std::string> res(var.size());
+			for (auto& index : var) {
+				res.push_back(index.key);
+			}
+			return res;
+		}
+
+		TDD Tensor_2_TDD(const Tensor tn) {
+			//if (tn.data.dimension() != tn.index_set.size()) {
+			//	throw "action non definies";
+			//}
+
+			TDD res;
+			std::vector<int> order = {};
+			res.e = xarray_2_edge(tn.data, &order);
+			res.index_set = tn.index_set;
+			res.key_2_index = generate_key(tn.index_set);
+
+			return res;
+		}
+
+
 
 		TDD Matrix2TDD(const GateMatrix mat, std::vector<Index> var_out)
 		{
@@ -438,19 +531,39 @@ namespace dd {
 
 			assert(e.p->ref == 0);
 
-
-			if (edges[0].p == edges[1].p && e.p->e[0].w.approximatelyEquals(e.p->e[1].w)) {
-				if (cached) {
-					if (e.p->e[1].w != Complex::zero) {
-						cn.returnToCache(e.p->e[1].w);
-						return edges[0];
-					}
-
-					return edges[0];
-
+			bool all_equal = true;
+			for (int k = 0; k < edges.size(); k++) {
+				if (edges[k].p != edges[0].p || !e.p->e[k].w.approximatelyEquals(e.p->e[0].w)) {
+					all_equal = false;
+					break;
 				}
-				return edges[0];
+
 			}
+
+			if (all_equal) {
+				if (cached) {
+					for (int k = 1; k < edges.size(); k++) {
+						if (e.p->e[k].w != Complex::zero && e.p->e[k].w != Complex::one) {
+							cn.returnToCache(e.p->e[k].w);
+							return edges[0];
+						}
+					}
+					return edges[0];
+				}
+			}
+
+			//if (edges[0].p == edges[1].p && e.p->e[0].w.approximatelyEquals(e.p->e[1].w)) {
+			//	if (cached) {
+			//		if (e.p->e[1].w != Complex::zero) {
+			//			cn.returnToCache(e.p->e[1].w);
+			//			return edges[0];
+			//		}
+
+			//		return edges[0];
+
+			//	}
+			//	return edges[0];
+			//}
 
 			e = normalize(e, cached);
 
