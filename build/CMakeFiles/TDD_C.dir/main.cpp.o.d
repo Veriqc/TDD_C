@@ -359,4 +359,5 @@ CMakeFiles/TDD_C.dir/main.cpp.o: /home/gaodc/TDD_C/main.cpp \
  /home/gaodc/TDD_C/include/xtensor/xshape.hpp \
  /home/gaodc/TDD_C/include/xtensor/xslice.hpp \
  /home/gaodc/TDD_C/include/xtensor/xfixed.hpp \
+ /home/gaodc/TDD_C/include/xtensor/xmanipulation.hpp \
  /home/gaodc/TDD_C/include/Cir_import.h /usr/include/c++/11/math.h

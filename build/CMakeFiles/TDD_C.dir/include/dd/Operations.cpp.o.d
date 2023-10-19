@@ -344,6 +344,7 @@ CMakeFiles/TDD_C.dir/include/dd/Operations.cpp.o: \
  /home/gaodc/TDD_C/include/xtensor/xshape.hpp \
  /home/gaodc/TDD_C/include/xtensor/xslice.hpp \
  /home/gaodc/TDD_C/include/xtensor/xfixed.hpp \
+ /home/gaodc/TDD_C/include/xtensor/xmanipulation.hpp \
  /home/gaodc/TDD_C/include/dd/../operations/ClassicControlledOperation.hpp \
  /home/gaodc/TDD_C/include/dd/../operations/Operation.hpp \
  /home/gaodc/TDD_C/include/dd/../operations/../Definitions.hpp \

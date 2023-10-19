@@ -51,7 +51,7 @@
 #include <xtensor/xslice.hpp>
 #include <xtensor/xfixed.hpp>
 #include <xtensor/xview.hpp>
-
+#include <xtensor/xmanipulation.hpp>
 namespace dd {
 
 	template <class Config> class Package {
@@ -152,9 +152,11 @@ namespace dd {
 
 		Edge<mNode> xarray_2_edge(
 			const xt::xarray<ComplexValue>& array,
-			const std::vector<int>& order = {}){
-
-			if (array.dimension()==1) {
+			std::vector<int>& order){
+			int sum_of_dim = std::accumulate(array.shape().begin(),
+											array.shape().end(),
+											0);
+			if (sum_of_dim == array.dimension()) {
 				std::vector<Edge<mNode>> edges;
 				for (auto num : array) {
 					if (num == complex_zero) {
@@ -171,16 +173,50 @@ namespace dd {
 
 			}
 
-			if (order.empty()) {
-				// list(range(dim))
-				std::vector<std::size_t> order(array.dimension());
-				std::iota(order.begin(), order.end(), 0);
+			auto split_pos = std::max_element(order.begin(), order.end()) - order.begin();
+			Qubit x = order[split_pos];
+			order[split_pos] = -1;
+			auto split_U = xt::split(array, array.shape(split_pos), split_pos);
+
+
+			std::vector<Edge<mNode>> edges;
+			for (auto u : split_U) {
+				edges.push_back(xarray_2_edge(u, order));
+			}
+
+			return makeDDNode((Qubit)x + 1, edges, false);
+
+		}
+
+		Edge<mNode> xarray_2_edge(
+			const xt::xarray<ComplexValue>& array){
+			
+			std::vector<int> order(array.dimension());
+			std::iota(order.begin(), order.end(), 0);
+			int sum_of_dim = std::accumulate(array.shape().begin(),
+											array.shape().end(),
+											0);
+			if (sum_of_dim == array.dimension()) {
+				std::vector<Edge<mNode>> edges;
+				for (auto num : array) {
+					if (num == complex_zero) {
+						edges.push_back(Edge<mNode>::zero);
+					}
+					else if (num == complex_one) {
+						edges.push_back(Edge<mNode>::one);
+					}
+					else {
+						edges.push_back(Edge<mNode>::terminal(cn.lookup(num)));
+					}
+				}
+			return makeDDNode(0, edges, false);
+
 			}
 
 			auto split_pos = std::max_element(order.begin(), order.end()) - order.begin();
 			Qubit x = order[split_pos];
 			order[split_pos] = -1;
-			std::vector<xt::xarray<ComplexValue>> split_U = xt::split(array, array.shape(split_pos), split_pos);
+			auto split_U = xt::split(array, array.shape(split_pos), split_pos);
 
 
 			std::vector<Edge<mNode>> edges;
