@@ -8,13 +8,15 @@
 #include <array>
 #include <cstddef>
 #include <utility>
+#include <vector>
 
 namespace dd {
 
 
 	// NOLINTNEXTLINE(readability-identifier-naming)
 	struct mNode {
-		std::array<Edge<mNode>, RADIX> e{}; // edges out of this node
+		//std::array<Edge<mNode>, RADIX> e{}; // edges out of this node
+		std::vector<Edge<mNode>> e; // edges out of this node
 		mNode* next{};                      // used to link nodes in unique table
 		RefCount ref{};                     // reference count
 		Qubit v{}; // variable index (nonterminal) value (-1 for terminal)
@@ -31,5 +33,3 @@ namespace dd {
 	using mCachedEdge = CachedEdge<mNode>;
 
 } // namespace dd
-
-

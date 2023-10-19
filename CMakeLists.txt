@@ -3,7 +3,8 @@ cmake_minimum_required(VERSION 3.16.0 FATAL_ERROR)
 set(CMAKE_SYSTEM_VERSION 10.0 CACHE STRING "" FORCE)
 
 project(TDD_C CXX)
-
+set(CXX_STANDARD 20)
+set(CXX_STANDARD_REQUIRED True)
 ################################################################################
 # Set target arch type if empty. Visual studio solution generator provides it.
 ################################################################################

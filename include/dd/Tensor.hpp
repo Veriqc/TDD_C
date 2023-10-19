@@ -1,10 +1,10 @@
-#ifndef C8FAF390_DFC3_4832_9CED_297E251943C5
-#define C8FAF390_DFC3_4832_9CED_297E251943C5
+#pragma once
 
 
 #include <xtensor/xio.hpp>
 #include <xtensor/xview.hpp>
 #include <xtensor/xarray.hpp>
+#include <xtensor/xtensor.hpp>
 #include "Tdd.hpp"
 
 namespace dd {
@@ -26,6 +26,3 @@ namespace dd {
 
 
 }
-
-
-#endif /* C8FAF390_DFC3_4832_9CED_297E251943C5 */

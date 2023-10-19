@@ -13,8 +13,10 @@
 #include "Package_fwd.hpp"
 
 #include "UniqueTable.hpp"
-#include "Tensor.hpp"
+
 #include "Tdd.hpp"
+#include "Tensor.hpp"
+
 
 #include <algorithm>
 #include <array>
@@ -40,6 +42,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+#include <stdexcept>
 #include <numeric>
 
 #include <xtensor/xarray.hpp>
@@ -48,6 +51,7 @@
 #include <xtensor/xslice.hpp>
 #include <xtensor/xfixed.hpp>
 #include <xtensor/xview.hpp>
+
 namespace dd {
 
 	template <class Config> class Package {
@@ -108,41 +112,51 @@ namespace dd {
 
 	private:
 		std::size_t nqubits;
-	private:
-		bool check_edges_equal(std::vector<Edge<mNode>> edges) {
-			auto verify_p = edges[0].p;
-			auto verify_w = edges[0].w;
 
-			for (auto &edge: edges) {
-				if (edge.p != verify_p) {
-					return false;
-				}
-				if (edge.w != verify_w) {
-					return false;
-				}
-			}
-			return true;
-		}
-	private:
-		std::vector<std::string> generate_key(std::vector<Index> var) {
-			std::vector<std::string> res(var.size());
-			for (auto &index: var) {
-				res.push_back(index.key);
-			}
-			return res;
-		}
+		///
+		/// Vector nodes, edges and quantum states
+		///
 	public:
-		Edge<mNode> xarray_2_edge(
-			const xt::xarray<ComplexValue>& array, 
-			const std::vector<std::size_t>& order ={})
-		{
-			std::size_t sum_of_dim = std::accumulate(array.shape().begin(),
-													array.shape().end(),
-													0);
 
-			if(sum_of_dim == array.dimension()){
+
+		//==========================================我写的========================================
+		//template <class Node>
+
+		//TDD Tensor_2_TDD(const Tensor tn)
+		//{
+
+		//	TDD res;
+
+		//	if()
+
+
+
+
+		//	return res;
+		//}
+
+		//bool check_edges_equal(std::vector<Edge<mNode>> edges) {
+		//	auto verify_p = edges[0].p;
+		//	auto verify_w = edges[0].w;
+
+		//	for (auto& edge : edges) {
+		//		if (edge.p != verify_p) {
+		//			return false;
+		//		}
+		//		if (edge.w != verify_w) {
+		//			return false;
+		//		}
+		//	}
+		//	return true;
+		//}
+
+		Edge<mNode> xarray_2_edge(
+			const xt::xarray<ComplexValue>& array,
+			const std::vector<int>& order = {}){
+
+			if (array.dimension()==1) {
 				std::vector<Edge<mNode>> edges;
-				for(auto num: array){
+				for (auto num : array) {
 					if (num == complex_zero) {
 						edges.push_back(Edge<mNode>::zero);
 					}
@@ -153,78 +167,83 @@ namespace dd {
 						edges.push_back(Edge<mNode>::terminal(cn.lookup(num)));
 					}
 				}
+			return makeDDNode(0, edges, false);
 
-				if(check_edges_equal){
-					return edges[0];
-				}
-				else{
-					return makeDDnode_( (Qubit)0, edges, false);
-				}
 			}
 
-			if(order.empty()){
+			if (order.empty()) {
 				// list(range(dim))
-				std::vector<std::size_t> order(array.dimension()) ;
-				std::iota(order.begin(),order.end(), 0);
+				std::vector<std::size_t> order(array.dimension());
+				std::iota(order.begin(), order.end(), 0);
 			}
-			
+
 			auto split_pos = std::max_element(order.begin(), order.end()) - order.begin();
 			Qubit x = order[split_pos];
 			order[split_pos] = -1;
 			std::vector<xt::xarray<ComplexValue>> split_U = xt::split(array, array.shape(split_pos), split_pos);
 
-			
+
 			std::vector<Edge<mNode>> edges;
-			for (auto u: split_U) {
-				edges.push_back(xarray_2_edge(u,order));
+			for (auto u : split_U) {
+				edges.push_back(xarray_2_edge(u, order));
 			}
 
-			if (check_edges_equal(edges)) {
-				return edges[0];
-			}
-			else {
-				return makeDDNode_( (Qubit)x+1, edges, false);
-			}
+			return makeDDNode((Qubit)x + 1, edges, false);
+
 		}
 
-	public:
-		TDD Tensor_2_TDD(const Tensor tn){
+		std::vector<std::string> generate_key(std::vector<Index> var) {
+			std::vector<std::string> res(var.size());
+			for (auto& index : var) {
+				res.push_back(index.key);
+			}
+			return res;
+		}
+
+		TDD Tensor_2_TDD(const Tensor tn) {
 			if (tn.data.dimension() != tn.index_set.size()) {
 				throw "action non definies";
 			}
 
-			TDD res;
-			res.e = xarray_2_edge(tn.data);
-			res.index_set = tn.index_set;
+			std::vector<int> order = {};
+			for(auto index: tn.index_set){
+				auto it = varOrder.find(index.key);
+				if(it != varOrder.end()){
+					order.push_back(it->second);
+				}
+				else{
+					throw std::invalid_argument("cle introuvable: " + index.key);
+				}
+			}
+			TDD res;			
+			res.e = xarray_2_edge(tn.data,order);
+			res.index_set = tn.index_set; 
 			res.key_2_index = generate_key(tn.index_set);
-
 			return res;
 		}
-	public:
 
 
-		//==========================================我写的========================================
-		//template <class Node>
+
 		TDD Matrix2TDD(const GateMatrix mat, std::vector<Index> var_out)
 		{
 
-			TDD low_dd, high_dd, res;
-			Edge<mNode> edge_temp[4];
+			TDD low, high, res;
+			Edge<mNode> e_temp[4];
 
-			std::array<Edge<mNode>, 2> low_edges{}, high_edges{}, edges{};
+			std::vector<Edge<mNode>> e_low(2), e_high(2), e(2);
 
 			int Radix = 2;
 
 			for (int i = 0; i < Radix; i++) {
 				for (int j = 0; j < Radix; j++) {
 					if (mat[2 * i + j] == complex_zero) {
-						edge_temp[i * Radix + j] = Edge<mNode>::zero;
+						e_temp[i * Radix + j] = Edge<mNode>::zero;
 					}
 					else if (mat[2 * i + j] == complex_one) {
-						edge_temp[i * Radix + j] = Edge<mNode>::one;
+						e_temp[i * Radix + j] = Edge<mNode>::one;
 					}
 					else {
-						edge_temp[i * Radix + j] = Edge<mNode>::terminal(cn.lookup(mat[2 * i + j]));
+						e_temp[i * Radix + j] = Edge<mNode>::terminal(cn.lookup(mat[2 * i + j]));
 					}
 				}
 			}
@@ -232,40 +251,40 @@ namespace dd {
 
 			std::vector<std::string> key_2_index;
 			if (varOrder[var_out[0].key] < varOrder[var_out[1].key]) {
-				low_edges[0] = edge_temp[0];
-				low_edges[1] = edge_temp[1];
-				high_edges[0] = edge_temp[2];
-				high_edges[1] = edge_temp[3];
+				e_low[0] = e_temp[0];
+				e_low[1] = e_temp[1];
+				e_high[0] = e_temp[2];
+				e_high[1] = e_temp[3];
 				key_2_index = { var_out[0].key,var_out[1].key };
 			}
 			else {
-				low_edges[0] = edge_temp[0];
-				low_edges[1] = edge_temp[2];
-				high_edges[0] = edge_temp[1];
-				high_edges[1] = edge_temp[3];
+				e_low[0] = e_temp[0];
+				e_low[1] = e_temp[2];
+				e_high[0] = e_temp[1];
+				e_high[1] = e_temp[3];
 				key_2_index = { var_out[1].key,var_out[0].key };
 			}
 
 
-			if (low_edges[0].p == low_edges[1].p and low_edges[0].w == low_edges[1].w) {
-				low_dd.e = low_edges[0];
+			if (e_low[0].p == e_low[1].p and e_low[0].w == e_low[1].w) {
+				low.e = e_low[0];
 			}
 			else {
-				low_dd.e = makeDDNode(0, low_edges, false);
+				low.e = makeDDNode(0, e_low, false);
 			}
-			if (high_edges[0].p == high_edges[1].p and high_edges[0].w == high_edges[1].w) {
-				high_dd.e = high_edges[0];
-			}
-			else {
-				high_dd.e = makeDDNode(0, high_edges, false);
-			}
-			if (low_dd.e.p == high_dd.e.p and low_dd.e.w == high_dd.e.w) {
-				res.e = low_dd.e;
+			if (e_high[0].p == e_high[1].p and e_high[0].w == e_high[1].w) {
+				high.e = e_high[0];
 			}
 			else {
-				edges[0] = low_dd.e;
-				edges[1] = high_dd.e;
-				res.e = makeDDNode(1, edges, false); ;
+				high.e = makeDDNode(0, e_high, false);
+			}
+			if (low.e.p == high.e.p and low.e.w == high.e.w) {
+				res.e = low.e;
+			}
+			else {
+				e[0] = low.e;
+				e[1] = high.e;
+				res.e = makeDDNode(1, e, false); ;
 			}
 			res.index_set = var_out;
 			res.key_2_index = key_2_index;
@@ -278,7 +297,7 @@ namespace dd {
 			TDD res;
 			int Radix = 2;
 
-			std::array<Edge<mNode>, 2> e_temp{};
+			std::vector<Edge<mNode>> e_temp(2);
 			for (int i = 0; i < Radix; i++) {
 
 				if (mat[2 * i + i] == complex_zero) {
@@ -305,7 +324,7 @@ namespace dd {
 
 
 			TDD low, high, res;
-			std::array<Edge<mNode>, 2> e{};
+			std::vector<Edge<mNode>> e(2);
 			if (ca == 1) {
 				if (varOrder[var[0].key] > varOrder[var[3].key] && varOrder[var[0].key] > varOrder[var[4].key]) {
 					low = Matrix2TDD(Imat, { var[3] ,var[4] });
@@ -352,12 +371,17 @@ namespace dd {
 
 			auto argmax = -1;
 
-			auto zero = std::array{	e.p->e[0].w.approximatelyZero(), e.p->e[1].w.approximatelyZero()};
+			//auto zero = std::array{	e.p->e[0].w.approximatelyZero(), e.p->e[1].w.approximatelyZero()};
+			int R = e.p->e.size();
+			std::vector<bool> zero;
+			for (int k = 0; k < R; k++) {
+				zero.push_back(e.p->e[k].w.approximatelyZero());
+			}
 
 			// make sure to release cached numbers approximately zero, but not exactly
 			// zero
 			if (cached) {
-				for (auto i = 0U; i < RADIX; i++) {
+				for (auto i = 0U; i < R; i++) {
 					if (zero[i] && e.p->e[i].w != Complex::zero) {
 						cn.returnToCache(e.p->e[i].w);
 						e.p->e[i] = Edge<Node>::zero;
@@ -368,7 +392,7 @@ namespace dd {
 			fp max = 0;
 			auto maxc = Complex::one;
 			// determine max amplitude
-			for (auto i = 0U; i < RADIX; ++i) {
+			for (auto i = 0U; i < R; ++i) {
 				if (zero[i]) {
 					continue;
 				}
@@ -399,7 +423,7 @@ namespace dd {
 
 			auto r = e;
 			// divide each entry by max
-			for (auto i = 0U; i < RADIX; ++i) {
+			for (auto i = 0U; i < R; ++i) {
 				if (static_cast<decltype(argmax)>(i) == argmax) {
 					if (cached) {
 						if (r.w.exactlyOne()) {
@@ -502,7 +526,7 @@ namespace dd {
 		template <class Node>
 		Edge<Node> makeDDNode(
 			Qubit var,
-			const std::vector<Edge<Node>>, std::array<Edge<Node>, std::tuple_size_v<decltype(Node::e)>>& edges,
+			const std::vector<Edge<Node>>& edges,
 			bool cached = false) {
 
 			auto& uniqueTable = getUniqueTable<Node>();
@@ -512,19 +536,39 @@ namespace dd {
 
 			assert(e.p->ref == 0);
 
-
-			if (edges[0].p == edges[1].p && e.p->e[0].w.approximatelyEquals(e.p->e[1].w)) {
-				if (cached) {
-					if (e.p->e[1].w != Complex::zero) {
-						cn.returnToCache(e.p->e[1].w);
-						return edges[0];
-					}
-
-					return edges[0];
-
+			bool all_equal = true;
+			for (int k = 0; k < edges.size(); k++) {
+				if (edges[k].p != edges[0].p || !e.p->e[k].w.approximatelyEquals(e.p->e[0].w)) {
+					all_equal = false;
+					break;
 				}
-				return edges[0];
+
 			}
+
+			if (all_equal) {
+				if (cached) {
+					for (int k = 1; k < edges.size(); k++) {
+						if (e.p->e[k].w != Complex::zero && e.p->e[k].w != Complex::one) {
+							cn.returnToCache(e.p->e[k].w);
+							return edges[0];
+						}
+					}
+					return edges[0];
+				}
+			}
+
+			//if (edges[0].p == edges[1].p && e.p->e[0].w.approximatelyEquals(e.p->e[1].w)) {
+			//	if (cached) {
+			//		if (e.p->e[1].w != Complex::zero) {
+			//			cn.returnToCache(e.p->e[1].w);
+			//			return edges[0];
+			//		}
+
+			//		return edges[0];
+
+			//	}
+			//	return edges[0];
+			//}
 
 			e = normalize(e, cached);
 
@@ -532,49 +576,6 @@ namespace dd {
 
 			// look it up in the unique tables
 			auto l = uniqueTable.lookup(e, false);
-
-			assert(l.p->v == var || l.isTerminal());
-
-			return l;
-		}
-
-
-		template <class Node>
-		Edge<Node> makeDDNode(
-			Qubit var,
-			const std::vector<Edge<Node>> edges,
-			bool cached = false) {
-			if(edges.size() > 2){
-				throw "action non definies";
-			}
-
-			auto& uniqueTable = getUniqueTable<Node>();
-			Edge<Node> edge{uniqueTable.getNode(), Complex::one};
-			edge.p->v = var;
-			edge.p->e = edges;
-
-			assert(edge.p->ref == 0);
-
-			// Le code doit être modifié pour prendre en compte des dimensions plus élevées.
-			if (edges[0].p == edges[1].p && edge.p->e[0].w.approximatelyEquals(edge.p->e[1].w)) {
-				if (cached) {
-					if (edge.p->e[1].w != Complex::zero) {
-						cn.returnToCache(edge.p->e[1].w);
-						return edges[0];
-					}
-
-					return edges[0];
-
-				}
-				return edges[0];
-			}
-
-			edge = normalize(edge, cached);
-
-			assert(edge.p->v == var || edge.isTerminal());
-
-			// look it up in the unique tables
-			auto l = uniqueTable.lookup(edge, false);
 
 			assert(l.p->v == var || l.isTerminal());
 
@@ -875,8 +876,9 @@ namespace dd {
 				? y.p->v
 				: x.p->v;
 
-			constexpr std::size_t n = std::tuple_size_v<decltype(x.p->e)>;
-			std::array<Edge<Node>, n> edge{};
+			int n = (x.p->v != w)? y.p->e.size() : x.p->e.size();
+
+			std::vector<Edge<Node>> edge(n);
 			for (std::size_t i = 0U; i < n; i++) {
 				Edge<Node> e1{};
 				if (!x.isTerminal() && x.p->v == w) {
@@ -997,7 +999,7 @@ namespace dd {
 					return ResultEdge::zero;
 				}
 				if (res.cont_num != var_num) {
-					ComplexNumbers::mul(e.w, e.w, cn.getTemporary(pow(2, var_num - res.cont_num), 0));
+					ComplexNumbers::mul(e.w, e.w, cn.getTemporary(pow(2, var_num - res.cont_num), 0));//对于一般形状的tensor,以2为底数可能有问题
 				}
 				return e;
 			}
@@ -1009,67 +1011,64 @@ namespace dd {
 
 			ResultEdge e1{}, e2{}, r{};
 
-			std::array<ResultEdge, 2> e{};
-
 			if (newk1 > newk2) {
 				if (int(newk1 * 2) % 2 == 1) {
-					for (int k = 0; k < 2; ++k) {
+					r = ResultEdge::zero;
+					ResultEdge etemp{};
+					for (int k = 0; k < x.p->e.size(); ++k) {
 						e1 = x.p->e[k];
 						e2 = yCopy;
-						e[k] = cont2(e1, e2, temp_key_2_new_key1, temp_key_2_new_key2, var_num - 1);
-					}
-					if (e[0].w.exactlyZero() && e[1].w.exactlyZero()) {
-						r = ResultEdge::zero;
-					}
-					else if (e[0].w.exactlyZero()) {
-						r = e[1];
-					}
-					else if (e[1].w.exactlyZero()) {
-						r = e[0];
-					}
-					else {
-						r = T_add2(e[0], e[1]);
-						cn.returnToCache(e[0].w);
-						cn.returnToCache(e[1].w);
+						etemp = cont2(e1, e2, temp_key_2_new_key1, temp_key_2_new_key2, var_num - 1);
+						if (!etemp.w.exactlyZero()) {
+							if (r != ResultEdge::zero) {
+								auto temp = r.w;
+								r = T_add2(r, etemp);
+								cn.returnToCache(temp);
+								cn.returnToCache(etemp.w);
+							}
+							else {
+								r = etemp;
+							}
+						}
 					}
 				}
 				else {
-					for (int k = 0; k < 2; ++k) {
+					std::vector<ResultEdge> e;
+					for (int k = 0; k < x.p->e.size(); ++k) {
 						e1 = x.p->e[k];
 						e2 = yCopy;
-						e[k] = cont2(e1, e2, temp_key_2_new_key1, temp_key_2_new_key2, var_num);
+						e.push_back(cont2(e1, e2, temp_key_2_new_key1, temp_key_2_new_key2, var_num));
 					}
 					r = makeDDNode(Qubit(newk1), e, true);
 				}
 			}
 			else if (newk1 < newk2) {
-
 				if (int(newk2 * 2) % 2 == 1) {
-					for (int k = 0; k < 2; ++k) {
+					r = ResultEdge::zero;
+					ResultEdge etemp{};
+					for (int k = 0; k < y.p->e.size(); ++k) {
 						e1 = xCopy;
 						e2 = y.p->e[k];
-						e[k] = cont2(e1, e2, temp_key_2_new_key1, temp_key_2_new_key2, var_num - 1);
-					}
-					if (e[0].w.exactlyZero() && e[1].w.exactlyZero()) {
-						r = ResultEdge::zero;
-					}
-					else if (e[0].w.exactlyZero()) {
-						r = e[1];
-					}
-					else if (e[1].w.exactlyZero()) {
-						r = e[0];
-					}
-					else {
-						r = T_add2(e[0], e[1]);
-						cn.returnToCache(e[0].w);
-						cn.returnToCache(e[1].w);
+						etemp = cont2(e1, e2, temp_key_2_new_key1, temp_key_2_new_key2, var_num - 1);
+						if (!etemp.w.exactlyZero()) {
+							if (r != ResultEdge::zero) {
+								auto temp = r.w;
+								r = T_add2(r, etemp);
+								cn.returnToCache(temp);
+								cn.returnToCache(etemp.w);
+							}
+							else {
+								r = etemp;
+							}
+						}
 					}
 				}
 				else {
-					for (int k = 0; k < 2; ++k) {
+					std::vector<ResultEdge> e;
+					for (int k = 0; k < y.p->e.size(); ++k) {
 						e1 = xCopy;
 						e2 = y.p->e[k];
-						e[k] = cont2(e1, e2, temp_key_2_new_key1, temp_key_2_new_key2, var_num);
+						e.push_back(cont2(e1, e2, temp_key_2_new_key1, temp_key_2_new_key2, var_num));
 					}
 					r = makeDDNode(Qubit(newk2), e, true);
 				}
@@ -1077,31 +1076,31 @@ namespace dd {
 			}
 			else {
 				if (int(newk2 * 2) % 2 == 1) {
-					for (int k = 0; k < 2; ++k) {
+					r = ResultEdge::zero;
+					ResultEdge etemp{};
+					for (int k = 0; k < x.p->e.size(); ++k) {
 						e1 = x.p->e[k];
 						e2 = y.p->e[k];
-						e[k] = cont2(e1, e2, temp_key_2_new_key1, temp_key_2_new_key2, var_num - 1);
-					}
-					if (e[0].w.exactlyZero() && e[1].w.exactlyZero()) {
-						r = ResultEdge::zero;
-					}
-					else if (e[0].w.exactlyZero()) {
-						r = e[1];
-					}
-					else if (e[1].w.exactlyZero()) {
-						r = e[0];
-					}
-					else {
-						r = T_add2(e[0], e[1]);
-						cn.returnToCache(e[0].w);
-						cn.returnToCache(e[1].w);
+						etemp = cont2(e1, e2, temp_key_2_new_key1, temp_key_2_new_key2, var_num - 1);
+						if (!etemp.w.exactlyZero()) {
+							if (r != ResultEdge::zero) {
+								auto temp = r.w;
+								r = T_add2(r, etemp);
+								cn.returnToCache(temp);
+								cn.returnToCache(etemp.w);
+							}
+							else {
+								r = etemp;
+							}
+						}
 					}
 				}
 				else {
-					for (int k = 0; k < 2; ++k) {
+					std::vector<ResultEdge> e;
+					for (int k = 0; k < x.p->e.size(); ++k) {
 						e1 = x.p->e[k];
 						e2 = y.p->e[k];
-						e[k] = cont2(e1, e2, temp_key_2_new_key1, temp_key_2_new_key2, var_num);
+						e.push_back(cont2(e1, e2, temp_key_2_new_key1, temp_key_2_new_key2, var_num));
 					}
 					r = makeDDNode(Qubit(newk1), e, true);
 				}
