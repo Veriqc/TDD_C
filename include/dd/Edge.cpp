@@ -1,6 +1,6 @@
-#include "Edge.hpp"
+#include "dd/Edge.hpp"
 
-#include "Node.hpp"
+#include "dd/Node.hpp"
 
 namespace dd {
 

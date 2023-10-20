@@ -42,7 +42,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
-#include <stdexcept>
+
 #include <numeric>
 
 #include <xtensor/xarray.hpp>
@@ -51,7 +51,7 @@
 #include <xtensor/xslice.hpp>
 #include <xtensor/xfixed.hpp>
 #include <xtensor/xview.hpp>
-#include <xtensor/xmanipulation.hpp>
+
 namespace dd {
 
 	template <class Config> class Package {
@@ -152,65 +152,25 @@ namespace dd {
 
 		Edge<mNode> xarray_2_edge(
 			const xt::xarray<ComplexValue>& array,
-			std::vector<int>& order){
-			int sum_of_dim = std::accumulate(array.shape().begin(),
-											array.shape().end(),
-											0);
-			if (sum_of_dim == array.dimension()) {
-				std::vector<Edge<mNode>> edges;
-				for (auto num : array) {
-					if (num == complex_zero) {
-						edges.push_back(Edge<mNode>::zero);
-					}
-					else if (num == complex_one) {
-						edges.push_back(Edge<mNode>::one);
-					}
-					else {
-						edges.push_back(Edge<mNode>::terminal(cn.lookup(num)));
-					}
-				}
-			return makeDDNode(0, edges, false);
-
+			std::vector<int> order){
+			std::cout << "order:" << std::endl;
+			for (auto it : order) {
+				std::cout << it << ", ";
 			}
-
-			auto split_pos = std::max_element(order.begin(), order.end()) - order.begin();
-			Qubit x = order[split_pos];
-			order[split_pos] = -1;
-			auto split_U = xt::split(array, array.shape(split_pos), split_pos);
-
-
-			std::vector<Edge<mNode>> edges;
-			for (auto u : split_U) {
-				edges.push_back(xarray_2_edge(u, order));
-			}
-
-			return makeDDNode((Qubit)x + 1, edges, false);
-
-		}
-
-		Edge<mNode> xarray_2_edge(
-			const xt::xarray<ComplexValue>& array){
+			std::cout << std::endl;
 			
-			std::vector<int> order(array.dimension());
-			std::iota(order.begin(), order.end(), 0);
-			int sum_of_dim = std::accumulate(array.shape().begin(),
-											array.shape().end(),
-											0);
-			if (sum_of_dim == array.dimension()) {
-				std::vector<Edge<mNode>> edges;
-				for (auto num : array) {
-					if (num == complex_zero) {
-						edges.push_back(Edge<mNode>::zero);
-					}
-					else if (num == complex_one) {
-						edges.push_back(Edge<mNode>::one);
-					}
-					else {
-						edges.push_back(Edge<mNode>::terminal(cn.lookup(num)));
-					}
-				}
-			return makeDDNode(0, edges, false);
 
+			if (array.size()==1) {
+				
+				if (array[0] == complex_zero) {
+					return Edge<mNode>::zero ;
+				}
+				else if (array[0] == complex_one) {
+					return Edge<mNode>::one;
+				}
+				else {
+					return Edge<mNode>::terminal(cn.lookup(array[0]));
+				}
 			}
 
 			auto split_pos = std::max_element(order.begin(), order.end()) - order.begin();
@@ -240,21 +200,22 @@ namespace dd {
 			if (tn.data.dimension() != tn.index_set.size()) {
 				throw "action non definies";
 			}
-
 			std::vector<int> order = {};
-			for(auto index: tn.index_set){
+			for (auto index : tn.index_set) {
 				auto it = varOrder.find(index.key);
-				if(it != varOrder.end()){
+				if (it != varOrder.end()) {
 					order.push_back(it->second);
 				}
-				else{
+				else {
 					throw std::invalid_argument("cle introuvable: " + index.key);
 				}
 			}
-			TDD res;			
-			res.e = xarray_2_edge(tn.data,order);
-			res.index_set = tn.index_set; 
+
+			TDD res;
+			res.e = xarray_2_edge(tn.data, order);
+			res.index_set = tn.index_set;
 			res.key_2_index = generate_key(tn.index_set);
+
 			return res;
 		}
 

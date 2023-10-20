@@ -1,0 +1,6 @@
+C:/Users/Bygdc.000/Desktop/code/TDD_C/out/build/x64-Debug/CMakeFiles/TDD_C.dir
+C:/Users/Bygdc.000/Desktop/code/TDD_C/out/build/x64-Debug/CMakeFiles/edit_cache.dir
+C:/Users/Bygdc.000/Desktop/code/TDD_C/out/build/x64-Debug/CMakeFiles/rebuild_cache.dir
+C:/Users/Bygdc.000/Desktop/code/TDD_C/out/build/x64-Debug/test/CMakeFiles/test.dir
+C:/Users/Bygdc.000/Desktop/code/TDD_C/out/build/x64-Debug/test/CMakeFiles/edit_cache.dir
+C:/Users/Bygdc.000/Desktop/code/TDD_C/out/build/x64-Debug/test/CMakeFiles/rebuild_cache.dir

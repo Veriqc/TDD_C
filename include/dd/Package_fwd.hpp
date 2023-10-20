@@ -1,6 +1,6 @@
 #pragma once
-#include "DDpackageConfig.hpp"
-#include "Node.hpp"
+#include "dd/DDpackageConfig.hpp"
+#include "dd/Node.hpp"
 
 namespace qc {
 

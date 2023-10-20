@@ -3,8 +3,8 @@ cmake_minimum_required(VERSION 3.16.0 FATAL_ERROR)
 set(CMAKE_SYSTEM_VERSION 10.0 CACHE STRING "" FORCE)
 
 project(TDD_C CXX)
-set(CXX_STANDARD 20)
-set(CXX_STANDARD_REQUIRED True)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED On)
 ################################################################################
 # Set target arch type if empty. Visual studio solution generator provides it.
 ################################################################################
@@ -262,6 +262,7 @@ set(ALL_FILES
 ################################################################################
 add_executable(${PROJECT_NAME} ${ALL_FILES})
 
+target_compile_features(${PROJECT_NAME} PUBLIC cxx_auto_type)
 target_link_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_include_directories(${PROJECT_NAME}
                             PUBLIC
@@ -335,6 +336,10 @@ if(MSVC)
             /INCREMENTAL
         )
     endif()
+endif()
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /ZI")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /ZI")
 endif()
 
 add_subdirectory(test)

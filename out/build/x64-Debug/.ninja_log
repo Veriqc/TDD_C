@@ -1,0 +1,23 @@
+# ninja log v5
+69	597	7194955315572165	test/CMakeFiles/test.dir/try.cpp.obj	91ed30ab78c40e90
+598	1440	7194955323913685	test/test.exe	589a56e11cda2b49
+42	1523	7195093567890364	CMakeFiles/TDD_C.dir/include/parsers/qasm_parser/Scanner.cpp.obj	7bf993cf894008b0
+17	1129	7195093563968170	CMakeFiles/TDD_C.dir/include/operations/Expression.cpp.obj	5cb26ebd2c42d173
+7	1260	7195093565283604	CMakeFiles/TDD_C.dir/include/dd/Edge.cpp.obj	d8de5e3e6d074613
+11	1301	7195093565678939	CMakeFiles/TDD_C.dir/include/dd/Node.cpp.obj	d4366905aecbd991
+3	2693	7195093579633730	CMakeFiles/TDD_C.dir/include/CircuitOptimizer.cpp.obj	961faa5cea5c8e35
+25	1667	7195093569325614	CMakeFiles/TDD_C.dir/include/operations/Operation.cpp.obj	833290e25c7c0ff2
+2	1914	7195097439382500	CMakeFiles/TDD_C.dir/include/dd/Operations.cpp.obj	7be5ce9cf4eab0f5
+28	1717	7195093569860907	CMakeFiles/TDD_C.dir/include/operations/StandardOperation.cpp.obj	1e2f026cf4803014
+21	1694	7195093569600886	CMakeFiles/TDD_C.dir/include/operations/NonUnitaryOperation.cpp.obj	626411edbb7051bc
+36	2434	7195093577027534	CMakeFiles/TDD_C.dir/include/parsers/GRCSParser.cpp.obj	5c2b1977ea27b2fe
+32	1823	7195093570906221	CMakeFiles/TDD_C.dir/include/operations/SymbolicOperation.cpp.obj	5494557eef7f0c2f
+46	2359	7195093576252302	CMakeFiles/TDD_C.dir/include/parsers/QASMParser.cpp.obj	5c992b58e05fe15b
+53	2652	7195093579188144	CMakeFiles/TDD_C.dir/include/parsers/RealParser.cpp.obj	1e1a69d3fd2d1bc1
+39	2641	7195093579098153	CMakeFiles/TDD_C.dir/include/parsers/qasm_parser/Parser.cpp.obj	ac05cde91d1b7c8e
+49	2681	7195093579508387	CMakeFiles/TDD_C.dir/include/parsers/QCParser.cpp.obj	fc9b0be98a026fea
+56	2660	7195093579288149	CMakeFiles/TDD_C.dir/include/parsers/TFCParser.cpp.obj	8ef01369a80b6cb9
+60	2848	7195093581192390	CMakeFiles/TDD_C.dir/include/QuantumComputation.cpp.obj	92af0f23ceb28bf4
+2	3529	7195099894230606	CMakeFiles/TDD_C.dir/main.cpp.obj	c77440e207dabced
+3530	3777	7195099896389151	C:/Users/Bygdc.000/Desktop/code/TDD_C/x64/Debug/TDD_C.exe	cb7cc081091086b4
+1	1175	0	clean	e425fbe6b96812bb
