@@ -231,7 +231,7 @@ namespace dd {
 			std::sort(index_set.begin(),index_set.end(),compare_fun);
 			int min_order = varOrder(index_set.at(0).key);
 			for (Index& index : indexVector) {
-				index.idx = varOrder[index.key]-min_order;
+				index.idx = varOrder[index.key]-min_idx;
 			}
 
 			res.key_2_index = generate_key(index_set);

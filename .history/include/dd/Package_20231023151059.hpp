@@ -213,7 +213,6 @@ namespace dd {
 			}
 		}
 		bool compare_fun(const Index&a , const Index&b){return varOrder.at(a.key) < varOrder.at(b.key)}
-
 		TDD Tensor_2_TDD(const Tensor tn) {
 			if (tn.data.dimension() != tn.index_set.size()) {
 				throw "action non definies";
@@ -223,7 +222,7 @@ namespace dd {
 			for(auto index: tn.index_set){
 				order.push_back(varOrder[index.key]);
 			}
-
+			
 			TDD res;
 			res.e = xarray_2_edge(tn.data, order);
 
@@ -231,7 +230,7 @@ namespace dd {
 			std::sort(index_set.begin(),index_set.end(),compare_fun);
 			int min_order = varOrder(index_set.at(0).key);
 			for (Index& index : indexVector) {
-				index.idx = varOrder[index.key]-min_order;
+				index.idx = varOrder[index.key]-min_idx;
 			}
 
 			res.key_2_index = generate_key(index_set);
