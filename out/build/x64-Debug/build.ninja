@@ -261,50 +261,80 @@ build rebuild_cache: phony CMakeFiles\rebuild_cache.util
 # =============================================================================
 
 # =============================================================================
-# Object build statements for EXECUTABLE target test
+# Object build statements for EXECUTABLE target test_sort
 
 
 #############################################
-# Order-only phony target for test
+# Order-only phony target for test_sort
 
-build cmake_object_order_depends_target_test: phony || test\CMakeFiles\test.dir
+build cmake_object_order_depends_target_test_sort: phony || test\CMakeFiles\test_sort.dir
 
-build test\CMakeFiles\test.dir\try.cpp.obj: CXX_COMPILER__test_unscanned_Debug C$:\Users\Bygdc.000\Desktop\code\TDD_C\test\try.cpp || cmake_object_order_depends_target_test
+build test\CMakeFiles\test_sort.dir\sort.cpp.obj: CXX_COMPILER__test_sort_unscanned_Debug C$:\Users\Bygdc.000\Desktop\code\TDD_C\test\sort.cpp || cmake_object_order_depends_target_test_sort
   FLAGS = /ZI -std:c++20 -MDd
   INCLUDES = -IC:\Users\Bygdc.000\Desktop\code\TDD_C\include
-  OBJECT_DIR = test\CMakeFiles\test.dir
-  OBJECT_FILE_DIR = test\CMakeFiles\test.dir
-  TARGET_COMPILE_PDB = test\CMakeFiles\test.dir\
-  TARGET_PDB = test\test.pdb
-
-build test\CMakeFiles\test.dir\sort.cpp.obj: CXX_COMPILER__test_unscanned_Debug C$:\Users\Bygdc.000\Desktop\code\TDD_C\test\sort.cpp || cmake_object_order_depends_target_test
-  FLAGS = /ZI -std:c++20 -MDd
-  INCLUDES = -IC:\Users\Bygdc.000\Desktop\code\TDD_C\include
-  OBJECT_DIR = test\CMakeFiles\test.dir
-  OBJECT_FILE_DIR = test\CMakeFiles\test.dir
-  TARGET_COMPILE_PDB = test\CMakeFiles\test.dir\
-  TARGET_PDB = test\test.pdb
+  OBJECT_DIR = test\CMakeFiles\test_sort.dir
+  OBJECT_FILE_DIR = test\CMakeFiles\test_sort.dir
+  TARGET_COMPILE_PDB = test\CMakeFiles\test_sort.dir\
+  TARGET_PDB = test\test_sort.pdb
 
 
 # =============================================================================
-# Link build statements for EXECUTABLE target test
+# Link build statements for EXECUTABLE target test_sort
 
 
 #############################################
-# Link the executable test\test.exe
+# Link the executable test\test_sort.exe
 
-build test\test.exe: CXX_EXECUTABLE_LINKER__test_Debug test\CMakeFiles\test.dir\try.cpp.obj test\CMakeFiles\test.dir\sort.cpp.obj
+build test\test_sort.exe: CXX_EXECUTABLE_LINKER__test_sort_Debug test\CMakeFiles\test_sort.dir\sort.cpp.obj
   FLAGS = /ZI -MDd
   LINK_FLAGS = /subsystem:console
   LINK_LIBRARIES = kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
   LINK_PATH = -LIBPATH:C:\Users\Bygdc.000\Desktop\code\TDD_C\include
-  OBJECT_DIR = test\CMakeFiles\test.dir
+  OBJECT_DIR = test\CMakeFiles\test_sort.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
-  TARGET_COMPILE_PDB = test\CMakeFiles\test.dir\
-  TARGET_FILE = test\test.exe
-  TARGET_IMPLIB = test\test.lib
-  TARGET_PDB = test\test.pdb
+  TARGET_COMPILE_PDB = test\CMakeFiles\test_sort.dir\
+  TARGET_FILE = test\test_sort.exe
+  TARGET_IMPLIB = test\test_sort.lib
+  TARGET_PDB = test\test_sort.pdb
+
+# =============================================================================
+# Object build statements for EXECUTABLE target test_tdd
+
+
+#############################################
+# Order-only phony target for test_tdd
+
+build cmake_object_order_depends_target_test_tdd: phony || test\CMakeFiles\test_tdd.dir
+
+build test\CMakeFiles\test_tdd.dir\try.cpp.obj: CXX_COMPILER__test_tdd_unscanned_Debug C$:\Users\Bygdc.000\Desktop\code\TDD_C\test\try.cpp || cmake_object_order_depends_target_test_tdd
+  FLAGS = /ZI -std:c++20 -MDd
+  INCLUDES = -IC:\Users\Bygdc.000\Desktop\code\TDD_C\include
+  OBJECT_DIR = test\CMakeFiles\test_tdd.dir
+  OBJECT_FILE_DIR = test\CMakeFiles\test_tdd.dir
+  TARGET_COMPILE_PDB = test\CMakeFiles\test_tdd.dir\
+  TARGET_PDB = test\test_tdd.pdb
+
+
+# =============================================================================
+# Link build statements for EXECUTABLE target test_tdd
+
+
+#############################################
+# Link the executable test\test_tdd.exe
+
+build test\test_tdd.exe: CXX_EXECUTABLE_LINKER__test_tdd_Debug test\CMakeFiles\test_tdd.dir\try.cpp.obj
+  FLAGS = /ZI -MDd
+  LINK_FLAGS = /subsystem:console
+  LINK_LIBRARIES = kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
+  LINK_PATH = -LIBPATH:C:\Users\Bygdc.000\Desktop\code\TDD_C\include
+  OBJECT_DIR = test\CMakeFiles\test_tdd.dir
+  POST_BUILD = cd .
+  PRE_LINK = cd .
+  TARGET_COMPILE_PDB = test\CMakeFiles\test_tdd.dir\
+  TARGET_FILE = test\test_tdd.exe
+  TARGET_IMPLIB = test\test_tdd.lib
+  TARGET_PDB = test\test_tdd.pdb
 
 
 #############################################
@@ -336,9 +366,13 @@ build TDD_C: phony C$:\Users\Bygdc.000\Desktop\code\TDD_C\x64\Debug\TDD_C.exe
 
 build TDD_C.exe: phony C$:\Users\Bygdc.000\Desktop\code\TDD_C\x64\Debug\TDD_C.exe
 
-build test: phony test\test.exe
+build test_sort: phony test\test_sort.exe
 
-build test.exe: phony test\test.exe
+build test_sort.exe: phony test\test_sort.exe
+
+build test_tdd: phony test\test_tdd.exe
+
+build test_tdd.exe: phony test\test_tdd.exe
 
 # =============================================================================
 # Folder targets.
@@ -355,7 +389,7 @@ build all: phony C$:\Users\Bygdc.000\Desktop\code\TDD_C\x64\Debug\TDD_C.exe test
 #############################################
 # Folder: C:/Users/Bygdc.000/Desktop/code/TDD_C/out/build/x64-Debug/test
 
-build test\all: phony test\test.exe
+build test\all: phony test\test_sort.exe test\test_tdd.exe
 
 # =============================================================================
 # Built-in targets

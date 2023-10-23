@@ -195,26 +195,46 @@ namespace dd {
 			}
 			return res;
 		}
-
+		int update_map_value() {
+			if (varOrder.empty()) {
+				return 0;
+			}
+			auto compare_function = [](const auto& a, const auto& b) { return a.second < b.second; };
+			auto max_pair = std::max_element(varOrder.begin(), varOrder.end(), compare_function);
+			return (max_pair->second) +1;
+		}
+		std::vector<int> get_order(std::vector<Index> index_vector){
+			std::vector<int> order;
+			for(auto index:index_vector){
+				auto it = varOrder.find(index.key);
+				if(it == varOrder.end()){
+					int num = update_map_value() ;
+					varOrder[index.key] = num;
+					order.push_back(num) ;
+				}
+				else{
+					order.push_back(it->second);
+				}
+			}
+		}
+		bool compare_fun(const Index&a , const Index&b){return varOrder.at(a.key) < varOrder.at(b.key)}
 		TDD Tensor_2_TDD(const Tensor tn) {
 			if (tn.data.dimension() != tn.index_set.size()) {
 				throw "action non definies";
 			}
-			std::vector<int> order = {};
-			for (auto index : tn.index_set) {
-				auto it = varOrder.find(index.key);
-				if (it != varOrder.end()) {
-					order.push_back(it->second);
-				}
-				else {
-					throw std::invalid_argument("cle introuvable: " + index.key);
-				}
-			}
-
+			std::vector<int> order = get_order(tn.index_set);
 			TDD res;
 			res.e = xarray_2_edge(tn.data, order);
-			res.index_set = tn.index_set;
-			res.key_2_index = generate_key(tn.index_set);
+
+			std::vector<Index> index_set = tn.index_set;
+			std::sort(index_set.begin(),index_set.end(),compare_fun);
+			int min_order = varOrder(index_set.at(0).key);
+			for (Index& index : indexVector) {
+				index.idx = varOrder[index.key]-min_idx;
+			}
+
+			res.key_2_index = generate_key(index_set);
+			res.index_set = index_set;
 
 			return res;
 		}

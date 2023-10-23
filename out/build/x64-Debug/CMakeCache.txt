@@ -196,6 +196,24 @@ test_IS_TOP_LEVEL:STATIC=OFF
 //Value Computed by CMake
 test_SOURCE_DIR:STATIC=C:/Users/Bygdc.000/Desktop/code/TDD_C/test
 
+//Value Computed by CMake
+test_sort_BINARY_DIR:STATIC=C:/Users/Bygdc.000/Desktop/code/TDD_C/out/build/x64-Debug/test
+
+//Value Computed by CMake
+test_sort_IS_TOP_LEVEL:STATIC=OFF
+
+//Value Computed by CMake
+test_sort_SOURCE_DIR:STATIC=C:/Users/Bygdc.000/Desktop/code/TDD_C/test
+
+//Value Computed by CMake
+test_tdd_BINARY_DIR:STATIC=C:/Users/Bygdc.000/Desktop/code/TDD_C/out/build/x64-Debug/test
+
+//Value Computed by CMake
+test_tdd_IS_TOP_LEVEL:STATIC=OFF
+
+//Value Computed by CMake
+test_tdd_SOURCE_DIR:STATIC=C:/Users/Bygdc.000/Desktop/code/TDD_C/test
+
 
 ########################
 # INTERNAL cache entries
