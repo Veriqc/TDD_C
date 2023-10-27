@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
   //std::vector<dd::Index> indexs ={{"x0",0},{"y0",1}};
   dd::Tensor tn = {U,indexs, "cx"};
   dd::TDD tdd = dd1->Tensor_2_TDD(tn);
-  /*dd::export2Dot(tdd.e,"tdd1");*/
+  dd::export2Dot(tdd.e,"tdd1");
   return 0;
 }
 

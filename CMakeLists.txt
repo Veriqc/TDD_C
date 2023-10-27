@@ -337,9 +337,6 @@ if(MSVC)
         )
     endif()
 endif()
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /ZI")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /ZI")
-endif()
+
 
 add_subdirectory(test)

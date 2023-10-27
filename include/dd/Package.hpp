@@ -152,38 +152,25 @@ namespace dd {
 
 		Edge<mNode> xarray_2_edge(
 			const xt::xarray<ComplexValue>& array,
-<<<<<<< Updated upstream:include/dd/Package.hpp
 			std::vector<int> order){
-=======
-			std::vector<int> order) {
->>>>>>> Stashed changes:TDD_New/dd/Package.hpp
 			std::cout << "order:" << std::endl;
 			for (auto it : order) {
 				std::cout << it << ", ";
 			}
 			std::cout << std::endl;
-<<<<<<< Updated upstream:include/dd/Package.hpp
-			
-
-			if (array.size()==1) {
-				
-				if (array[0] == complex_zero) {
-					return Edge<mNode>::zero ;
-=======
 
 
 			if (array.size() == 1) {
-
-				if (array[0] == complex_zero) {
-					return Edge<mNode>::zero;
->>>>>>> Stashed changes:TDD_New/dd/Package.hpp
-				}
-				else if (array[0] == complex_one) {
-					return Edge<mNode>::one;
-				}
-				else {
-					return Edge<mNode>::terminal(cn.lookup(array[0]));
-				}
+				return Edge<mNode>::zero;
+				// if (array[0] == complex_zero) {
+				// 	return Edge<mNode>::zero;
+				// }
+				// else if (array[0] == complex_one) {
+				// 	return Edge<mNode>::one;
+				// }
+				// else {
+				// 	return Edge<mNode>::terminal(cn.lookup(array[0]));
+				// }
 			}
 
 			auto split_pos = std::max_element(order.begin(), order.end()) - order.begin();
@@ -214,15 +201,6 @@ namespace dd {
 			}
 			auto compare_function = [](const auto& a, const auto& b) { return a.second < b.second; };
 			auto max_pair = std::max_element(varOrder.begin(), varOrder.end(), compare_function);
-<<<<<<< Updated upstream:include/dd/Package.hpp
-			return (max_pair->second) +1;
-		}
-		void add_map(std::vector<Index> index_vector){
-			for(auto index:index_vector){
-				auto it = varOrder.find(index.key);
-				if(it == varOrder.end()){
-					int num = update_map_value() ;
-=======
 			return (max_pair->second) + 1;
 		}
 		void add_map(std::vector<Index> index_vector) {
@@ -230,46 +208,24 @@ namespace dd {
 				auto it = varOrder.find(index.key);
 				if (it == varOrder.end()) {
 					int num = update_map_value();
->>>>>>> Stashed changes:TDD_New/dd/Package.hpp
 					varOrder[index.key] = num;
 				}
 			}
 		}
-<<<<<<< Updated upstream:include/dd/Package.hpp
-		bool compare_fun(const Index&a , const Index&b){return varOrder.at(a.key) < varOrder.at(b.key)}
-
-=======
 		
->>>>>>> Stashed changes:TDD_New/dd/Package.hpp
 		TDD Tensor_2_TDD(const Tensor tn) {
 			if (tn.data.dimension() != tn.index_set.size()) {
 				throw "action non definies";
 			}
 			add_map(tn.index_set);
 			std::vector<int> order;
-<<<<<<< Updated upstream:include/dd/Package.hpp
-			for(auto index: tn.index_set){
-=======
 			for (auto index : tn.index_set) {
->>>>>>> Stashed changes:TDD_New/dd/Package.hpp
 				order.push_back(varOrder[index.key]);
 			}
 
 			TDD res;
+			std::cout << "hi xarray" << std::endl;
 			res.e = xarray_2_edge(tn.data, order);
-<<<<<<< Updated upstream:include/dd/Package.hpp
-
-			std::vector<Index> index_set = tn.index_set;
-			std::sort(index_set.begin(),index_set.end(),compare_fun);
-			int min_order = varOrder(index_set.at(0).key);
-			for (Index& index : indexVector) {
-				index.idx = varOrder[index.key]-min_order;
-			}
-
-			res.key_2_index = generate_key(index_set);
-			res.index_set = index_set;
-=======
->>>>>>> Stashed changes:TDD_New/dd/Package.hpp
 
 			std::vector<Index> index_set = tn.index_set;
 			std::sort(index_set.begin(),

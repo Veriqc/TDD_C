@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/test_tdd.dir/try.cpp.o -o test_tdd   -L/home/gaodc/TDD_C/include 
