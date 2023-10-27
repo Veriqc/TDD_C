@@ -370,7 +370,8 @@ namespace dd {
 
 	template <class Edge>
 	static std::ostream& memoryNode(const Edge& e, std::ostream& os) {
-		constexpr std::size_t n = std::tuple_size_v<decltype(e.p->e)>;
+		/*constexpr std::size_t n = std::tuple_size_v<decltype(e.p->e)>;*/
+		int n = e.p->e.size();
 		auto nodelabel = (reinterpret_cast<std::uintptr_t>(e.p) & 0x001fffffU) >>
 			1U; // this allows for 2^20 (roughly 1e6) unique nodes
 		os << nodelabel << "[label=<";
