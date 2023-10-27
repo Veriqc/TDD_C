@@ -918,7 +918,6 @@ int* Simulate_with_tdd(std::string path, std::string  file_name, std::unique_ptr
 	//	std::cout << element << " ";
 	//}
 	//std::cout << std::endl;
-
 	int node_num_final = dd->size(tdd.e);
 	nodes[1] = node_num_final;
 	//dd->statistics();

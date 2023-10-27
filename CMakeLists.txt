@@ -227,6 +227,7 @@ set(Header_Files
     "include/xtl/xvariant.hpp"
     "include/xtl/xvariant_impl.hpp"
     "include/xtl/xvisitor.hpp"
+    "test/test.hpp"
 )
 source_group("Header Files" FILES ${Header_Files})
 
@@ -248,7 +249,8 @@ set(Source_Files
     "include/parsers/RealParser.cpp"
     "include/parsers/TFCParser.cpp"
     "include/QuantumComputation.cpp"
-    "main.cpp"
+    "test/test_circuit.cpp"
+    "test/test_tdd.cpp"
 )
 source_group("Source Files" FILES ${Source_Files})
 
@@ -260,14 +262,20 @@ set(ALL_FILES
 ################################################################################
 # Target
 ################################################################################
-add_executable(${PROJECT_NAME} ${ALL_FILES})
+add_executable(${PROJECT_NAME} ${ALL_FILES} "main.cpp")
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_auto_type)
-target_link_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_link_directories(${PROJECT_NAME} 
+                        PUBLIC 
+                        ${PROJECT_SOURCE_DIR}/include
+                        ${PROJECT_SOURCE_DIR}/test
+)
 target_include_directories(${PROJECT_NAME}
                             PUBLIC
                             ${PROJECT_BINARY_DIR}
-                            ${PROJECT_SOURCE_DIR}/include)
+                            ${PROJECT_SOURCE_DIR}/include
+                            ${PROJECT_SOURCE_DIR}/test
+)
 use_props(${PROJECT_NAME} "${CMAKE_CONFIGURATION_TYPES}" "${DEFAULT_CXX_PROPS}")
 set_target_properties(${PROJECT_NAME} PROPERTIES
     VS_GLOBAL_KEYWORD "Win32Proj"
@@ -337,6 +345,4 @@ if(MSVC)
         )
     endif()
 endif()
-
-
 add_subdirectory(test)

@@ -161,16 +161,15 @@ namespace dd {
 
 
 			if (array.size() == 1) {
-				return Edge<mNode>::zero;
-				// if (array[0] == complex_zero) {
-				// 	return Edge<mNode>::zero;
-				// }
-				// else if (array[0] == complex_one) {
-				// 	return Edge<mNode>::one;
-				// }
-				// else {
-				// 	return Edge<mNode>::terminal(cn.lookup(array[0]));
-				// }
+				 if (array[0] == complex_zero) {
+				 	return Edge<mNode>::zero;
+				 }
+				 else if (array[0] == complex_one) {
+				 	return Edge<mNode>::one;
+				 }
+				 else {
+				 	return Edge<mNode>::terminal(cn.lookup(array[0]));
+				 }
 			}
 
 			auto split_pos = std::max_element(order.begin(), order.end()) - order.begin();
@@ -184,7 +183,7 @@ namespace dd {
 				edges.push_back(xarray_2_edge(u, order));
 			}
 
-			return makeDDNode((Qubit)x + 1, edges, false);
+			return makeDDNode((Qubit)x, edges, false);
 
 		}
 
@@ -218,25 +217,28 @@ namespace dd {
 				throw "action non definies";
 			}
 			add_map(tn.index_set);
-			std::vector<int> order;
-			for (auto index : tn.index_set) {
-				order.push_back(varOrder[index.key]);
+			
+			std::vector<int> order(tn.index_set.size());
+			std::iota(order.begin(), order.end(), 0);
+
+			std::sort(order.begin(), order.end(), [&](int a, int b) {
+				return varOrder[tn.index_set[a].key] < varOrder[tn.index_set[b].key];
+				});
+
+			for (auto num : order) {
+				std::cout << num << " ";
 			}
+			std::cout << std::endl;
 
 			TDD res;
-			std::cout << "hi xarray" << std::endl;
 			res.e = xarray_2_edge(tn.data, order);
 
 			std::vector<Index> index_set = tn.index_set;
 			std::sort(index_set.begin(),
 				index_set.end(),
-				[this](const auto& a, const auto& b) {return varOrder[a.key] < varOrder[b.key]; }
+				[&](const auto& a, const auto& b) {return varOrder[a.key] < varOrder[b.key]; }
 			);
-			int n = 0;
-			for (Index& index : index_set) {
-				index.idx = n;
-				n += 1;
-			}
+
 
 			res.key_2_index = generate_key(index_set);
 			res.index_set = index_set;

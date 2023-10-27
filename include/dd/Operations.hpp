@@ -1,12 +1,12 @@
 #pragma once
 
-#include "Definitions.hpp"
-#include "dd/GateMatrixDefinitions.hpp"
-#include "dd/Package.hpp"
-#include "operations/ClassicControlledOperation.hpp"
-#include "operations/CompoundOperation.hpp"
-#include "operations/NonUnitaryOperation.hpp"
-#include "operations/StandardOperation.hpp"
+#include "../Definitions.hpp"
+#include "GateMatrixDefinitions.hpp"
+#include "Package.hpp"
+#include "../operations/ClassicControlledOperation.hpp"
+#include "../operations/CompoundOperation.hpp"
+#include "../operations/NonUnitaryOperation.hpp"
+#include "../operations/StandardOperation.hpp"
 
 #include <variant>
 
