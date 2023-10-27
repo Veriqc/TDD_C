@@ -119,36 +119,7 @@ namespace dd {
 	public:
 
 
-		//==========================================我写的========================================
-		//template <class Node>
-
-		//TDD Tensor_2_TDD(const Tensor tn)
-		//{
-
-		//	TDD res;
-
-		//	if()
-
-
-
-
-		//	return res;
-		//}
-
-		//bool check_edges_equal(std::vector<Edge<mNode>> edges) {
-		//	auto verify_p = edges[0].p;
-		//	auto verify_w = edges[0].w;
-
-		//	for (auto& edge : edges) {
-		//		if (edge.p != verify_p) {
-		//			return false;
-		//		}
-		//		if (edge.w != verify_w) {
-		//			return false;
-		//		}
-		//	}
-		//	return true;
-		//}
+		//==========================================我写的=======================================
 
 		Edge<mNode> xarray_2_edge(
 			const xt::xarray<ComplexValue>& array,
