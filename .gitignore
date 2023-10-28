@@ -4,3 +4,9 @@
 x64/
 
 */x64/
+
+build/
+
+.history/
+
+.vscode/

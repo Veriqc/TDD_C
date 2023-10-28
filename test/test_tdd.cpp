@@ -16,6 +16,9 @@ namespace test{
         std::cout << "test order of 2*2*2*2 CNOT" << std::endl;
         tensor_2_tdd_cx_2();
     }
+    std::map<std::string, std::function<void()>> testFunctions = {
+        {"tdd", test_tdd_2_tensor},
+    };
 }
 
 void tensor_2_tdd_cx_4(){
@@ -29,7 +32,8 @@ void tensor_2_tdd_cx_4(){
     };
 
     std::vector<dd::Index> indexs ={{"y2",3},{"x0",1} };
-    dd::Tensor tn = {U,indexs, "cx"};
+    // dd::Tensor tn = {U,indexs, "cx"};
+    dd::Tensor tn(U,indexs);
     dd::TDD tdd = dd1->Tensor_2_TDD(tn);
     std::cout << tdd.e.p->v << std::endl;
     dd::export2Dot(tdd.e,"cnot_4_4");

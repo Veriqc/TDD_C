@@ -23,6 +23,7 @@
 #include <math.h>
 
 
+#include <xtensor/xadapt.hpp>
 using namespace std;
 
 //auto dd = std::make_unique<dd::Package<>>(100);
@@ -871,13 +872,11 @@ int get_gates_num(std::string  file_name) {
 }
 
 //计算一个电路的tdd
-int* Simulate_with_tdd(std::string path, std::string  file_name, std::unique_ptr<dd::Package<>>& dd) {
+std::array<int,2> Simulate_with_tdd(std::string path, std::string  file_name, std::unique_ptr<dd::Package<>>& dd) {
 
 	std::map<int, gate> gate_set = import_circuit(path + file_name);
 
-	int* nodes = new int[2];
-	nodes[0] = 0;
-	nodes[1] = 0;
+	std::array<int,2> nodes = {0,0};
 	std::cout << "Start!!!" << std::endl;
 
 	dd->varOrder = get_var_order();
@@ -895,34 +894,22 @@ int* Simulate_with_tdd(std::string path, std::string  file_name, std::unique_ptr
 	}
 
 	int node_num_max = 0;
-	start = clock();
 
 	for (int k = 0; k < gate_set.size(); k++) {
-		{
-			tdd = apply(tdd, gate_set[k].name, Index_set[k], dd);
-			if (get_max_node) {
-				node_num_max = dd->size(tdd.e);
-				if (node_num_max > nodes[0]) {
-					nodes[0] = node_num_max;
-				}
+		tdd = apply(tdd, gate_set[k].name, Index_set[k], dd);
+		if (get_max_node) {
+			node_num_max = dd->size(tdd.e);
+			if (node_num_max > nodes[0]) {
+				nodes[0] = node_num_max;
 			}
-
 		}
 	}
 
 
 
 	std::cout << tdd.e.w << std::endl;
-	//std::cout << "TDD: ";
-	//for (const auto& element : tdd.key_2_index) {
-	//	std::cout << element << " ";
-	//}
-	//std::cout << std::endl;
 	int node_num_final = dd->size(tdd.e);
 	nodes[1] = node_num_final;
-	//dd->statistics();
-	//dd::export2Dot(tdd.e, "tdd1");
-
 
 	if (release) {
 		dd->decRef(tdd.e);
@@ -931,4 +918,95 @@ int* Simulate_with_tdd(std::string path, std::string  file_name, std::unique_ptr
 
 	std::cout << "Done!!!" << std::endl;
 	return nodes;
+}
+
+dd::Tensor gate_2_tensor(std::string name, std::vector<dd::Index> index_set) {
+
+	std::map<std::string, int> gate_type;
+	gate_type["x"] = 1;
+	gate_type["y"] = 2;
+	gate_type["z"] = 3;
+	gate_type["h"] = 4;
+	gate_type["s"] = 5;
+	gate_type["sdg"] = 6;
+	gate_type["t"] = 7;
+	gate_type["tdg"] = 8;
+
+
+	if (name == "cx") {
+		return dd::Tensor(xt::adapt(dd::CXmat,{4,4}),index_set,"CX");
+	}
+	else {
+		switch (gate_type[name]) {
+		case 1:
+			return dd::Tensor(xt::adapt(dd::Xmat,{2,2}),index_set,"X");
+		case 2:
+			return dd::Tensor(xt::adapt(dd::Ymat,{2,2}),index_set,"Y");
+		case 3:
+			return dd::Tensor(xt::adapt(dd::Zmat,{2,2}),index_set,"Z");
+		case 4:
+			return dd::Tensor(xt::adapt(dd::Hmat,{2,2}),index_set,"H");
+		case 5:
+			return dd::Tensor(xt::adapt(dd::Smat,{2,2}),index_set,"S");
+		case 6:
+			return dd::Tensor(xt::adapt(dd::Sdagmat,{2,2}),index_set,"Sdag");
+		case 7:
+			return dd::Tensor(xt::adapt(dd::Tmat,{2,2}),index_set,"T");
+		case 8:
+			return dd::Tensor(xt::adapt(dd::Tdagmat,{2,2}),index_set,"Tdag");
+		default:
+			if (name[0] == 'r' and name[1] == 'z') {
+				regex pattern("rz\\((-?\\d.\\d+)\\)");
+				smatch result;
+				regex_match(name, result, pattern);
+				float theta = stof(result[1]);
+				return dd::Tensor(xt::adapt(dd::Phasemat(theta),{2,2}),index_set,"Rz");
+			}
+			if (name[0] == 'u' and name[1] == '1') {
+				regex para(".*?\\((.*?)\\)");
+				smatch result;
+				regex_match(name, result, para);
+				float theta = match_a_string(result[1]);
+
+				//dd::GateMatrix  U1mat = { { 1, 0 }, { 0, 0 } , { 0, 0 }, { cos(theta), sin(theta) }  };
+				return dd::Tensor(xt::adapt(dd::Phasemat(theta),{2,2}),index_set,"Rz");
+			}
+			if (name[0] == 'u' and name[1] == '3') {
+				//regex pattern("u3\\((-?\\d.\\d+), ?(-?\\d.\\d+), ?(-?\\d.\\d+)\\)");
+				//smatch result;
+				//regex_match(nam, result, pattern);
+				//float theta = stof(result[1]);
+				//float phi = stof(result[2]);
+				//float lambda = stof(result[3]);
+
+				regex para(".*?\\((.*?)\\)");
+				smatch result;
+				regex_match(name, result, para);
+				vector<string> para2 = split(result[1], ",");
+				float theta = match_a_string(para2[0]);
+				float phi = match_a_string(para2[1]);
+				float lambda = match_a_string(para2[2]);
+				//dd::GateMatrix  U3mat = { { cos(theta / 2), 0 }, { -cos(lambda) * sin(theta / 2),-sin(lambda) * sin(theta / 2)} , { cos(phi) * sin(theta / 2),sin(phi) * sin(theta / 2) }, { cos(lambda + phi) * cos(theta / 2),sin(lambda + phi) * cos(theta / 2) }  };
+				return dd::Tensor(xt::adapt(dd::U3mat(lambda, phi, theta),{2,2}),index_set,"U3");
+			}
+		}
+	}
+
+}
+dd::TensorNetwork cir_2_tn(std::string path, std::string  file_name, std::unique_ptr<dd::Package<>>& dd) {
+
+	std::map<int, gate> gate_set = import_circuit(path + file_name);
+	std::cout << "Start!!!" << std::endl;
+
+	dd->varOrder = get_var_order();
+	std::map<int, std::vector<dd::Index>> Index_set = get_index(gate_set, dd->varOrder);
+
+	dd::TensorNetwork tn;
+
+	for (int k = 0; k < gate_set.size(); k++) {
+		tn.tensors.push_back(gate_2_tensor(gate_set[k].name,Index_set[k]));
+	}
+
+	std::cout << "Done!!!" << std::endl;
+	return tn;
 }
