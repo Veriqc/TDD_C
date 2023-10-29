@@ -225,6 +225,17 @@ namespace dd {
 			return res;
 		}
 
+		TDD tn_cont(TensorNetwork tn) {
+			std::vector<TDD> tdds;
+			for (auto& ts : tn.tensors) {
+				tdds.push_back(Tensor_2_TDD(ts));
+			}
+			TDD dd_temp = tdds[0];
+			for (int i = 1; i < tdds.size(); ++i) {
+				dd_temp = cont(dd_temp, tdds[i]);
+			}
+			return dd_temp;
+		};
 
 
 		TDD Matrix2TDD(const GateMatrix mat, std::vector<Index> var_out)

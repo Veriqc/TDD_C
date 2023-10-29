@@ -6,6 +6,7 @@
 #include <xtensor/xarray.hpp>
 #include <xtensor/xtensor.hpp>
 #include "Tdd.hpp"
+#include "Package.hpp"
 
 namespace dd {
 
@@ -30,7 +31,17 @@ namespace dd {
             std::cout << "et j'ai " << tensors.size() << " tenseur" << std::endl;
         }
 
-        dd::TDD cont();
+        /*TDD cont(std::unique_ptr<dd::Package<>> ddpackage) {
+            std::vector<TDD> tdds;
+            for (auto ts : tensors) {
+                tdds.push_back(ddpackage->Tensor_2_TDD(ts));
+            }
+            TDD dd_temp = tdds[0];
+            for (int i = 1; i < tdds.size(); ++i) {
+                dd_temp = ddpackage->cont(dd_temp, tdds[i]);
+            }
+            return dd_temp;
+        };*/
     };
 
 
