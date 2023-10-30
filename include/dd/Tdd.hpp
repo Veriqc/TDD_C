@@ -12,6 +12,8 @@ namespace dd {
     struct Index {
         std::string key; //
         short idx;
+        Index(const std::string key_, const short idx_) :
+            key(key_), idx(idx_) {}
     };
 
 

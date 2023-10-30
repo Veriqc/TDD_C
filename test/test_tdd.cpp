@@ -1,8 +1,3 @@
-#include <iostream>
-#include <string>
-#include <ctime>
-#include <dd/Package.hpp>
-#include "dd/Export.hpp"
 #include <test.hpp>
 
 dd::ComplexValue one = { 1,0 };

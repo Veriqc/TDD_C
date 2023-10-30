@@ -1,11 +1,3 @@
-
-#include <iostream>
-#include <string>
-#include <ctime>
-#include "QuantumComputation.hpp"
-
-#include "dd/Export.hpp"
-#include "Cir_import.h"
 #include <test.hpp>
 void test_qasm();
 
@@ -16,8 +8,8 @@ namespace test {
     }
 }
 void test_qasm() {
-    string path2 = "Benchmarks/";
-    string file_name = "test.qasm";
+    std::string path2 = "Benchmarks/";
+    std::string file_name = "test.qasm";
     std::array<int,2> nodes;
     int n = get_qubits_num(path2 + file_name);
     auto dd = std::make_unique<dd::Package<>>(3 * n);
