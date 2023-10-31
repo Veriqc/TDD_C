@@ -86,7 +86,7 @@ set(PROJECT_NAME TDD_C)
 # Source groups
 ################################################################################
 set(Header_Files
-    "include/Cir_import.h"
+    "include/Cir_tn.h"
     "include/CircuitOptimizer.hpp"
     "include/dd/Complex.hpp"
     "include/dd/ComplexCache.hpp"
@@ -100,12 +100,13 @@ set(Header_Files
     "include/dd/Edge.hpp"
     "include/dd/Export.hpp"
     "include/dd/GateMatrixDefinitions.hpp"
+    "include/dd/GateXarray.hpp"
     "include/dd/Node.hpp"
+    "include/dd/Tensor.hpp"
     "include/dd/Operations.hpp"
     "include/dd/Package.hpp"
     "include/dd/Package_fwd.hpp"
     "include/dd/Tdd.hpp"
-    "include/dd/Tensor.hpp"
     "include/dd/UniqueTable.hpp"
     "include/Definitions.hpp"
     "include/operations/ClassicControlledOperation.hpp"
@@ -249,8 +250,8 @@ set(Source_Files
     "include/parsers/RealParser.cpp"
     "include/parsers/TFCParser.cpp"
     "include/QuantumComputation.cpp"
-    "test/test_circuit.cpp"
     "test/test_tdd.cpp"
+    "test/test_tn.cpp"
 )
 source_group("Source Files" FILES ${Source_Files})
 

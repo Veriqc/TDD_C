@@ -6,10 +6,9 @@
 #include <ctime>
 
 #include <QuantumComputation.hpp>
-#include <Cir_import.h>
 #include <dd/Package.hpp>
 #include <dd/Export.hpp>
-
+#include <dd/Tensor.hpp>
 #include <xtensor/xio.hpp>
 #include <xtensor/xarray.hpp>
 namespace test {

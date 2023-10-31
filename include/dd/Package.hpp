@@ -15,7 +15,6 @@
 #include "UniqueTable.hpp"
 
 #include "Tdd.hpp"
-#include "Tensor.hpp"
 
 
 #include <algorithm>
@@ -183,17 +182,17 @@ namespace dd {
 			}
 		}
 		
-		TDD Tensor_2_TDD(const Tensor tn) {
-			if (tn.data.dimension() != tn.index_set.size()) {
+		/*TDD Tensor_2_TDD(const Tensor ts) {
+			if (ts.data.dimension() != ts.index_set.size()) {
 				throw "action non definies";
 			}
-			add_map(tn.index_set);
+			add_map(ts.index_set);
 			
-			std::vector<int> order(tn.index_set.size());
+			std::vector<int> order(ts.index_set.size());
 			std::iota(order.begin(), order.end(), 0);
 
 			std::sort(order.begin(), order.end(), [&](int a, int b) {
-				return varOrder[tn.index_set[a].key] < varOrder[tn.index_set[b].key];
+				return varOrder[ts.index_set[a].key] < varOrder[ts.index_set[b].key];
 				});
 
 			for (auto num : order) {
@@ -202,9 +201,9 @@ namespace dd {
 			std::cout << std::endl;
 
 			TDD res;
-			res.e = xarray_2_edge(tn.data, order);
+			res.e = xarray_2_edge(ts.data, order);
 
-			std::vector<Index> index_set = tn.index_set;
+			std::vector<Index> index_set = ts.index_set;
 			std::sort(index_set.begin(),
 				index_set.end(),
 				[&](const auto& a, const auto& b) {return varOrder[a.key] < varOrder[b.key]; }
@@ -225,17 +224,13 @@ namespace dd {
 			return res;
 		}
 
-		TDD tn_cont(TensorNetwork tn) {
-			std::vector<TDD> tdds;
-			for (auto& ts : tn.tensors) {
-				tdds.push_back(Tensor_2_TDD(ts));
-			}
-			TDD dd_temp = tdds[0];
-			for (int i = 1; i < tdds.size(); ++i) {
+		TDD tn_cont(const TensorNetwork tn) {
+			TDD dd_temp = Tensor_2_TDD(tn.tensors[0]);
+			for (int i = 1; i < .size(); ++i) {
 				dd_temp = cont(dd_temp, tdds[i]);
 			}
 			return dd_temp;
-		};
+		};*/
 
 
 		TDD Matrix2TDD(const GateMatrix mat, std::vector<Index> var_out)

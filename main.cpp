@@ -10,8 +10,8 @@ int main(int argc, char *argv[]) {
 
     std::map<std::string, std::function<void()>> testFunctions = {
         {"tdd",test::test_tdd_2_tensor},
-        {"circuit",test::test_circuit}
-        //{"tn",test::test_TensorNetwork_cont}
+        //{"circuit",test::test_circuit},
+        {"tn",test::test_TensorNetwork_cont}
     };
     std::string input = argv[1];
     if (testFunctions.find(input) != testFunctions.end()) {

@@ -1,4 +1,7 @@
+#pragma once
+
 #include <test.hpp>
+#include <Cir_tn.h>
 void test_qasm();
 
 namespace test {

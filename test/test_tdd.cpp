@@ -1,3 +1,4 @@
+#pragma once
 #include <test.hpp>
 
 dd::ComplexValue one = { 1,0 };
@@ -29,7 +30,7 @@ void tensor_2_tdd_cx_4(){
     std::vector<dd::Index> indexs ={{"y2",3},{"x0",1} };
     // dd::Tensor tn = {U,indexs, "cx"};
     dd::Tensor tn(U,indexs);
-    dd::TDD tdd = dd1->Tensor_2_TDD(tn);
+    dd::TDD tdd = tn.to_tdd(dd1);
     std::cout << tdd.e.p->v << std::endl;
     dd::export2Dot(tdd.e,"cnot_4_4");
 }
@@ -44,7 +45,7 @@ void tensor_2_tdd_cx_2() {
     std::vector<dd::Index> indexs = {{"x1",2},{"y1",3},{"x0",0},{"y0",1}, };
 
     dd::Tensor tn = { U,indexs, "cx" };
-    dd::TDD tdd = dd1->Tensor_2_TDD(tn);
+    dd::TDD tdd = tn.to_tdd(dd1);
     std::cout << tdd.e.p->v << std::endl;
     dd::export2Dot(tdd.e, "cnot_2_2_2_2");
 }
