@@ -74,6 +74,9 @@ namespace dd {
         }
 
         TDD cont(std::unique_ptr<Package<>>& ddpackage) {
+			if (tensors.size() == 0) {
+				throw "null tensor network";
+			}
 			TDD dd_temp = tensors[0].to_tdd(ddpackage);
 			for (int i = 1; i < tensors.size(); ++i) {
 				dd_temp = ddpackage->cont(dd_temp, tensors[i].to_tdd(ddpackage));
