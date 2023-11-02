@@ -1,5 +1,5 @@
-#pragma once
-
+#ifndef Cir_tn
+#define Cir_tn
 #include <vector>
 #include <string>
 #include <regex>
@@ -30,10 +30,11 @@
 		int gates_num;
 	};
 #endif // !circuitResult
-
+#ifndef release
 bool release = true;
 bool get_max_node = true;
 constexpr long double PI = 3.14159265358979323846264338327950288419716939937510L;
+#endif // !release
 
 void print_index_set(std::vector<dd::Index> index_set) {
 	for (int k = 0; k < index_set.size(); k++) {
@@ -404,7 +405,7 @@ std::map<int, std::map<int, std::vector<int>>>  cir_partition2(const circuitResl
 				par[block][1].push_back(k);
 			}
 			else {
-				int temp_c_min = std::min(c_part_min, std::min(gateObj.qubits[0], gateObj.qubits[1]));
+				int temp_c_min = min(c_part_min, min(gateObj.qubits[0], gateObj.qubits[1]));
 				int temp_c_max = max(c_part_max, max(gateObj.qubits[0], gateObj.qubits[1]));
 				if ((temp_c_max - temp_c_min) > c_part_width) {
 					block += 1;
@@ -615,3 +616,4 @@ dd::TensorNetwork cir_2_tn(std::string path, std::string  file_name, std::unique
 			std::cout << "Done!!!" << std::endl;
 			return tn;
 		}
+#endif

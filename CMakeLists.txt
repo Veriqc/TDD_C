@@ -228,7 +228,6 @@ set(Header_Files
     "include/xtl/xvariant.hpp"
     "include/xtl/xvariant_impl.hpp"
     "include/xtl/xvisitor.hpp"
-    "test/test.hpp"
 )
 source_group("Header Files" FILES ${Header_Files})
 
@@ -250,20 +249,28 @@ set(Source_Files
     "include/parsers/RealParser.cpp"
     "include/parsers/TFCParser.cpp"
     "include/QuantumComputation.cpp"
+)
+set(test_file
+    "test/test.hpp"
     "test/test_tdd.cpp"
     "test/test_tn.cpp"
 )
-source_group("Source Files" FILES ${Source_Files})
+source_group("Source Files" FILES ${Source_Files} )
 
 set(ALL_FILES
     ${Header_Files}
     ${Source_Files}
 )
-
+add_library(tdd SHARED ${ALL_FILES} "include/python-c.cpp")
+target_include_directories(tdd PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_link_libraries(tdd
+    PRIVATE
+    ${PROJECT_SOURCE_DIR}/build/libtdd.so
+)
 ################################################################################
 # Target
 ################################################################################
-add_executable(${PROJECT_NAME} ${ALL_FILES} "main.cpp")
+add_executable(${PROJECT_NAME} ${ALL_FILES} ${test_file} "main.cpp")
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_auto_type)
 target_link_directories(${PROJECT_NAME} 

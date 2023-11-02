@@ -1,3 +1,5 @@
+#ifndef xgate
+#define xgate
 #include "Complex.hpp"
 #include <xtensor/xarray.hpp>
 
@@ -121,3 +123,5 @@ namespace xgate{
         };
 	}
 }
+
+#endif
