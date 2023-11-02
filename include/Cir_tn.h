@@ -136,7 +136,7 @@ circuitReslut import_circuit(std::string file_name) {
 	std::getline(infile, line);
 	std::getline(infile, line);
 	std::getline(infile, line);
-	std::getline(infile, line);
+	// std::getline(infile, line);
 	while (std::getline(infile, line))
 	{
 		gate temp_gate;
@@ -221,12 +221,11 @@ std::map<int, std::vector<dd::Index>> get_circuit_index(const circuitReslut& cir
 			targ_idx2 += std::to_string(qubit_idx[tar_q]);
 			Index_set[k] = {
 				{cont_idx,hyper_idx[cont_idx]},
-				{cont_idx,short(hyper_idx[cont_idx] + 1)},
-				{cont_idx,short(hyper_idx[cont_idx] + 2)},
+				{cont_idx,hyper_idx[cont_idx] + 1},
 				{targ_idx1,hyper_idx[targ_idx1]},
 				{targ_idx2,hyper_idx[targ_idx2]} };
 			//std::cout << cont_idx<<" " << hyper_idx[cont_idx] << " " << cont_idx << " " << hyper_idx[cont_idx] + 1 << " " << cont_idx << " " << hyper_idx[cont_idx] + 2 << " " << targ_idx1 << " " << hyper_idx[targ_idx1] << " " << targ_idx2 << " " <<hyper_idx[targ_idx2] << " " << std::endl;
-			hyper_idx[cont_idx] += 2;
+			hyper_idx[cont_idx] += 1;
 
 		}
 		else {
@@ -405,7 +404,7 @@ std::map<int, std::map<int, std::vector<int>>>  cir_partition2(const circuitResl
 				par[block][1].push_back(k);
 			}
 			else {
-				int temp_c_min = min(c_part_min, min(gateObj.qubits[0], gateObj.qubits[1]));
+				int temp_c_min = std::min(c_part_min, std::min(gateObj.qubits[0], gateObj.qubits[1]));
 				int temp_c_max = max(c_part_max, max(gateObj.qubits[0], gateObj.qubits[1]));
 				if ((temp_c_max - temp_c_min) > c_part_width) {
 					block += 1;
@@ -501,7 +500,7 @@ int get_qubits_num(std::string  file_name) {
 	std::getline(infile, line);
 	std::getline(infile, line);
 	std::getline(infile, line);
-	std::getline(infile, line);
+	// std::getline(infile, line);
 	while (std::getline(infile, line))
 	{
 
@@ -551,7 +550,7 @@ int get_gates_num(std::string  file_name) {
 	std::getline(infile, line);
 	std::getline(infile, line);
 	std::getline(infile, line);
-	std::getline(infile, line);
+	// std::getline(infile, line);
 	while (std::getline(infile, line))
 	{
 		gates_num += 1;
@@ -565,13 +564,10 @@ dd::Tensor gate_2_tensor(std::string name, std::vector<dd::Index> index_set) {
 
 	static const std::map<std::string, xt::xarray<dd::ComplexValue>> gate_type = {
 		{"x", xgate::Xmat}, {"y", xgate::Ymat}, {"z", xgate::Zmat}, {"h", xgate::Hmat},
-		{"s", xgate::Smat}, {"sdg", xgate::Sdagmat}, {"t", xgate::Tmat}, {"tdg", xgate::Tdagmat}
+		{"s", xgate::Smat}, {"sdg", xgate::Sdagmat}, {"t", xgate::Tmat}, {"tdg", xgate::Tdagmat},
+		{"cx",xgate::CXmat}
 	};
 
-
-	if (name == "cx") {
-		return dd::Tensor(xgate::CXmat, index_set, "CX");
-	}
 	auto it = gate_type.find(name);
 	if (it != gate_type.end()) {
 		return dd::Tensor(it->second, index_set, name);

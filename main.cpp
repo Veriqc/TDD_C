@@ -5,7 +5,6 @@
 int main(int argc, char *argv[]) {
     if (argc != 2) {
         std::cout << "Usage: " << argv[0] << " <test_function> (A, B, C)" << std::endl;
-        test::test_TensorNetwork_cont();
         return 1;
     }
 

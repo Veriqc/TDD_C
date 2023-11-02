@@ -19,8 +19,8 @@ void test_gate() {
 }
 
 void test_tn() {
-    std::string path2 = "include/Benchmarks/";
-    std::string file_name = "test.qasm";
+    std::string path2 = "../include/Benchmarks/";
+    std::string file_name = "test_one.qasm";
     int n = get_qubits_num(path2 + file_name);
 	std::cout << "qubits num: " << n << std::endl;
     auto ddpack = std::make_unique<dd::Package<>>(3 * n);
