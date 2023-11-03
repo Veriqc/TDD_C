@@ -1,5 +1,5 @@
-#pragma once
-
+#ifndef COMPLEXNUMBERS_HPP
+#define COMPLEXNUMBERS_HPP
 #include "Complex.hpp"
 #include "ComplexCache.hpp"
 #include "ComplexTable.hpp"
@@ -235,3 +235,4 @@ struct ComplexNumbers {
   }
 };
 } // namespace dd
+#endif

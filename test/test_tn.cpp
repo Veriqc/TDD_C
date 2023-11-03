@@ -1,7 +1,6 @@
 #pragma once
 
-#include <Cir_tn.h>
-#include <test.hpp>
+#include "test.hpp"
 void test_gate();
 void test_tn();
 namespace test {

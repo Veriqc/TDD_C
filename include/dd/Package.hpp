@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PACKAGE_HPP
+#define PACKAGE_HPP
 
 #include "Complex.hpp"
 #include "ComplexCache.hpp"
@@ -145,6 +146,7 @@ namespace dd {
 			auto split_pos = std::max_element(order.begin(), order.end()) - order.begin();
 			Qubit x = order[split_pos];
 			order[split_pos] = -1;
+			// TODO: change for hyper 
 			auto split_U = xt::split(array, array.shape(split_pos), split_pos);
 
 
@@ -157,13 +159,6 @@ namespace dd {
 
 		}
 
-		std::vector<std::string> generate_key(std::vector<Index> var) {
-			std::vector<std::string> res;
-			for (auto& index : var) {
-				res.push_back(index.key);
-			}
-			return res;
-		}
 		int update_map_value() {
 			if (varOrder.empty()) {
 				return 0;
@@ -172,66 +167,7 @@ namespace dd {
 			auto max_pair = std::max_element(varOrder.begin(), varOrder.end(), compare_function);
 			return (max_pair->second) + 1;
 		}
-		void add_map(std::vector<Index> index_vector) {
-			for (auto index : index_vector) {
-				auto it = varOrder.find(index.key);
-				if (it == varOrder.end()) {
-					int num = update_map_value();
-					varOrder[index.key] = num;
-				}
-			}
-		}
 		
-		/*TDD Tensor_2_TDD(const Tensor ts) {
-			if (ts.data.dimension() != ts.index_set.size()) {
-				throw "action non definies";
-			}
-			add_map(ts.index_set);
-			
-			std::vector<int> order(ts.index_set.size());
-			std::iota(order.begin(), order.end(), 0);
-
-			std::sort(order.begin(), order.end(), [&](int a, int b) {
-				return varOrder[ts.index_set[a].key] < varOrder[ts.index_set[b].key];
-				});
-
-			for (auto num : order) {
-				std::cout << num << " ";
-			}
-			std::cout << std::endl;
-
-			TDD res;
-			res.e = xarray_2_edge(ts.data, order);
-
-			std::vector<Index> index_set = ts.index_set;
-			std::sort(index_set.begin(),
-				index_set.end(),
-				[&](const auto& a, const auto& b) {return varOrder[a.key] < varOrder[b.key]; }
-			);
-
-
-			res.key_2_index = generate_key(index_set);
-			res.index_set = index_set;
-
-			std::cout << "TDD index set:" << std::endl;
-			for (auto index : res.index_set) {
-				std::cout << "index key: " << index.key << "	index idx: " << index.idx << std::endl;
-			}
-			std::cout << "TDD index:" << std::endl;
-			for (auto key : res.key_2_index) {
-				std::cout << "key: "<< key << std::endl ;
-			}
-			return res;
-		}
-
-		TDD tn_cont(const TensorNetwork tn) {
-			TDD dd_temp = Tensor_2_TDD(tn.tensors[0]);
-			for (int i = 1; i < .size(); ++i) {
-				dd_temp = cont(dd_temp, tdds[i]);
-			}
-			return dd_temp;
-		};*/
-
 
 		TDD Matrix2TDD(const GateMatrix mat, std::vector<Index> var_out)
 		{
@@ -1207,3 +1143,4 @@ namespace dd {
 	};
 
 } // namespace dd
+#endif

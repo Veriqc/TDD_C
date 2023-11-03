@@ -1,5 +1,5 @@
 #pragma once
-#include <test.hpp>
+#include "test.hpp"
 
 dd::ComplexValue one = { 1,0 };
 dd::ComplexValue zero = { 0,0 };
@@ -51,13 +51,13 @@ void tensor_2_tdd_cx_4(){
 }
 void tensor_2_tdd_cx_2() {
     auto dd1 = std::make_unique<dd::Package<>>(10);
-    dd1->varOrder = { {"x0",0},{"y0",1},{"x1",2},{"y1",3} };
+    dd1->varOrder = { {"x0",0},{"y0",1},{"x1",5},{"y1",6} };
 
     xt::xarray<dd::ComplexValue> U = {
         {{{one, zero}, {zero, one}}, {{zero, zero}, {zero, zero}}}, 
         {{{zero, zero}, {zero, zero}}, {{zero, one}, {one, zero}}}
     };
-    std::vector<dd::Index> indexs = {{"x0",0},{"y0",1},{"x1",2},{"y1",3}, };
+    std::vector<dd::Index> indexs = {{"x1",2},{"y1",3}, {"x0",0},{"y0",1}};
 
     dd::Tensor tn = { U,indexs, "cx" };
     dd::TDD tdd = tn.to_tdd(dd1);

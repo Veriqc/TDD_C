@@ -1,5 +1,5 @@
-#pragma once
-
+#ifndef EDGE_HPP
+#define EDGE_HPP
 #include "Complex.hpp"
 #include "ComplexValue.hpp"
 #include "Definitions.hpp"
@@ -79,3 +79,4 @@ template <class Node> struct hash<dd::CachedEdge<Node>> {
   }
 };
 } // namespace std
+#endif

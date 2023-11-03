@@ -1,13 +1,11 @@
 #pragma once
 #include "test/test.hpp"
-#include <iostream>
 
 int main(int argc, char *argv[]) {
     if (argc != 2) {
         std::cout << "Usage: " << argv[0] << " <test_function> (A, B, C)" << std::endl;
         return 1;
     }
-
     std::map<std::string, std::function<void()>> testFunctions = {
         {"tdd",test::test_tdd_2_tensor},
         //{"circuit",test::test_circuit},

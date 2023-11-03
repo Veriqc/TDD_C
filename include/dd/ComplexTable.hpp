@@ -1,5 +1,5 @@
-#pragma once
-
+#ifndef COMPLEXTABLE_HPP
+#define COMPLEXTABLE_HPP
 #include "Definitions.hpp"
 
 #include <algorithm>
@@ -618,3 +618,4 @@ private:
   }
 };
 } // namespace dd
+#endif

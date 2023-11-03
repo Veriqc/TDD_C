@@ -1,5 +1,5 @@
-#pragma once
-
+#ifndef DDPACKAGECONFIG_HPP
+#define DDPACKAGECONFIG_HPP
 #include <cstddef>
 
 namespace dd {
@@ -31,3 +31,4 @@ struct DDPackageConfig {
   static constexpr std::size_t STOCHASTIC_CACHE_OPS = 1;
 };
 } // namespace dd
+#endif

@@ -1,5 +1,5 @@
-#pragma once
-
+#ifndef COMPLEXCACHE_HPP
+#define COMPLEXCACHE_HPP
 #include "Complex.hpp"
 #include "ComplexTable.hpp"
 
@@ -125,3 +125,4 @@ private:
   std::size_t peakCount = 0;
 };
 } // namespace dd
+#endif

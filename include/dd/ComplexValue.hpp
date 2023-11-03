@@ -1,5 +1,5 @@
-#pragma once
-
+#ifndef COMPLEXVALUE_HPP
+#define COMPLEXVALUE_HPP
 #include "ComplexTable.hpp"
 #include "Definitions.hpp"
 
@@ -258,3 +258,4 @@ template <> struct hash<dd::ComplexValue> {
   }
 };
 } // namespace std
+#endif

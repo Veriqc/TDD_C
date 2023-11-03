@@ -1,5 +1,5 @@
-#pragma once
-
+#ifndef NODE_HPP
+#define NODE_HPP
 #include "Complex.hpp"
 #include "ComplexValue.hpp"
 #include "Definitions.hpp"
@@ -33,5 +33,4 @@ namespace dd {
 	using mCachedEdge = CachedEdge<mNode>;
 
 } // namespace dd
-
-
+#endif

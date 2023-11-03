@@ -1,5 +1,5 @@
-#pragma once
-
+#ifndef DEFINITIONS_HPP
+#define DEFINITIONS_HPP
 #include <complex>
 #include <cstdint>
 #include <type_traits>
@@ -95,3 +95,4 @@ constexpr std::size_t combineHash(std::size_t lhs, std::size_t rhs) {
   return ulps;
 }
 } // namespace dd
+#endif

@@ -1,5 +1,5 @@
-#pragma once
-
+#ifndef GATEMATRIXDEFITIONS_HPP
+#define GATEMATRIXDEFITIONS_HPP
 #include "ComplexValue.hpp"
 #include "Definitions.hpp"
 
@@ -226,3 +226,4 @@ inline TwoQubitGateMatrix XXPlusYYmat(const fp theta, const fp beta = 0.) {
 }
 // NOLINTEND(readability-identifier-naming)
 } // namespace dd
+#endif

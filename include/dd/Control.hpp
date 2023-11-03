@@ -1,5 +1,5 @@
-#pragma once
-
+#ifndef CONTRPL_HPP
+#define CONTRPL_HPP
 #include "Definitions.hpp"
 
 #include <set>
@@ -57,3 +57,4 @@ inline Control operator""_nc(unsigned long long int q) {
 }
 } // namespace literals
 } // namespace dd
+#endif

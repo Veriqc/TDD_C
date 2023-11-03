@@ -1,4 +1,5 @@
-#pragma once
+#ifndef OPERATIONS_HPP
+#define OPERATIONS_HPP
 
 #include "../Definitions.hpp"
 #include "GateMatrixDefinitions.hpp"
@@ -79,3 +80,4 @@ namespace dd {
 	}
 
 } // namespace dd
+#endif

@@ -86,7 +86,6 @@ set(PROJECT_NAME TDD_C)
 # Source groups
 ################################################################################
 set(Header_Files
-    "include/Cir_tn.h"
     "include/CircuitOptimizer.hpp"
     "include/dd/Complex.hpp"
     "include/dd/ComplexCache.hpp"
@@ -253,7 +252,7 @@ set(Source_Files
 set(test_file
     "test/test.hpp"
     "test/test_tdd.cpp"
-    "test/test_tn.cpp"
+    # "test/test_tn.cpp"
 )
 source_group("Source Files" FILES ${Source_Files} )
 
@@ -261,12 +260,12 @@ set(ALL_FILES
     ${Header_Files}
     ${Source_Files}
 )
-add_library(tdd SHARED ${ALL_FILES} "include/python-c.cpp")
-target_include_directories(tdd PUBLIC ${PROJECT_SOURCE_DIR}/include)
-target_link_libraries(tdd
-    PRIVATE
-    ${PROJECT_SOURCE_DIR}/build/libtdd.so
-)
+# add_library(tdd SHARED ${ALL_FILES} "include/python-c.cpp")
+# target_include_directories(tdd PUBLIC ${PROJECT_SOURCE_DIR}/include)
+# target_link_libraries(tdd
+#     PRIVATE
+#     ${PROJECT_SOURCE_DIR}/build/libtdd.so
+# )
 ################################################################################
 # Target
 ################################################################################

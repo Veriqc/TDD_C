@@ -1,5 +1,5 @@
-#pragma once
-
+#ifndef COMPUTETABLE_HPP
+#define COMPUTETABLE_HPP
 #include "Definitions.hpp"
 
 
@@ -200,3 +200,4 @@ namespace dd {
 	//"=================我加的======================="
 
 } // namespace dd
+#endif

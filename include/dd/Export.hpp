@@ -1,5 +1,5 @@
-#pragma once
-
+#ifndef EXPORT_HPP
+#define EXPORT_HPP
 #include "Complex.hpp"
 #include "ComplexNumbers.hpp"
 #include "Definitions.hpp"
@@ -801,3 +801,4 @@ namespace dd {
 	}
 
 } // namespace dd
+#endif

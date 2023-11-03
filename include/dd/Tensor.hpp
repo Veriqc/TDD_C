@@ -1,8 +1,6 @@
-#pragma once
+#ifndef TENSOR_HPP
+#define TENSOR_HPP
 
-
-#include <xtensor/xio.hpp>
-#include <xtensor/xview.hpp>
 #include <xtensor/xarray.hpp>
 #include <xtensor/xtensor.hpp>
 #include "Tdd.hpp"
@@ -11,6 +9,26 @@
 #include <stdexcept>
 
 namespace dd {
+	std::vector<int> reOrder(const std::vector<int>& index_set) {
+		std::vector<int> sorted_index_set = index_set;
+		std::sort(sorted_index_set.begin(), sorted_index_set.end());
+
+		std::map<int, int> index_map;
+		int rank = 0;
+
+		for (int i = 0; i < sorted_index_set.size(); ++i) {
+			if (i == 0 || sorted_index_set[i] != sorted_index_set[i - 1]) {
+				index_map[sorted_index_set[i]] = rank++;
+			}
+		}
+
+		std::vector<int> order;
+		for (int value : index_set) {
+			order.push_back(index_map[value]);
+		}
+
+		return order;
+	}
 
     struct Tensor {
 
@@ -23,31 +41,23 @@ namespace dd {
         Tensor(const xt::xarray<ComplexValue>& data_ = xt::xarray<ComplexValue>(),
            const std::vector<Index>& index_set_ = std::vector<Index>(),
            const std::string& name_ = "") : data(data_), index_set(index_set_), name(name_) {}
-
-		std::vector<std::string> key(){
-			std::vector<std::string> res;
-			for (auto& index : this->index_set) {
-				res.push_back(index.key);
-			}
-			return res;
-		}
         
 		TDD to_tdd(std::unique_ptr<Package<>>& ddpackage) {
 			
 			if (this->data.dimension() != this->index_set.size()) {
 				throw std::runtime_error("action non definies "+ this->name);
 			}
-			ddpackage->add_map(index_set);
 
-			std::vector<int> order(this->index_set.size());
-			std::iota(order.begin(), order.end(), 0);
-
-			std::sort(order.begin(), 
-						order.end(), 
-						[&](int a, int b) {
-							return ddpackage->varOrder[index_set[a].key] < ddpackage->varOrder[index_set[b].key];
-							}
-					);
+			std::vector<int> order;
+			for(const auto index: this->index_set){
+				auto it = ddpackage->varOrder.find(index.key);
+				if (it == ddpackage->varOrder.end()) {
+					int num = ddpackage->update_map_value();
+					ddpackage->varOrder[index.key] = num;
+				}
+				order.push_back(ddpackage->varOrder[index.key]);
+			}
+			order = reOrder(order);
 
 			std::cout << "order before xarray_2_edge: " << std::endl;
 			for (auto num : order) {
@@ -65,9 +75,9 @@ namespace dd {
 			res.e = ddpackage->xarray_2_edge(data, order);
 			std::cout << "finish xarray_2_edge" << std::endl;
 
-			std::vector<Index> index_set = this->index_set;
-			std::sort(index_set.begin(),
-				index_set.end(),
+			std::vector<Index> temp_index_set = this->index_set;
+			std::sort(temp_index_set.begin(),
+				temp_index_set.end(),
 				[&](const auto& a, const auto& b) {return ddpackage->varOrder[a.key] < ddpackage->varOrder[b.key]; }
 			);
 			std::cout << "index set after xarray_2_edge: "<< std::endl;
@@ -76,17 +86,14 @@ namespace dd {
 				std::cout << " index key " << index.key ;
 				std::cout << " index order " << ddpackage->varOrder[index.key] <<std::endl;
 			}
-			std::cout << "index set initial: "<< std::endl;
-			for(const auto index: index_set){
-				std::cout << "index idx " << index.idx ;
-				std::cout << " index key " << index.key ;
-				std::cout << " index order " << ddpackage->varOrder[index.key] <<std::endl;
-			}
 			std::cout << "finish index_set initial" << std::endl;
 
+			res.key_2_index = {};
+			for(const auto index: temp_index_set){
+				res.key_2_index.push_back(index.key);
+			}
 
-			res.key_2_index = this->key();
-			res.index_set = index_set;
+			res.index_set = temp_index_set;
 
 			std::cout << "TDD index set:" << std::endl;
 			for (auto index : res.index_set) {
@@ -123,3 +130,4 @@ namespace dd {
 
 
 }
+#endif

@@ -1,5 +1,6 @@
-#ifndef Cir_tn
-#define Cir_tn
+#ifndef Cir_tn_HPP
+#define Cir_tn_HPP
+
 #include <vector>
 #include <string>
 #include <regex>
@@ -7,10 +8,10 @@
 #include <map>
 #include <stdexcept>
 
-#include <dd/GateXarray.hpp>
+#include "dd/GateXarray.hpp"
 
-#include <dd/Tensor.hpp>
-#include <dd/Package.hpp>
+#include "dd/Tensor.hpp"
+#include "dd/Package.hpp"
 
 #include <xtensor/xarray.hpp>
 
@@ -36,6 +37,7 @@ bool get_max_node = true;
 constexpr long double PI = 3.14159265358979323846264338327950288419716939937510L;
 #endif // !release
 
+#ifndef print_index_set
 void print_index_set(std::vector<dd::Index> index_set) {
 	for (int k = 0; k < index_set.size(); k++) {
 		std::cout << "(" << index_set[k].key << ", " << index_set[k].idx << ") ,";
@@ -43,6 +45,7 @@ void print_index_set(std::vector<dd::Index> index_set) {
 	}
 	std::cout << std::endl;
 }
+#endif
 //是为了从qasm文件的行条目中提取出门的name和qubit
 std::vector<std::string> split(const std::string& s, const std::string& seperator) {
 	std::vector<std::string> result;
