@@ -225,7 +225,7 @@ std::map<int, std::vector<dd::Index>> get_circuit_index(const circuitReslut& cir
 			targ_idx2 += std::to_string(qubit_idx[tar_q]);
 			Index_set[k] = {
 				{cont_idx,hyper_idx[cont_idx]},
-				{cont_idx,hyper_idx[cont_idx] + 1},
+				{cont_idx,static_cast<short>(hyper_idx[cont_idx] + 1)},
 				{targ_idx1,hyper_idx[targ_idx1]},
 				{targ_idx2,hyper_idx[targ_idx2]} };
 			//std::cout << cont_idx<<" " << hyper_idx[cont_idx] << " " << cont_idx << " " << hyper_idx[cont_idx] + 1 << " " << cont_idx << " " << hyper_idx[cont_idx] + 2 << " " << targ_idx1 << " " << hyper_idx[targ_idx1] << " " << targ_idx2 << " " <<hyper_idx[targ_idx2] << " " << std::endl;

@@ -143,15 +143,29 @@ namespace dd {
 				 }
 			}
 
-			auto split_pos = std::max_element(order.begin(), order.end()) - order.begin();
+			auto split_pos = std::distance(order.begin(), std::max_element(order.begin(), order.end()));
 			Qubit x = order[split_pos];
 			order[split_pos] = -1;
 			// TODO: change for hyper 
-			auto split_U = xt::split(array, array.shape(split_pos), split_pos);
+			std::vector<xt::xarray<ComplexValue>> split_U;
+			for (const auto& u : xt::split(array, array.shape(split_pos), split_pos)) {
+				split_U.push_back(u);
+			}
+			// xt::split return a const type data, it is not good.
 
+			while (std::find(order.begin(), order.end(), x) != order.end()) {
+				auto split_pos = std::distance(order.begin(), std::find(order.begin(), order.end(), x));
+				order[split_pos] = -1;
+				std::vector<xt::xarray<ComplexValue>> temp_U;
+				for (int i = 0; i < split_U.size(); ++i) {
+					auto temp = xt::split(split_U.at(i), split_U.at(i).shape(split_pos), split_pos).at(i);
+					temp_U.push_back(temp);
+				}
+				split_U = temp_U;
+			}
 
 			std::vector<Edge<mNode>> edges;
-			for (auto u : split_U) {
+			for (const auto u : split_U) {
 				edges.push_back(xarray_2_edge(u, order));
 			}
 

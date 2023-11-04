@@ -269,7 +269,7 @@ set(ALL_FILES
 ################################################################################
 # Target
 ################################################################################
-add_executable(${PROJECT_NAME} ${ALL_FILES} ${test_file} "main.cpp")
+add_executable(${PROJECT_NAME} ${ALL_FILES} "main.cpp")
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_auto_type)
 target_link_directories(${PROJECT_NAME} 

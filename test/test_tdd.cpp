@@ -1,8 +1,7 @@
 #pragma once
 #include "test.hpp"
 
-dd::ComplexValue one = { 1,0 };
-dd::ComplexValue zero = { 0,0 };
+
 void tensor_2_tdd_cx_4();
 void tensor_2_tdd_cx_2();
 void tensor_hyper_index();
@@ -16,7 +15,8 @@ namespace test{
         tensor_hyper_index();
     }
 }
-
+dd::ComplexValue one = { 1,0 };
+dd::ComplexValue zero = { 0,0 };
 void tensor_hyper_index(){
     auto dd1 = std::make_unique<dd::Package<>>(10);
     dd1->varOrder = { {"x0",0},{"y0",1},{"x1",2},{"y1",3} };
