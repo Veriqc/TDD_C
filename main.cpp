@@ -1,20 +1,19 @@
-#pragma once
-
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
 #include <regex>
 
-#include <dd/Tensor.hpp>
-#include <dd/Tdd.hpp>
-#include <dd/ComplexValue.hpp>
+#include "dd/Tensor.hpp"
+#include "dd/Tdd.hpp"
+#include "dd/ComplexValue.hpp"
 
 #include <xtensor/xarray.hpp>
 #include <xtensor/xio.hpp>
 #include <xtensor/xadapt.hpp>
 
-dd::ComplexValue string_2complex(const std::string s){
+
+dd::ComplexValue string_2_complex(const std::string& s){
     std::regex pattern(R"((-?\d+\.\d+)([+-])(\d+\.\d+))");
     std::smatch matches;
 
@@ -28,92 +27,131 @@ dd::ComplexValue string_2complex(const std::string s){
         return dd::ComplexValue(real,imag);
     }
     else{
-        std::cerr << "faile" << std::endl;
+        std::cerr << "false here" << s << std::endl;
+        throw std::runtime_error("invalid format");
     }
 }
 
-int main(int argc, char *argv[]) {
-    if(argc < 2 or argc > 3){
-        std::cerr << "invaild input." << std::endl;
+std::vector<dd::ComplexValue> string_2_complex_vector(const std::string& s){
+    std::istringstream ss(s);
+    std::string temp;
+    std::vector<dd::ComplexValue> res;
+    while(std::getline(ss, temp, ' ')){
+        if(temp.compare(" ")==0 or temp.empty()){ continue;}
+        try{
+            res.push_back(string_2_complex(temp));
+        }
+        catch(std::runtime_error){
+            continue;
+        }
+    }
+    return res;
+}
+
+std::vector<int> string_2_shape (const std::string& s){
+    std::istringstream ss(s);
+    std::string temp;
+    std::vector<int> shape ;
+
+    while(std::getline(ss, temp, ' ')){
+        if(temp.compare(" ")==0 or temp.empty()){ continue;}
+        try {
+            int value = std::stoi(temp);
+            shape.push_back(value);
+        } catch (const std::invalid_argument& e) {
+            std::cerr << "Invalid input format." << std::endl;
+            throw std::invalid_argument("Invalid integer in shape");
+        }
+    }
+    return shape;
+} 
+dd::Index string_2_index (const std::string& s){
+    std::istringstream ss(s);
+    std::vector<std::string> parts;
+    std::string part;
+
+    while (std::getline(ss, part, ':')) {
+        parts.push_back(part);
+    }
+    if (parts.size() == 2) {
+        std::string firstPart = parts[0];
+        int secondPart;
+        
+        // Convert the second part to an integer
+        try {
+            secondPart = std::stoi(parts[1]);
+            return dd::Index(firstPart,secondPart);
+        } catch (const std::invalid_argument& e) {
+            std::cerr << "Invalid integer in the second part: " << e.what() << std::endl;
+            throw std::invalid_argument("Invalid integer in index set");
+        }
+    }
+    else{
+        std::cerr << "parts size < 2" << std::endl;
+        throw std::runtime_error("invalid format");
+    }
+}
+std::vector<dd::Index> string_2_index_set(const std::string& s){
+    std::istringstream ss(s);
+    std::string temp;
+
+    std::vector<dd::Index> index_set ;
+    while(std::getline(ss, temp, ' ')){
+        try{
+            index_set.push_back(string_2_index(temp));
+        }
+        catch (const std::runtime_error){
+            std::cerr << "catch error" << std::endl;
+            continue;
+        }
+    }
+    return index_set;
+}
+
+dd::Tensor string_2_tensor(const std::string& s){
+    std::vector<dd::ComplexValue> array;
+    std::vector<int> shape;
+    std::vector<dd::Index> index_set;
+
+    std::string temp;
+
+    std::istringstream ss(s);
+    std::string token;
+
+    std::getline(ss, token, ',');
+    array = string_2_complex_vector(token);
+
+    std::getline(ss, token, ',');
+    shape = string_2_shape(token);
+
+    std::getline(ss, token, ',');
+    index_set = string_2_index_set(token);
+
+    xt::xarray<dd::ComplexValue> data = xt::adapt(array,shape);
+    return dd::Tensor(data,index_set);
+}
+
+
+int main(int argc, char** argv){
+    if(argc < 2){
+        std::cerr << "wrong argument" << std::endl;
         return 1;
     }
-    std::ifstream inputFile;
-    inputFile.open(argv[1]);
-
-    if (!inputFile.is_open()) {
-        std::cerr << "Unable to open the file." << std::endl;
-        return 1;
+    std::ifstream file(argv[1]);
+    if (!file.is_open()) {
+        std::cerr << "Error: Unable to open file " << argv[1] << std::endl;
+        return 1; // Return an error code
     }
 
     std::string line;
-    std::getline(inputFile, line);
-    while (std::getline(inputFile, line)) {
-        std::vector<dd::ComplexValue> data;
-        std::vector<int> shape;
-        std::vector<dd::Index> index_set;
-        std::string temp;
-
-        std::istringstream ss(line);
-        std::string token;
-
-        std::getline(ss, token, ',');
-        std::istringstream datass(token);
-        while( std::getline(datass, temp, ' ')){
-            if(temp.compare(" ")==0 or temp.empty()){ continue;}
-            data.push_back(string_2complex(temp));
+    std::getline(file, line);
+    while (std::getline(file, line)) {
+        dd::Tensor ts = string_2_tensor(line);
+        std::cout << ts.data << std::endl;
+        for(auto index: ts.index_set){
+            std::cout << "index key: " << index.key << std::endl;
+            std::cout << "index idx: " << index.idx << std::endl;
         }
-         
-
-        std::getline(ss, token, ',');
-        std::istringstream shapess(token);
-        while( std::getline(shapess, temp, ' ')){
-            if(temp.compare(" ")==0 or temp.empty()){ continue;}
-            try {
-                int value = std::stoi(token);
-                shape.push_back(value);
-            } catch (const std::invalid_argument& e) {
-                std::cerr << "Invalid input format." << std::endl;
-                return 1;
-            }
-        }
-
-        xt::xarray<dd::ComplexValue> res = xt::adapt(data,shape);
-        std::cout << res  << std::endl;
-
-        std::getline(ss, token, ',');
-        std::istringstream index_setss(token);
-        while(std::getline(index_setss, temp, ' ')){
-            if(temp.compare(" ")==0 or temp.empty()){ continue;}
-
-            std::istringstream index_partss(temp);
-            std::vector<std::string> parts;
-            std::string part;
-            while (std::getline(index_partss, part, ':')) {
-                parts.push_back(part);
-            }
-            if (parts.size() == 2) {
-                std::string firstPart = parts[0];
-                int secondPart;
-                
-                // Convert the second part to an integer
-                try {
-                    secondPart = std::stoi(parts[1]);
-                    index_set.push_back(dd::Index(firstPart,secondPart));
-                } catch (const std::invalid_argument& e) {
-                    std::cerr << "Invalid integer in the second part: " << e.what() << std::endl;
-                    return 1;
-                }
-            } else {
-                continue;
-            }
-        }
-        for(auto index_temp: index_set){
-            std::cout << "index key: " << index_temp.key << " index idx: " << index_temp.idx << std::endl;
-        }
-        dd::Tensor tn = dd::Tensor(res,index_set);
     }
-
-    inputFile.close();
-
     return 0;
 }
