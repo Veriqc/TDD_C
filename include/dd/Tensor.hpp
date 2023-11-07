@@ -59,35 +59,15 @@ namespace dd {
 			}
 			order = reOrder(order);
 
-			std::cout << "order before xarray_2_edge: " << std::endl;
-			for (auto num : order) {
-				std::cout << num << " ";
-			}
-			std::cout << std::endl;
-			std::cout << "index set before xarray_2_edge: "<< std::endl;
-			for(const auto index: this->index_set){
-				std::cout << "index idx " << index.idx ;
-				std::cout << " index key " << index.key ;
-				std::cout << " index order " << ddpackage->varOrder[index.key] <<std::endl;
-			}
-
 			TDD res;
 			res.e = ddpackage->xarray_2_edge(data, order);
-			std::cout << "finish xarray_2_edge" << std::endl;
-
+			
 			std::vector<Index> temp_index_set = this->index_set;
 			std::sort(temp_index_set.begin(),
 				temp_index_set.end(),
 				[&](const auto& a, const auto& b) {return ddpackage->varOrder[a.key] < ddpackage->varOrder[b.key]; }
 			);
-			std::cout << "index set after xarray_2_edge: "<< std::endl;
-			for(const auto index: this->index_set){
-				std::cout << "index idx " << index.idx ;
-				std::cout << " index key " << index.key ;
-				std::cout << " index order " << ddpackage->varOrder[index.key] <<std::endl;
-			}
-			std::cout << "finish index_set initial" << std::endl;
-
+		
 			res.key_2_index = {};
 			for(const auto index: temp_index_set){
 				res.key_2_index.push_back(index.key);
@@ -95,14 +75,6 @@ namespace dd {
 
 			res.index_set = temp_index_set;
 
-			std::cout << "TDD index set:" << std::endl;
-			for (auto index : res.index_set) {
-				std::cout << "index key: " << index.key << "	index idx: " << index.idx << std::endl;
-			}
-			std::cout << "TDD index:" << std::endl;
-			for (auto key : res.key_2_index) {
-				std::cout << "key: " << key << std::endl;
-			}
 			return res;
         }
     };

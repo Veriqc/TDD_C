@@ -124,13 +124,6 @@ namespace dd {
 		Edge<mNode> xarray_2_edge(
 			const xt::xarray<ComplexValue>& array,
 			std::vector<int> order){
-			std::cout << "order:" << std::endl;
-			for (auto it : order) {
-				std::cout << it << ", ";
-			}
-			std::cout << std::endl;
-
-
 			if (array.size() == 1) {
 				 if (array[0] == complex_zero) {
 				 	return Edge<mNode>::zero;
@@ -146,7 +139,7 @@ namespace dd {
 			auto split_pos = std::distance(order.begin(), std::max_element(order.begin(), order.end()));
 			Qubit x = order[split_pos];
 			order[split_pos] = -1;
-			// TODO: change for hyper 
+			
 			std::vector<xt::xarray<ComplexValue>> split_U;
 			for (const auto& u : xt::split(array, array.shape(split_pos), split_pos)) {
 				split_U.push_back(u);
