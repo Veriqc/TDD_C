@@ -64,7 +64,7 @@ def cir_2_tn(cir,input_s=[],output_s=[]):
             tn.tensors.append(ts)
                 
     gates=cir.data
-    CX=np.array([[[[1,0],[0,1]],[[0,0],[0,0]]],[[[0,0],[0,0]],[[0,1],[1,0]]]])
+    CX=np.array([[[[1,0],[0,1]],[[0,0],[0,0]]],[[[0,0],[0,0]],[[0,1],[1,0]]]],dtype=complex)
     for k in range(len(gates)):
         g=gates[k]
         nam=g[0].name
@@ -135,7 +135,7 @@ def cir_2_tn(cir,input_s=[],output_s=[]):
             end_tensors[k].index_set[end_tensors[k].index_set.index(last2)]=new2
                
     for k in range(qubits_num):
-        U=np.eye(2)
+        U=np.eye(2,dtype=complex)
         if qubits_index[k]==0 and not 'x'+str(k)+'_'+str(0) in hyper_index:
             var_in='x'+str(k)
             var=[Index('x'+str(k),0),Index('y'+str(k),0)]

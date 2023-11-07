@@ -7,6 +7,8 @@
 #include "dd/Tensor.hpp"
 #include "dd/Tdd.hpp"
 #include "dd/ComplexValue.hpp"
+#include "dd/DDpackageConfig.hpp"
+#include "dd/Export.hpp"
 
 #include <xtensor/xarray.hpp>
 #include <xtensor/xio.hpp>
@@ -65,6 +67,7 @@ std::vector<int> string_2_shape (const std::string& s){
     }
     return shape;
 } 
+
 dd::Index string_2_index (const std::string& s){
     std::istringstream ss(s);
     std::vector<std::string> parts;
@@ -91,6 +94,7 @@ dd::Index string_2_index (const std::string& s){
         throw std::runtime_error("invalid format");
     }
 }
+
 std::vector<dd::Index> string_2_index_set(const std::string& s){
     std::istringstream ss(s);
     std::string temp;
@@ -133,25 +137,54 @@ dd::Tensor string_2_tensor(const std::string& s){
 
 
 int main(int argc, char** argv){
-    if(argc < 2){
+    if(argc < 4){
         std::cerr << "wrong argument" << std::endl;
         return 1;
     }
-    std::ifstream file(argv[1]);
-    if (!file.is_open()) {
-        std::cerr << "Error: Unable to open file " << argv[1] << std::endl;
+    std::string line;
+    dd::TensorNetwork tn;
+
+    std::ifstream tensorsfile(argv[1]);
+    if (!tensorsfile.is_open()) {
+        std::cerr << "Error: Unable to open tensorsfile " << argv[1] << std::endl;
         return 1; // Return an error code
     }
-
-    std::string line;
-    std::getline(file, line);
-    while (std::getline(file, line)) {
+    std::getline(tensorsfile, line);
+    while (std::getline(tensorsfile, line)) {
         dd::Tensor ts = string_2_tensor(line);
-        std::cout << ts.data << std::endl;
-        for(auto index: ts.index_set){
-            std::cout << "index key: " << index.key << std::endl;
-            std::cout << "index idx: " << index.idx << std::endl;
-        }
+        // std::cout << ts.data << std::endl;
+        // for(auto index: ts.index_set){
+        //     std::cout << "index key: " << index.key << std::endl;
+        //     std::cout << "index idx: " << index.idx << std::endl;
+        // }
+        tn.tensors.push_back(ts);
     }
+    tn.infor();
+
+    int qubit_num;
+    try{
+        qubit_num = std::stoi(argv[2]);
+    }
+    catch (const std::invalid_argument& e) {
+        std::cerr << "Invalid input format." << std::endl;
+        throw std::invalid_argument("Invalid integer about qubit_num");
+        return 1;
+    }
+    auto dd = std::make_unique<dd::Package<>>(qubit_num);
+
+    std::ifstream varOrderfile(argv[3]);
+    if (!tensorsfile.is_open()) {
+        std::cerr << "Error: Unable to open varOrderfile " << argv[1] << std::endl;
+        return 1; // Return an error code
+    }
+    int order = 0;
+    while (std::getline(varOrderfile,line)){
+        if(line.empty() or line.compare(" ")==0) {continue;}
+        dd->varOrder[line] = order ;
+        order ++;
+    }
+
+    dd::TDD tdd = tn.cont(dd);
+    dd::export2Dot(tdd.e, "test");
     return 0;
 }
