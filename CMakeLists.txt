@@ -80,7 +80,7 @@ include(CMake/GlobalSettingsInclude.cmake OPTIONAL)
 ################################################################################
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-set(PROJECT_NAME TDD_C)
+set(PROJECT_NAME tdd_main)
 
 ################################################################################
 # Source groups
@@ -155,19 +155,21 @@ set(ALL_FILES
     ${Source_Files}
 )
 
-add_library(TDD SHARED ${ALL_FILES} )
-target_include_directories(TDD PUBLIC ${PROJECT_SOURCE_DIR}/include ${XTENSOR_INCLUDE_DIR} ${XTL_INCLUDE_DIR})
-target_compile_features(TDD PUBLIC cxx_auto_type)
+add_library(TDD_C SHARED ${ALL_FILES} )
+target_include_directories(TDD_C PUBLIC ${PROJECT_SOURCE_DIR}/include ${XTENSOR_INCLUDE_DIR} ${XTL_INCLUDE_DIR})
+target_compile_features(TDD_C PUBLIC cxx_auto_type)
 
 
 ################################################################################
 # Target
 ################################################################################
 add_subdirectory(extern/pybind11)
-pybind11_add_module(your_module_name "include/python-c.cpp")
+pybind11_add_module(TDD "include/python-c.cpp")
+target_link_libraries(TDD PUBLIC TDD_C)
+
 
 add_executable(${PROJECT_NAME} "main.cpp")
-target_link_libraries(${PROJECT_NAME} PUBLIC TDD)
+target_link_libraries(${PROJECT_NAME} PUBLIC TDD_C)
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_auto_type)
 
 use_props(${PROJECT_NAME} "${CMAKE_CONFIGURATION_TYPES}" "${DEFAULT_CXX_PROPS}")
