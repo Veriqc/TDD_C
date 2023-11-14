@@ -158,6 +158,8 @@ set(XTENSOR_FILES
     "extern/xtensor/xvectorize.hpp"
     "extern/xtensor/xview.hpp"
     "extern/xtensor/xview_utils.hpp"
+)
+set (XTL_FILES
     "extern/xtl/xany.hpp"
     "extern/xtl/xbase64.hpp"
     "extern/xtl/xbasic_fixed_string.hpp"
@@ -191,8 +193,7 @@ set(XTENSOR_FILES
     "extern/xtl/xvariant.hpp"
     "extern/xtl/xvariant_impl.hpp"
     "extern/xtl/xvisitor.hpp"
-)
-
+    )
 set(Header_Files
     "include/CircuitOptimizer.hpp"
     "include/dd/Complex.hpp"
@@ -262,16 +263,18 @@ set(ALL_FILES
     ${Header_Files}
     ${Source_Files}
 )
+add_library(XTL SHARED ${XTL_FILES})
+set_target_properties(XTL PROPERTIES LINKER_LANGUAGE CXX)
+target_compile_features(XTL PUBLIC cxx_auto_type)
+
 add_library(XTENSOR SHARED ${XTENSOR_FILES} )
 set_target_properties(XTENSOR PROPERTIES LINKER_LANGUAGE CXX)
+target_link_libraries(XTENSOR PUBLIC XTL)
 target_include_directories(XTENSOR PUBLIC ${PROJECT_SOURCE_DIR}/extern)
 target_compile_features(XTENSOR PUBLIC cxx_auto_type)
 
 add_library(TDD SHARED ${ALL_FILES} )
-target_include_directories(TDD 
-    PUBLIC 
-    ${PROJECT_SOURCE_DIR}/include
-    )
+target_include_directories(TDD PUBLIC ${PROJECT_SOURCE_DIR}/extern ${PROJECT_SOURCE_DIR}/include)
 target_link_libraries(TDD PUBLIC XTENSOR)
 target_compile_features(TDD PUBLIC cxx_auto_type)
 
@@ -279,6 +282,9 @@ target_compile_features(TDD PUBLIC cxx_auto_type)
 ################################################################################
 # Target
 ################################################################################
+add_subdirectory(extern/pybind11)
+pybind11_add_module(your_module_name "include/python-c.cpp")
+
 add_executable(${PROJECT_NAME} "main.cpp")
 target_link_libraries(${PROJECT_NAME} PUBLIC XTENSOR TDD)
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_auto_type)
