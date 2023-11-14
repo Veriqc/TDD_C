@@ -427,7 +427,7 @@ namespace dd {
 				return self->next[new_key];
 			}
 			else {
-				self->next[new_key] = new key_2_new_key_node{ self->level + 1, new_key, {}, self };
+				self->next[new_key] = new key_2_new_key_node{ short(self->level + 1), new_key, {}, self };
 
 				return self->next[new_key];
 			}
