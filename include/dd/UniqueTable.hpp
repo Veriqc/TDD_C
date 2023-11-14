@@ -295,7 +295,7 @@ public:
   };
 
   void print() {
-    auto q = static_cast<dd::Qubit>(nvars - 1);
+    auto q = static_cast<int16_t>(nvars - 1);
     for (auto it = tables.rbegin(); it != tables.rend(); ++it) {
       auto& table = *it;
       std::cout << "\tq" << static_cast<std::size_t>(q) << ":"
@@ -330,19 +330,19 @@ public:
     std::cout << "\n";
   }
 
-  [[nodiscard]] fp hitRatio() const {
-    return static_cast<fp>(hits) / static_cast<fp>(lookups);
+  [[nodiscard]] double hitRatio() const {
+    return static_cast<double>(hits) / static_cast<double>(lookups);
   }
 
-  [[nodiscard]] fp colRatio() const {
-    return static_cast<fp>(collisions) / static_cast<fp>(lookups);
+  [[nodiscard]] double colRatio() const {
+    return static_cast<double>(collisions) / static_cast<double>(lookups);
   }
 
   [[nodiscard]] std::size_t getActiveNodeCount() const {
     return activeNodeCount;
   }
 
-  [[nodiscard]] std::size_t getActiveNodeCount(Qubit var) {
+  [[nodiscard]] std::size_t getActiveNodeCount(int16_t var) {
     return active.at(var);
   }
 

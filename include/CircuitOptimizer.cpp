@@ -36,7 +36,7 @@ void CircuitOptimizer::removeIdentities(QuantumComputation& qc) {
 }
 
 void CircuitOptimizer::swapReconstruction(QuantumComputation& qc) {
-  Qubit highestPhysicalQubit = 0;
+  int16_t highestPhysicalQubit = 0;
   for (const auto& q : qc.initialLayout) {
     if (q.first > highestPhysicalQubit) {
       highestPhysicalQubit = q.first;
@@ -58,8 +58,8 @@ void CircuitOptimizer::swapReconstruction(QuantumComputation& qc) {
       continue;
     }
 
-    const Qubit control = it->getControls().begin()->qubit;
-    const Qubit target = it->getTargets().at(0);
+    const int16_t control = it->getControls().begin()->qubit;
+    const int16_t target = it->getTargets().at(0);
 
     // first operation
     if (dag.at(control).empty() || dag.at(target).empty()) {
@@ -124,7 +124,7 @@ void CircuitOptimizer::swapReconstruction(QuantumComputation& qc) {
 }
 
 DAG CircuitOptimizer::constructDAG(QuantumComputation& qc) {
-  Qubit highestPhysicalQubit = 0;
+  int16_t highestPhysicalQubit = 0;
   for (const auto& q : qc.initialLayout) {
     if (q.first > highestPhysicalQubit) {
       highestPhysicalQubit = q.first;
@@ -158,7 +158,7 @@ void CircuitOptimizer::addNonStandardOperationToDag(
   // compound operations are added "as-is"
   if (gate->isCompoundOperation()) {
     for (std::size_t i = 0U; i < gate->getNqubits(); ++i) {
-      if (gate->actsOn(static_cast<Qubit>(i))) {
+      if (gate->actsOn(static_cast<int16_t>(i))) {
         dag.at(i).push_back(op);
       }
     }
@@ -192,7 +192,7 @@ void CircuitOptimizer::singleQubitGateFusion(QuantumComputation& qc) {
       {qc::Sdag, qc::S},   {qc::T, qc::Tdag},  {qc::Tdag, qc::T},
       {qc::SX, qc::SXdag}, {qc::SXdag, qc::SX}};
 
-  Qubit highestPhysicalQubit = 0;
+  int16_t highestPhysicalQubit = 0;
   for (const auto& q : qc.initialLayout) {
     if (q.first > highestPhysicalQubit) {
       highestPhysicalQubit = q.first;
@@ -239,7 +239,7 @@ void CircuitOptimizer::singleQubitGateFusion(QuantumComputation& qc) {
       // check if compound operation contains non-single-qubit gates
       std::size_t involvedQubits = 0;
       for (std::size_t q = 0; q < dag.size(); ++q) {
-        if (compop->actsOn(static_cast<Qubit>(q))) {
+        if (compop->actsOn(static_cast<int16_t>(q))) {
           ++involvedQubits;
         }
       }
@@ -292,7 +292,7 @@ void CircuitOptimizer::singleQubitGateFusion(QuantumComputation& qc) {
 
 bool CircuitOptimizer::removeDiagonalGate(DAG& dag,
                                           DAGReverseIterators& dagIterators,
-                                          Qubit idx, DAGReverseIterator& it,
+                                          int16_t idx, DAGReverseIterator& it,
                                           qc::Operation* op) {
   // not a diagonal gate
   if (std::find(DIAGONAL_GATES.begin(), DIAGONAL_GATES.end(), op->getType()) ==
@@ -361,11 +361,11 @@ bool CircuitOptimizer::removeDiagonalGate(DAG& dag,
 }
 
 void CircuitOptimizer::removeDiagonalGatesBeforeMeasureRecursive(
-    DAG& dag, DAGReverseIterators& dagIterators, Qubit idx,
+    DAG& dag, DAGReverseIterators& dagIterators, int16_t idx,
     const qc::Operation* until) {
   // qubit is finished -> consider next qubit
   if (dagIterators.at(idx) == dag.at(idx).rend()) {
-    if (idx < static_cast<Qubit>(dag.size() - 1)) {
+    if (idx < static_cast<int16_t>(dag.size() - 1)) {
       removeDiagonalGatesBeforeMeasureRecursive(dag, dagIterators, idx + 1,
                                                 nullptr);
     }
@@ -419,7 +419,7 @@ void CircuitOptimizer::removeDiagonalGatesBeforeMeasureRecursive(
       }
       if (onlyDiagonalGates) {
         for (size_t q = 0; q < dag.size(); ++q) {
-          if (compOp->actsOn(static_cast<Qubit>(q))) {
+          if (compOp->actsOn(static_cast<int16_t>(q))) {
             ++(dagIterators.at(q));
           }
         }
@@ -448,7 +448,7 @@ void CircuitOptimizer::removeDiagonalGatesBeforeMeasureRecursive(
 
   // qubit is finished -> consider next qubit
   if (dagIterators.at(idx) == dag.at(idx).rend() &&
-      idx < static_cast<Qubit>(dag.size() - 1)) {
+      idx < static_cast<int16_t>(dag.size() - 1)) {
     removeDiagonalGatesBeforeMeasureRecursive(dag, dagIterators, idx + 1,
                                               nullptr);
   }
@@ -479,7 +479,7 @@ void CircuitOptimizer::removeDiagonalGatesBeforeMeasure(
 
 bool CircuitOptimizer::removeFinalMeasurement(DAG& dag,
                                               DAGReverseIterators& dagIterators,
-                                              Qubit idx, DAGReverseIterator& it,
+                                              int16_t idx, DAGReverseIterator& it,
                                               qc::Operation* op) {
   if (op->getNtargets() != 0) {
     // need to check all targets
@@ -515,10 +515,10 @@ bool CircuitOptimizer::removeFinalMeasurement(DAG& dag,
 }
 
 void CircuitOptimizer::removeFinalMeasurementsRecursive(
-    DAG& dag, DAGReverseIterators& dagIterators, Qubit idx,
+    DAG& dag, DAGReverseIterators& dagIterators, int16_t idx,
     const qc::Operation* until) {
   if (dagIterators.at(idx) == dag.at(idx).rend()) { // we reached the end
-    if (idx < static_cast<Qubit>(dag.size() - 1)) {
+    if (idx < static_cast<int16_t>(dag.size() - 1)) {
       removeFinalMeasurementsRecursive(dag, dagIterators, idx + 1, nullptr);
     }
     return;
@@ -585,7 +585,7 @@ void CircuitOptimizer::removeFinalMeasurementsRecursive(
     }
   }
   if (dagIterators.at(idx) == dag.at(idx).rend() &&
-      idx < static_cast<Qubit>(dag.size() - 1)) {
+      idx < static_cast<int16_t>(dag.size() - 1)) {
     removeFinalMeasurementsRecursive(dag, dagIterators, idx + 1, nullptr);
   }
 }
@@ -687,12 +687,12 @@ void CircuitOptimizer::eliminateResets(QuantumComputation& qc) {
   //            0            1                   ║  ░ └───┘└╥┘
   //                                  c: 2/══════╩══════════╩═
   //                                             0          1
-  auto replacementMap = std::map<Qubit, Qubit>();
+  auto replacementMap = std::map<int16_t, int16_t>();
   auto it = qc.ops.begin();
   while (it != qc.ops.end()) {
     if ((*it)->getType() == qc::Reset) {
       for (const auto& target : (*it)->getTargets()) {
-        auto indexAddQubit = static_cast<Qubit>(qc.getNqubits());
+        auto indexAddQubit = static_cast<int16_t>(qc.getNqubits());
         qc.addQubit(indexAddQubit, indexAddQubit, indexAddQubit);
         auto oldReset = replacementMap.find(target);
         if (oldReset != replacementMap.end()) {
@@ -709,7 +709,7 @@ void CircuitOptimizer::eliminateResets(QuantumComputation& qc) {
         while (compOpIt != compOp->end()) {
           if ((*compOpIt)->getType() == qc::Reset) {
             for (const auto& compTarget : (*compOpIt)->getTargets()) {
-              auto indexAddQubit = static_cast<Qubit>(qc.getNqubits());
+              auto indexAddQubit = static_cast<int16_t>(qc.getNqubits());
               qc.addQubit(indexAddQubit, indexAddQubit, indexAddQubit);
               auto oldReset = replacementMap.find(compTarget);
               if (oldReset != replacementMap.end()) {
@@ -759,7 +759,7 @@ void CircuitOptimizer::eliminateResets(QuantumComputation& qc) {
 }
 
 void CircuitOptimizer::changeTargets(
-    Targets& targets, const std::map<Qubit, Qubit>& replacementMap) {
+    Targets& targets, const std::map<int16_t, int16_t>& replacementMap) {
   for (auto& target : targets) {
     auto newTargetIt = replacementMap.find(target);
     if (newTargetIt != replacementMap.end()) {
@@ -769,7 +769,7 @@ void CircuitOptimizer::changeTargets(
 }
 
 void CircuitOptimizer::changeControls(
-    Controls& controls, const std::map<Qubit, Qubit>& replacementMap) {
+    Controls& controls, const std::map<int16_t, int16_t>& replacementMap) {
   if (controls.empty() || replacementMap.empty()) {
     return;
   }
@@ -794,7 +794,7 @@ void CircuitOptimizer::deferMeasurements(QuantumComputation& qc) {
   //            ║ ┌──╨──┐             c: 2/═══════════╩═
   // c: 2/══════╩═╡ = 1 ╞                             0
   //            0 └─────┘
-  std::unordered_map<Qubit, std::size_t> qubitsToAddMeasurements{};
+  std::unordered_map<int16_t, std::size_t> qubitsToAddMeasurements{};
   auto it = qc.begin();
   while (it != qc.end()) {
     if (const auto* measurement =
@@ -877,7 +877,7 @@ void CircuitOptimizer::deferMeasurements(QuantumComputation& qc) {
           }
 
           // if this is not the classical bit that is measured, continue
-          if (controlRegister.first == static_cast<Qubit>(measurementBit)) {
+          if (controlRegister.first == static_cast<int16_t>(measurementBit)) {
             // get the underlying operation
             const auto* standardOp =
                 dynamic_cast<qc::StandardOperation*>(classicOp->getOperation());
@@ -965,7 +965,7 @@ void CircuitOptimizer::deferMeasurements(QuantumComputation& qc) {
 }
 
 bool CircuitOptimizer::isDynamicCircuit(QuantumComputation& qc) {
-  Qubit highestPhysicalQubit = 0;
+  int16_t highestPhysicalQubit = 0;
   for (const auto& q : qc.initialLayout) {
     if (q.first > highestPhysicalQubit) {
       highestPhysicalQubit = q.first;
@@ -1081,7 +1081,7 @@ void CircuitOptimizer::reorderOperations(QuantumComputation& qc) {
     done = true;
 
     // iterate over qubits in reverse order
-    for (auto q = static_cast<std::make_signed_t<Qubit>>(msq); q >= 0; --q) {
+    for (auto q = static_cast<std::make_signed_t<int16_t>>(msq); q >= 0; --q) {
       // nothing to be done for this qubit
       if (dagIterators.at(static_cast<std::size_t>(q)) ==
           dag.at(static_cast<std::size_t>(q)).end()) {
@@ -1114,8 +1114,8 @@ void CircuitOptimizer::reorderOperations(QuantumComputation& qc) {
       for (std::size_t i = 0; i < dag.size(); ++i) {
         // actually check in reverse order
         const auto qb =
-            static_cast<std::make_signed_t<Qubit>>(dag.size() - 1 - i);
-        if (qb != q && op->actsOn(static_cast<Qubit>(qb))) {
+            static_cast<std::make_signed_t<int16_t>>(dag.size() - 1 - i);
+        if (qb != q && op->actsOn(static_cast<int16_t>(qb))) {
           actsOn[static_cast<std::size_t>(qb)] = true;
 
           assert(dagIterators.at(static_cast<std::size_t>(qb)) !=
@@ -1214,7 +1214,7 @@ CircuitOptimizer::Iterator CircuitOptimizer::flattenCompoundOperation(
 }
 
 void CircuitOptimizer::cancelCNOTs(QuantumComputation& qc) {
-  Qubit highestPhysicalQubit = 0;
+  int16_t highestPhysicalQubit = 0;
   for (const auto& q : qc.initialLayout) {
     if (q.first > highestPhysicalQubit) {
       highestPhysicalQubit = q.first;
@@ -1239,8 +1239,8 @@ void CircuitOptimizer::cancelCNOTs(QuantumComputation& qc) {
       continue;
     }
 
-    const Qubit q0 = it->getTargets().at(0);
-    const Qubit q1 =
+    const int16_t q0 = it->getTargets().at(0);
+    const int16_t q1 =
         isSWAP ? it->getTargets().at(1) : it->getControls().begin()->qubit;
 
     // first operation
@@ -1270,8 +1270,8 @@ void CircuitOptimizer::cancelCNOTs(QuantumComputation& qc) {
       continue;
     }
 
-    const Qubit prevQ0 = op0->getTargets().at(0);
-    const Qubit prevQ1 = prevOpIsSWAP ? op0->getTargets().at(1)
+    const int16_t prevQ0 = op0->getTargets().at(0);
+    const int16_t prevQ1 = prevOpIsSWAP ? op0->getTargets().at(1)
                                       : op0->getControls().begin()->qubit;
 
     if (isCNOT && prevOpIsCNOT) {
@@ -1314,8 +1314,8 @@ void CircuitOptimizer::cancelCNOTs(QuantumComputation& qc) {
           continue;
         }
 
-        const Qubit prevPrevQ0 = prevPrevOp0->getTargets().at(0);
-        const Qubit prevPrevQ1 = prevPrevOp0->getControls().begin()->qubit;
+        const int16_t prevPrevQ0 = prevPrevOp0->getTargets().at(0);
+        const int16_t prevPrevQ1 = prevPrevOp0->getControls().begin()->qubit;
 
         if (q0 == prevPrevQ0 && q1 == prevPrevQ1) {
           // SWAP gate identified

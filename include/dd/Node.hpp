@@ -18,8 +18,8 @@ namespace dd {
 		//std::array<Edge<mNode>, RADIX> e{}; // edges out of this node
 		std::vector<Edge<mNode>> e; // edges out of this node
 		mNode* next{};                      // used to link nodes in unique table
-		RefCount ref{};                     // reference count
-		Qubit v{}; // variable index (nonterminal) value (-1 for terminal)
+		uint32_t ref{};                     // reference count
+		int16_t v{}; // variable index (nonterminal) value (-1 for terminal)
 		std::uint8_t flags = 0;
 
 		// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)

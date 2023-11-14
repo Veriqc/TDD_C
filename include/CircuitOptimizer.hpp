@@ -53,24 +53,24 @@ public:
 
 protected:
   static void removeDiagonalGatesBeforeMeasureRecursive(
-      DAG& dag, DAGReverseIterators& dagIterators, Qubit idx,
+      DAG& dag, DAGReverseIterators& dagIterators, int16_t idx,
       const qc::Operation* until);
   static bool removeDiagonalGate(DAG& dag, DAGReverseIterators& dagIterators,
-                                 Qubit idx, DAGReverseIterator& it,
+                                 int16_t idx, DAGReverseIterator& it,
                                  qc::Operation* op);
 
   static void
   removeFinalMeasurementsRecursive(DAG& dag, DAGReverseIterators& dagIterators,
-                                   Qubit idx, const qc::Operation* until);
+                                   int16_t idx, const qc::Operation* until);
   static bool removeFinalMeasurement(DAG& dag,
                                      DAGReverseIterators& dagIterators,
-                                     Qubit idx, DAGReverseIterator& it,
+                                     int16_t idx, DAGReverseIterator& it,
                                      qc::Operation* op);
 
   static void changeTargets(Targets& targets,
-                            const std::map<Qubit, Qubit>& replacementMap);
+                            const std::map<int16_t, int16_t>& replacementMap);
   static void changeControls(Controls& controls,
-                             const std::map<Qubit, Qubit>& replacementMap);
+                             const std::map<int16_t, int16_t>& replacementMap);
 
   using Iterator = decltype(qc::QuantumComputation::ops.begin());
   static Iterator

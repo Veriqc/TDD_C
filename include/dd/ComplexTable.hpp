@@ -23,9 +23,9 @@ template <std::size_t NBUCKET = 65537,
 class ComplexTable {
 public:
   struct Entry {
-    fp value{};
+    double value{};
     Entry* next{};
-    RefCount refCount{};
+    uint32_t refCount{};
 
     ///
     /// The sign of number is encoded in the least significant bit of its entry
@@ -67,14 +67,14 @@ public:
               static_cast<std::uintptr_t>(1U)) != 0U;
     }
 
-    [[nodiscard]] static inline fp val(const Entry* e) {
+    [[nodiscard]] static inline double val(const Entry* e) {
       if (isNegativePointer(e)) {
         return -getAlignedPointer(e)->value;
       }
       return e->value;
     }
 
-    [[nodiscard]] static inline RefCount ref(const Entry* e) {
+    [[nodiscard]] static inline uint32_t ref(const Entry* e) {
       if (isNegativePointer(e)) {
         return -getAlignedPointer(e)->refCount;
       }
@@ -85,8 +85,8 @@ public:
     approximatelyEquals(const Entry* left, const Entry* right) {
       return left == right || approximatelyEquals(val(left), val(right));
     }
-    [[nodiscard]] static constexpr bool approximatelyEquals(const fp left,
-                                                            const fp right) {
+    [[nodiscard]] static constexpr bool approximatelyEquals(const double left,
+                                                            const double right) {
       // equivalence check is a shortcut before check with tolerance
       // NOLINTNEXTLINE(clang-diagnostic-float-equal)
       return left == right || std::abs(left - right) <= TOLERANCE;
@@ -95,14 +95,14 @@ public:
     [[nodiscard]] static constexpr bool approximatelyZero(const Entry* e) {
       return e == &zero || approximatelyZero(val(e));
     }
-    [[nodiscard]] static constexpr bool approximatelyZero(const fp e) {
+    [[nodiscard]] static constexpr bool approximatelyZero(const double e) {
       return std::abs(e) <= TOLERANCE;
     }
 
     [[nodiscard]] static constexpr bool approximatelyOne(const Entry* e) {
       return e == &one || approximatelyOne(val(e));
     }
-    [[nodiscard]] static constexpr bool approximatelyOne(fp e) {
+    [[nodiscard]] static constexpr bool approximatelyOne(double e) {
       return approximatelyEquals(e, 1.0);
     }
 
@@ -127,14 +127,14 @@ public:
 
   ~ComplexTable() = default;
 
-  static fp tolerance() { return TOLERANCE; }
+  static double tolerance() { return TOLERANCE; }
 
-  static void setTolerance(fp tol) { TOLERANCE = tol; }
+  static void setTolerance(double tol) { TOLERANCE = tol; }
 
   static constexpr std::int64_t MASK = NBUCKET - 1;
 
   // linear (clipped) hash function
-  static constexpr std::int64_t hash(const fp val) {
+  static constexpr std::int64_t hash(const double val) {
     assert(val >= 0);
     auto key = static_cast<std::int64_t>(std::nearbyint(val * MASK));
     return std::min<std::int64_t>(key, MASK);
@@ -153,7 +153,7 @@ public:
 
   [[nodiscard]] bool availableEmpty() const { return available == nullptr; };
 
-  Entry* lookup(const fp& val) {
+  Entry* lookup(const double& val) {
     assert(!std::isnan(val));
     assert(val >= 0); // required anyway for the hash function
     ++lookups;
@@ -274,7 +274,7 @@ public:
 
     // important (static) numbers are never altered
     if (entryPtr != &one && entryPtr != &zero && entryPtr != &sqrt2_2) {
-      if (entryPtr->refCount == std::numeric_limits<RefCount>::max()) {
+      if (entryPtr->refCount == std::numeric_limits<uint32_t>::max()) {
         std::clog << "[WARN] MAXREFCNT reached for " << entryPtr->value
                   << ". Number will never be collected." << std::endl;
         return;
@@ -296,11 +296,11 @@ public:
 
     // important (static) numbers are never altered
     if (entryPtr != &one && entryPtr != &zero && entryPtr != &sqrt2_2) {
-      if (entryPtr->refCount == std::numeric_limits<RefCount>::max()) {
+      if (entryPtr->refCount == std::numeric_limits<uint32_t>::max()) {
         return;
       }
       if (entryPtr->refCount == 0) {
-        throw std::runtime_error("In ComplexTable: RefCount of entry " +
+        throw std::runtime_error("In ComplexTable: uint32_t of entry " +
                                  std::to_string(entryPtr->value) +
                                  " is zero before decrement");
       }
@@ -411,7 +411,7 @@ public:
 
   void print() {
     const auto precision = std::cout.precision();
-    std::cout.precision(std::numeric_limits<dd::fp>::max_digits10);
+    std::cout.precision(std::numeric_limits<double>::max_digits10);
     for (std::size_t key = 0; key < table.size(); ++key) {
       auto p = table[key];
       if (p != nullptr) {
@@ -433,12 +433,12 @@ public:
     std::cout.precision(precision);
   }
 
-  [[nodiscard]] fp hitRatio() const {
-    return static_cast<fp>(hits) / static_cast<fp>(lookups);
+  [[nodiscard]] double hitRatio() const {
+    return static_cast<double>(hits) / static_cast<double>(lookups);
   }
 
-  [[nodiscard]] fp colRatio() const {
-    return static_cast<fp>(collisions) / static_cast<fp>(lookups);
+  [[nodiscard]] double colRatio() const {
+    return static_cast<double>(collisions) / static_cast<double>(lookups);
   }
 
   std::map<std::string, std::size_t, std::less<>> getStatistics() {
@@ -512,7 +512,7 @@ private:
 
   // numerical tolerance to be used for floating point values
   // NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables,readability-identifier-naming)
-  static inline fp TOLERANCE = std::numeric_limits<dd::fp>::epsilon() * 1024;
+  static inline double TOLERANCE = std::numeric_limits<double>::epsilon() * 1024;
 
   Entry* available{};
   std::vector<std::vector<Entry>> chunks{
@@ -531,8 +531,8 @@ private:
   std::size_t gcRuns = 0;
   std::size_t gcLimit = 100000;
 
-  inline Entry* findOrInsert(const std::int64_t key, const fp val) {
-    [[maybe_unused]] const fp valTol = val + TOLERANCE;
+  inline Entry* findOrInsert(const std::int64_t key, const double val) {
+    [[maybe_unused]] const double valTol = val + TOLERANCE;
 
     Entry* curr = table[static_cast<std::size_t>(key)];
     Entry* prev = nullptr;
@@ -588,7 +588,7 @@ private:
    * @param val value to be inserted
    * @return pointer to the inserted entry
    */
-  inline Entry* insert(const std::int64_t key, const fp val) {
+  inline Entry* insert(const std::int64_t key, const double val) {
     ++inserts;
     Entry* entry = getEntry();
     entry->value = val;

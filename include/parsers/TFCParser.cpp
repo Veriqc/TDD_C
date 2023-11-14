@@ -1,13 +1,13 @@
 #include "../QuantumComputation.hpp"
 
 void qc::QuantumComputation::importTFC(std::istream& is) {
-  std::map<std::string, Qubit> varMap{};
+  std::map<std::string, int16_t> varMap{};
   auto line = readTFCHeader(is, varMap);
   readTFCGateDescriptions(is, line, varMap);
 }
 
 int qc::QuantumComputation::readTFCHeader(
-    std::istream& is, std::map<std::string, Qubit>& varMap) {
+    std::istream& is, std::map<std::string, int16_t>& varMap) {
   std::string cmd;
   std::string variable;
   std::string identifier;
@@ -134,9 +134,9 @@ int qc::QuantumComputation::readTFCHeader(
             constants.at(constidx - inputs.size()) == "1") {
           // add X operation in case of initial value 1
           if (constants.at(constidx - inputs.size()) == "1") {
-            x(static_cast<Qubit>(constidx));
+            x(static_cast<int16_t>(constidx));
           }
-          varMap.insert({var, static_cast<Qubit>(constidx++)});
+          varMap.insert({var, static_cast<int16_t>(constidx++)});
         } else {
           throw QFRException("[tfc parser] l:" + std::to_string(line) +
                              " msg: Non-binary constant specified: " + cmd);
@@ -144,7 +144,7 @@ int qc::QuantumComputation::readTFCHeader(
       } else {
         // variable does not occur in input statement --> assumed to be |0>
         // ancillary
-        varMap.insert({var, static_cast<Qubit>(constidx++)});
+        varMap.insert({var, static_cast<int16_t>(constidx++)});
       }
     }
   }
@@ -152,17 +152,17 @@ int qc::QuantumComputation::readTFCHeader(
   for (size_t q = 0; q < variables.size(); ++q) {
     variable = variables.at(q);
     auto p = varMap.at(variable);
-    initialLayout[static_cast<Qubit>(q)] = p;
+    initialLayout[static_cast<int16_t>(q)] = p;
     if (!outputs.empty()) {
       if (std::count(outputs.begin(), outputs.end(), variable) != 0) {
-        outputPermutation[static_cast<Qubit>(q)] = p;
+        outputPermutation[static_cast<int16_t>(q)] = p;
       } else {
-        outputPermutation.erase(static_cast<Qubit>(q));
+        outputPermutation.erase(static_cast<int16_t>(q));
         garbage.at(p) = true;
       }
     } else {
       // no output statement given --> assume all outputs are relevant
-      outputPermutation[static_cast<Qubit>(q)] = p;
+      outputPermutation[static_cast<int16_t>(q)] = p;
     }
   }
 
@@ -170,7 +170,7 @@ int qc::QuantumComputation::readTFCHeader(
 }
 
 void qc::QuantumComputation::readTFCGateDescriptions(
-    std::istream& is, int line, std::map<std::string, Qubit>& varMap) {
+    std::istream& is, int line, std::map<std::string, int16_t>& varMap) {
   const std::regex gateRegex = std::regex("([tTfF])(\\d+)");
   std::smatch m;
   std::string cmd;
@@ -236,13 +236,13 @@ void qc::QuantumComputation::readTFCGateDescriptions(
     controls.emplace_back(Control{varMap.at(qubits)});
 
     if (gate == X) {
-      const Qubit target = controls.back().qubit;
+      const int16_t target = controls.back().qubit;
       controls.pop_back();
       x(target, Controls{controls.cbegin(), controls.cend()});
     } else {
-      const Qubit target0 = controls.back().qubit;
+      const int16_t target0 = controls.back().qubit;
       controls.pop_back();
-      const Qubit target1 = controls.back().qubit;
+      const int16_t target1 = controls.back().qubit;
       controls.pop_back();
       swap(target0, target1, Controls{controls.cbegin(), controls.cend()});
     }

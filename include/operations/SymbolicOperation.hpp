@@ -21,16 +21,16 @@ class SymbolicOperation final : public StandardOperation {
 protected:
   std::vector<std::optional<Symbolic>> symbolicParameter{};
 
-  static OpType parseU3(const Symbolic& theta, fp& phi, fp& lambda);
-  static OpType parseU3(fp& theta, const Symbolic& phi, fp& lambda);
-  static OpType parseU3(fp& theta, fp& phi, const Symbolic& lambda);
-  static OpType parseU3(const Symbolic& theta, const Symbolic& phi, fp& lambda);
-  static OpType parseU3(const Symbolic& theta, fp& phi, const Symbolic& lambda);
-  static OpType parseU3(fp& theta, const Symbolic& phi, const Symbolic& lambda);
+  static OpType parseU3(const Symbolic& theta, double& phi, double& lambda);
+  static OpType parseU3(double& theta, const Symbolic& phi, double& lambda);
+  static OpType parseU3(double& theta, double& phi, const Symbolic& lambda);
+  static OpType parseU3(const Symbolic& theta, const Symbolic& phi, double& lambda);
+  static OpType parseU3(const Symbolic& theta, double& phi, const Symbolic& lambda);
+  static OpType parseU3(double& theta, const Symbolic& phi, const Symbolic& lambda);
 
   static OpType parseU2(const Symbolic& phi, const Symbolic& lambda);
-  static OpType parseU2(const Symbolic& phi, fp& lambda);
-  static OpType parseU2(fp& phi, const Symbolic& lambda);
+  static OpType parseU2(const Symbolic& phi, double& lambda);
+  static OpType parseU2(double& phi, const Symbolic& lambda);
 
   static OpType parseU1(const Symbolic& lambda);
 
@@ -50,12 +50,12 @@ protected:
     return std::get<Symbolic>(param);
   }
 
-  static fp& getNumber(SymbolOrNumber& param) { return std::get<fp>(param); }
+  static double& getNumber(SymbolOrNumber& param) { return std::get<double>(param); }
 
   void setup(std::size_t nq, const std::vector<SymbolOrNumber>& params,
-             Qubit startingQubit = 0);
+             int16_t startingQubit = 0);
 
-  [[nodiscard]] static fp
+  [[nodiscard]] static double
   getInstantiation(const SymbolOrNumber& symOrNum,
                    const VariableAssignment& assignment);
 
@@ -83,32 +83,32 @@ public:
   }
 
   // Standard Constructors
-  SymbolicOperation(std::size_t nq, Qubit target, OpType g,
+  SymbolicOperation(std::size_t nq, int16_t target, OpType g,
                     const std::vector<SymbolOrNumber>& params = {},
-                    Qubit startingQubit = 0);
+                    int16_t startingQubit = 0);
   SymbolicOperation(std::size_t nq, const Targets& targ, OpType g,
                     const std::vector<SymbolOrNumber>& params = {},
-                    Qubit startingQubit = 0);
+                    int16_t startingQubit = 0);
 
-  SymbolicOperation(std::size_t nq, Control control, Qubit target, OpType g,
+  SymbolicOperation(std::size_t nq, Control control, int16_t target, OpType g,
                     const std::vector<SymbolOrNumber>& params = {},
-                    Qubit startingQubit = 0);
+                    int16_t startingQubit = 0);
   SymbolicOperation(std::size_t nq, Control control, const Targets& targ,
                     OpType g, const std::vector<SymbolOrNumber>& params = {},
-                    Qubit startingQubit = 0);
+                    int16_t startingQubit = 0);
 
-  SymbolicOperation(std::size_t nq, const Controls& c, Qubit target, OpType g,
+  SymbolicOperation(std::size_t nq, const Controls& c, int16_t target, OpType g,
                     const std::vector<SymbolOrNumber>& params = {},
-                    Qubit startingQubit = 0);
+                    int16_t startingQubit = 0);
   SymbolicOperation(std::size_t nq, const Controls& c, const Targets& targ,
                     OpType g, const std::vector<SymbolOrNumber>& params = {},
-                    Qubit startingQubit = 0);
+                    int16_t startingQubit = 0);
 
   // MCF (cSWAP), Peres, parameterized two target Constructor
-  SymbolicOperation(std::size_t nq, const Controls& c, Qubit target0,
-                    Qubit target1, OpType g,
+  SymbolicOperation(std::size_t nq, const Controls& c, int16_t target0,
+                    int16_t target1, OpType g,
                     const std::vector<SymbolOrNumber>& params = {},
-                    Qubit startingQubit = 0);
+                    int16_t startingQubit = 0);
 
   [[nodiscard]] std::unique_ptr<Operation> clone() const override {
     return std::make_unique<SymbolicOperation>(

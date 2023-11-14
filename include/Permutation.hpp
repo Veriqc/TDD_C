@@ -6,7 +6,7 @@
 #include <map>
 
 namespace qc {
-class Permutation : public std::map<Qubit, Qubit> {
+class Permutation : public std::map<int16_t, int16_t> {
 public:
   [[nodiscard]] inline Controls apply(const Controls& controls) const {
     Controls c{};

@@ -97,7 +97,7 @@ public:
     return os;
   }
 
-  [[nodiscard]] bool actsOn(const Qubit i) const override {
+  [[nodiscard]] bool actsOn(const int16_t i) const override {
     return std::any_of(ops.cbegin(), ops.cend(),
                        [&i](const auto& op) { return op->actsOn(i); });
   }
@@ -183,8 +183,8 @@ public:
 
   std::vector<std::unique_ptr<Operation>>& getOps() { return ops; }
 
-  [[nodiscard]] std::set<Qubit> getUsedQubits() const override {
-    std::set<Qubit> usedQubits{};
+  [[nodiscard]] std::set<int16_t> getUsedQubits() const override {
+    std::set<int16_t> usedQubits{};
     for (const auto& op : ops) {
       usedQubits.merge(op->getUsedQubits());
     }

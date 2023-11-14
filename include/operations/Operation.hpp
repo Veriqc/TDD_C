@@ -19,10 +19,10 @@ class Operation {
 protected:
   Controls controls{};
   Targets targets{};
-  std::vector<fp> parameter{};
+  std::vector<double> parameter{};
 
   std::size_t nqubits = 0;
-  Qubit startQubit = 0;
+  int16_t startQubit = 0;
   OpType type = None;
   std::string name{};
 
@@ -63,20 +63,20 @@ public:
 
   [[nodiscard]] std::size_t getNqubits() const { return nqubits; }
 
-  [[nodiscard]] const std::vector<fp>& getParameter() const {
+  [[nodiscard]] const std::vector<double>& getParameter() const {
     return parameter;
   }
-  std::vector<fp>& getParameter() { return parameter; }
+  std::vector<double>& getParameter() { return parameter; }
 
   [[nodiscard]] const std::string& getName() const { return name; }
   [[nodiscard]] virtual OpType getType() const { return type; }
 
-  [[nodiscard]] virtual Qubit getStartingQubit() const { return startQubit; }
+  [[nodiscard]] virtual int16_t getStartingQubit() const { return startQubit; }
 
-  [[nodiscard]] virtual std::set<Qubit> getUsedQubits() const {
+  [[nodiscard]] virtual std::set<int16_t> getUsedQubits() const {
     const auto& opTargets = getTargets();
     const auto& opControls = getControls();
-    std::set<Qubit> usedQubits = {opTargets.begin(), opTargets.end()};
+    std::set<int16_t> usedQubits = {opTargets.begin(), opTargets.end()};
     for (const auto& control : opControls) {
       usedQubits.insert(control.qubit);
     }
@@ -97,7 +97,7 @@ public:
     setName();
   }
 
-  virtual void setParameter(const std::vector<fp>& p) { parameter = p; }
+  virtual void setParameter(const std::vector<double>& p) { parameter = p; }
 
   [[nodiscard]] inline virtual bool isUnitary() const { return true; }
 
@@ -125,7 +125,7 @@ public:
     return !controls.empty();
   }
 
-  [[nodiscard]] inline virtual bool actsOn(const Qubit i) const {
+  [[nodiscard]] inline virtual bool actsOn(const int16_t i) const {
     for (const auto& t : targets) {
       if (t == i) {
         return true;

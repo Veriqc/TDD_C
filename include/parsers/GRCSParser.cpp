@@ -8,8 +8,8 @@ void qc::QuantumComputation::importGRCS(std::istream& is) {
 
   std::string line;
   std::string identifier;
-  Qubit control = 0;
-  Qubit target = 0;
+  int16_t control = 0;
+  int16_t target = 0;
   std::size_t cycle = 0;
   while (std::getline(is, line)) {
     if (line.empty()) {

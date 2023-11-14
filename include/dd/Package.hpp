@@ -66,7 +66,7 @@ namespace dd {
 		/// Construction, destruction, information and reset
 		///
 
-		static constexpr std::size_t MAX_POSSIBLE_QUBITS = static_cast<std::make_unsigned_t<Qubit>>(std::numeric_limits<Qubit>::max()) + 1U;
+		static constexpr std::size_t MAX_POSSIBLE_QUBITS = static_cast<std::make_unsigned_t<int16_t>>(std::numeric_limits<int16_t>::max()) + 1U;
 		static constexpr std::size_t DEFAULT_QUBITS = 300;
 
 
@@ -89,11 +89,11 @@ namespace dd {
 		void resize(std::size_t nq) {
 			if (nq > MAX_POSSIBLE_QUBITS) {
 				throw std::invalid_argument("Requested too many qubits from package. "
-					"Qubit datatype only allows up to " +
+					"int16_t datatype only allows up to " +
 					std::to_string(MAX_POSSIBLE_QUBITS) +
 					" qubits, while " + std::to_string(nq) +
 					" were requested. Please recompile the "
-					"package with a wider Qubit type!");
+					"package with a wider int16_t type!");
 			}
 			nqubits = nq;
 			nodeUniqueTable.resize(nqubits);
@@ -136,7 +136,7 @@ namespace dd {
 			}
 
 			auto split_pos = std::distance(order.begin(), std::max_element(order.begin(), order.end()));
-			Qubit x = order[split_pos];
+			int16_t x = order[split_pos];
 			order[split_pos] = -1;
 			
 			std::vector<xt::xarray<ComplexValue>> split_U;
@@ -161,7 +161,7 @@ namespace dd {
 				edges.push_back(xarray_2_edge(u, order));
 			}
 
-			return makeDDNode((Qubit)x, edges, false);
+			return makeDDNode((int16_t)x, edges, false);
 
 		}
 
@@ -205,7 +205,7 @@ namespace dd {
 				}
 			}
 
-			fp max = 0;
+			double max = 0;
 			auto maxc = Complex::one;
 			// determine max amplitude
 			for (auto i = 0U; i < R; ++i) {
@@ -341,7 +341,7 @@ namespace dd {
 		// not recreated if it already exists.
 		template <class Node>
 		Edge<Node> makeDDNode(
-			Qubit var,
+			int16_t var,
 			const std::vector<Edge<Node>>& edges,
 			bool cached = false) {
 
@@ -688,7 +688,7 @@ namespace dd {
 				return { r.p, c };
 			}
 
-			const Qubit w = (x.isTerminal() || (!y.isTerminal() && y.p->v > x.p->v))
+			const int16_t w = (x.isTerminal() || (!y.isTerminal() && y.p->v > x.p->v))
 				? y.p->v
 				: x.p->v;
 
@@ -855,7 +855,7 @@ namespace dd {
 						e2 = yCopy;
 						e.push_back(cont2(e1, e2, temp_key_2_new_key1, temp_key_2_new_key2, var_num));
 					}
-					r = makeDDNode(Qubit(newk1), e, true);
+					r = makeDDNode(int16_t(newk1), e, true);
 				}
 			}
 			else if (newk1 < newk2) {
@@ -886,7 +886,7 @@ namespace dd {
 						e2 = y.p->e[k];
 						e.push_back(cont2(e1, e2, temp_key_2_new_key1, temp_key_2_new_key2, var_num));
 					}
-					r = makeDDNode(Qubit(newk2), e, true);
+					r = makeDDNode(int16_t(newk2), e, true);
 				}
 
 			}
@@ -918,7 +918,7 @@ namespace dd {
 						e2 = y.p->e[k];
 						e.push_back(cont2(e1, e2, temp_key_2_new_key1, temp_key_2_new_key2, var_num));
 					}
-					r = makeDDNode(Qubit(newk1), e, true);
+					r = makeDDNode(int16_t(newk1), e, true);
 				}
 			}
 

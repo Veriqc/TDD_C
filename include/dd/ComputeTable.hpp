@@ -81,8 +81,8 @@ namespace dd {
 			}
 		}
 
-		[[nodiscard]] fp hitRatio() const {
-			return static_cast<fp>(hits) / static_cast<fp>(lookups);
+		[[nodiscard]] double hitRatio() const {
+			return static_cast<double>(hits) / static_cast<double>(lookups);
 		}
 
 		std::ostream& printStatistics(std::ostream& os = std::cout) {
@@ -179,8 +179,8 @@ namespace dd {
 			}
 		}
 
-		[[nodiscard]] fp hitRatio() const {
-			return static_cast<fp>(hits) / static_cast<fp>(lookups);
+		[[nodiscard]] double hitRatio() const {
+			return static_cast<double>(hits) / static_cast<double>(lookups);
 		}
 
 		std::ostream& printStatistics(std::ostream& os = std::cout) {

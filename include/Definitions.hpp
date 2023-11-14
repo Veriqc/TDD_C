@@ -23,12 +23,11 @@ public:
   }
 };
 
-using Qubit = std::uint32_t;
 using Bit = std::uint64_t;
 
 template <class IdxType, class SizeType>
 using Register = std::pair<IdxType, SizeType>;
-using QuantumRegister = Register<Qubit, std::size_t>;
+using QuantumRegister = Register<int16_t, std::size_t>;
 using ClassicalRegister = Register<Bit, std::size_t>;
 template <class RegisterType>
 using RegisterMap = std::map<std::string, RegisterType, std::greater<>>;
@@ -36,20 +35,19 @@ using QuantumRegisterMap = RegisterMap<QuantumRegister>;
 using ClassicalRegisterMap = RegisterMap<ClassicalRegister>;
 using RegisterNames = std::vector<std::pair<std::string, std::string>>;
 
-using Targets = std::vector<Qubit>;
+using Targets = std::vector<int16_t>;
 
 using BitString = std::bitset<128>;
 
 // floating-point type used throughout the library
-using fp = double;
 
-constexpr fp PARAMETER_TOLERANCE = 1e-13;
+constexpr double PARAMETER_TOLERANCE = 1e-13;
 
-static constexpr fp PI = static_cast<fp>(
+static constexpr double PI = static_cast<double>(
     3.141592653589793238462643383279502884197169399375105820974L);
-static constexpr fp PI_2 = static_cast<fp>(
+static constexpr double PI_2 = static_cast<double>(
     1.570796326794896619231321691639751442098584699687552910487L);
-static constexpr fp PI_4 = static_cast<fp>(
+static constexpr double PI_4 = static_cast<double>(
     0.785398163397448309615660845819875721049292349843776455243L);
 
 // forward declaration
@@ -65,7 +63,7 @@ using DAGReverseIterator =
 using DAGIterators = std::vector<DAGIterator>;
 using DAGReverseIterators = std::vector<DAGReverseIterator>;
 
-using Symbolic = sym::Expression<fp, fp>;
-using VariableAssignment = std::unordered_map<sym::Variable, fp>;
-using SymbolOrNumber = std::variant<Symbolic, fp>;
+using Symbolic = sym::Expression<double, double>;
+using VariableAssignment = std::unordered_map<sym::Variable, double>;
+using SymbolOrNumber = std::variant<Symbolic, double>;
 } // namespace qc

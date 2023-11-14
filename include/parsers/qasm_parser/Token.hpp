@@ -61,7 +61,7 @@ struct Token {
   int line = 0;
   int col = 0;
   int val = 0;
-  qc::fp valReal = 0.0;
+  double valReal = 0.0;
   std::string str;
 
   Token() = default;

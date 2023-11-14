@@ -266,10 +266,10 @@ qc::Permutation Parser::checkForInitialLayout(std::string comment) {
   static const auto QUBIT_REGEX = std::regex("\\d+");
   qc::Permutation initial{};
   if (std::regex_search(comment, INITIAL_LAYOUT_REGEX)) {
-    qc::Qubit logicalQubit = 0;
+    int16_t logicalQubit = 0;
     for (std::smatch m; std::regex_search(comment, m, QUBIT_REGEX);
          comment = m.suffix()) {
-      auto physicalQubit = static_cast<qc::Qubit>(std::stoul(m.str()));
+      auto physicalQubit = static_cast<int16_t>(std::stoul(m.str()));
       initial.insert({physicalQubit, logicalQubit});
       ++logicalQubit;
     }
@@ -282,10 +282,10 @@ qc::Permutation Parser::checkForOutputPermutation(std::string comment) {
   static const auto QUBIT_REGEX = std::regex("\\d+");
   qc::Permutation output{};
   if (std::regex_search(comment, OUTPUT_PERMUTATION_REGEX)) {
-    qc::Qubit logicalQubit = 0;
+    int16_t logicalQubit = 0;
     for (std::smatch m; std::regex_search(comment, m, QUBIT_REGEX);
          comment = m.suffix()) {
-      auto physicalQubit = static_cast<qc::Qubit>(std::stoul(m.str()));
+      auto physicalQubit = static_cast<int16_t>(std::stoul(m.str()));
       output.insert({physicalQubit, logicalQubit});
       ++logicalQubit;
     }
@@ -329,7 +329,7 @@ qc::QuantumRegister Parser::argumentQreg() {
     check(Token::Kind::Nninteger);
     const auto offset = static_cast<std::size_t>(t.val);
     check(Token::Kind::Rbrack);
-    return std::make_pair(static_cast<qc::Qubit>(qregs[s].first + offset), 1U);
+    return std::make_pair(static_cast<int16_t>(qregs[s].first + offset), 1U);
   }
   return std::make_pair(qregs[s].first, qregs[s].second);
 }
@@ -495,7 +495,7 @@ std::unique_ptr<qc::Operation> Parser::gate() {
       if (gate == nullptr) {
         error("Unsupported gate type in compound gate definition");
       }
-      std::vector<qc::fp> rewrittenParameters;
+      std::vector<double> rewrittenParameters;
       rewrittenParameters.reserve(gate->parameters.size());
       for (const auto& p : gate->parameters) {
         rewrittenParameters.emplace_back(rewriteExpr(p, paramMap)->num);
@@ -758,14 +758,14 @@ std::unique_ptr<qc::Operation> Parser::qop() {
     check(Token::Kind::Semicolon);
 
     if (qreg.second == creg.second) {
-      std::vector<qc::Qubit> qubits{};
+      std::vector<int16_t> qubits{};
       std::vector<qc::Bit> classics{};
       for (std::size_t i = 0; i < qreg.second; ++i) {
         const auto qubit = qreg.first + i;
         const auto clbit = creg.first + i;
         if (qubit >= nqubits) {
           std::stringstream ss{};
-          ss << "Qubit " << qubit
+          ss << "int16_t " << qubit
              << " cannot be measured since the circuit only contains "
              << nqubits << " qubits";
           error(ss.str());
@@ -778,7 +778,7 @@ std::unique_ptr<qc::Operation> Parser::qop() {
              << nclassics << " classical bits";
           error(ss.str());
         }
-        qubits.emplace_back(static_cast<qc::Qubit>(qubit));
+        qubits.emplace_back(static_cast<int16_t>(qubit));
         classics.emplace_back(clbit);
       }
       return std::make_unique<qc::NonUnitaryOperation>(nqubits, qubits,
@@ -791,17 +791,17 @@ std::unique_ptr<qc::Operation> Parser::qop() {
     auto qreg = argumentQreg();
     check(Token::Kind::Semicolon);
 
-    std::vector<qc::Qubit> qubits;
+    std::vector<int16_t> qubits;
     for (std::size_t i = 0; i < qreg.second; ++i) {
       auto qubit = qreg.first + i;
       if (qubit >= nqubits) {
         std::stringstream ss{};
-        ss << "Qubit " << qubit
+        ss << "int16_t " << qubit
            << " cannot be reset since the circuit only contains " << nqubits
            << " qubits";
         error(ss.str());
       }
-      qubits.emplace_back(static_cast<qc::Qubit>(qubit));
+      qubits.emplace_back(static_cast<int16_t>(qubit));
     }
     return std::make_unique<qc::NonUnitaryOperation>(nqubits, qubits);
   }
@@ -809,7 +809,7 @@ std::unique_ptr<qc::Operation> Parser::qop() {
 }
 
 void Parser::parseParameters(const GateInfo& info,
-                             std::vector<qc::fp>& parameters) {
+                             std::vector<double>& parameters) {
   // if the gate has parameters, then parse them first
   if (info.nParameters > 0) {
     check(Token::Kind::Lpar);
@@ -824,7 +824,7 @@ void Parser::parseParameters(const GateInfo& info,
 }
 
 void Parser::parseArguments(const GateInfo& info,
-                            std::vector<qc::fp>& parameters,
+                            std::vector<double>& parameters,
                             std::vector<qc::QuantumRegister>& controlRegisters,
                             std::vector<qc::QuantumRegister>& targetRegisters) {
   parseParameters(info, parameters);
@@ -874,7 +874,7 @@ bool Parser::gateInfo(const std::string& name, GateInfo& info) {
 }
 
 std::unique_ptr<qc::Operation>
-Parser::knownGate(const GateInfo& info, const std::vector<qc::fp>& parameters,
+Parser::knownGate(const GateInfo& info, const std::vector<double>& parameters,
                   const std::vector<qc::QuantumRegister>& controlRegisters,
                   const std::vector<qc::QuantumRegister>& targetRegisters) {
   bool broadcasting = false;
@@ -884,7 +884,7 @@ Parser::knownGate(const GateInfo& info, const std::vector<qc::fp>& parameters,
       broadcasting = true;
     }
     for (std::size_t i = 0; i < length; ++i) {
-      const auto control = qc::Control{static_cast<qc::Qubit>(startQubit + i)};
+      const auto control = qc::Control{static_cast<int16_t>(startQubit + i)};
       if (std::find(controls.begin(), controls.end(), control) !=
           controls.end()) {
         error("Duplicate control qubit in multi-qubit gate.");
@@ -899,7 +899,7 @@ Parser::knownGate(const GateInfo& info, const std::vector<qc::fp>& parameters,
       broadcasting = true;
     }
     for (std::size_t i = 0; i < length; ++i) {
-      const auto target = static_cast<qc::Qubit>(startQubit + i);
+      const auto target = static_cast<int16_t>(startQubit + i);
       if (std::find(targets.begin(), targets.end(), target) != targets.end()) {
         error("Duplicate target qubit in multi-qubit gate.");
       }
@@ -925,7 +925,7 @@ Parser::knownGate(const GateInfo& info, const std::vector<qc::fp>& parameters,
       auto gate = qc::CompoundOperation(nqubits);
       for (std::size_t i = 0; i < length; ++i) {
         gate.emplace_back<qc::StandardOperation>(
-            nqubits, static_cast<qc::Qubit>(startQubit + i), info.type,
+            nqubits, static_cast<int16_t>(startQubit + i), info.type,
             parameters);
       }
       return std::make_unique<qc::CompoundOperation>(std::move(gate));
@@ -944,14 +944,14 @@ Parser::knownGate(const GateInfo& info, const std::vector<qc::fp>& parameters,
         for (std::size_t i = 0; i < lengthTarget; ++i) {
           gate.emplace_back<qc::StandardOperation>(
               nqubits, qc::Control{startControl},
-              static_cast<qc::Qubit>(startTarget + i), info.type, parameters);
+              static_cast<int16_t>(startTarget + i), info.type, parameters);
         }
         return std::make_unique<qc::CompoundOperation>(std::move(gate));
       }
       if (lengthControl > 1 && lengthTarget == 1) {
         for (std::size_t i = 0; i < lengthControl; ++i) {
           gate.emplace_back<qc::StandardOperation>(
-              nqubits, qc::Control{static_cast<qc::Qubit>(startControl + i)},
+              nqubits, qc::Control{static_cast<int16_t>(startControl + i)},
               startTarget, info.type, parameters);
         }
         return std::make_unique<qc::CompoundOperation>(std::move(gate));
@@ -959,8 +959,8 @@ Parser::knownGate(const GateInfo& info, const std::vector<qc::fp>& parameters,
       if (lengthControl == lengthTarget) {
         for (std::size_t i = 0; i < lengthControl; ++i) {
           gate.emplace_back<qc::StandardOperation>(
-              nqubits, qc::Control{static_cast<qc::Qubit>(startControl + i)},
-              static_cast<qc::Qubit>(startTarget + i), info.type, parameters);
+              nqubits, qc::Control{static_cast<int16_t>(startControl + i)},
+              static_cast<int16_t>(startTarget + i), info.type, parameters);
         }
         return std::make_unique<qc::CompoundOperation>(std::move(gate));
       }

@@ -35,11 +35,11 @@ namespace dd {
 		return oss.str();
 	}
 
-	inline fp thicknessFromMagnitude(const Complex& a) {
+	inline double thicknessFromMagnitude(const Complex& a) {
 		return 3.0 * std::max(dd::ComplexNumbers::mag(a), 0.10);
 	}
 
-	static void printPhaseFormatted(std::ostream& os, fp r) {
+	static void printPhaseFormatted(std::ostream& os, double r) {
 		const auto tol = dd::ComplexTable<>::tolerance();
 
 		r /= dd::PI;
@@ -49,7 +49,7 @@ namespace dd {
 		const auto absr = std::abs(r);
 		auto fraction = ComplexValue::getLowestFraction(absr);
 		auto approx =
-			static_cast<fp>(fraction.first) / static_cast<fp>(fraction.second);
+			static_cast<double>(fraction.first) / static_cast<double>(fraction.second);
 		auto error = std::abs(absr - approx);
 
 		if (error < tol) { // suitable fraction a/b found
@@ -70,7 +70,7 @@ namespace dd {
 
 		auto abssqrt = absr / SQRT2_2;
 		fraction = ComplexValue::getLowestFraction(abssqrt);
-		approx = static_cast<fp>(fraction.first) / static_cast<fp>(fraction.second);
+		approx = static_cast<double>(fraction.first) / static_cast<double>(fraction.second);
 		error = std::abs(abssqrt - approx);
 
 		if (error < tol) { // suitable fraction a/(b * sqrt(2)) found
@@ -91,7 +91,7 @@ namespace dd {
 
 		auto abspi = absr / PI;
 		fraction = ComplexValue::getLowestFraction(abspi);
-		approx = static_cast<fp>(fraction.first) / static_cast<fp>(fraction.second);
+		approx = static_cast<double>(fraction.first) / static_cast<double>(fraction.second);
 		error = std::abs(abspi - approx);
 
 		if (error < tol) { // suitable fraction a/b π found
@@ -733,7 +733,7 @@ namespace dd {
 		}
 		else {
 			os << SERIALIZATION_VERSION << "\n";
-			os << basic.w.toString(false, std::numeric_limits<dd::fp>::max_digits10)
+			os << basic.w.toString(false, std::numeric_limits<double>::max_digits10)
 				<< "\n";
 		}
 		std::int64_t idx = 0;

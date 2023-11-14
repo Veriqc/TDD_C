@@ -8,7 +8,7 @@ namespace qc {
 /***
  * Protected Methods
  ***/
-OpType StandardOperation::parseU3(fp& theta, fp& phi, fp& lambda) {
+OpType StandardOperation::parseU3(double& theta, double& phi, double& lambda) {
   if (std::abs(theta) < PARAMETER_TOLERANCE &&
       std::abs(phi) < PARAMETER_TOLERANCE) {
     parameter = {lambda};
@@ -79,7 +79,7 @@ OpType StandardOperation::parseU3(fp& theta, fp& phi, fp& lambda) {
   return U3;
 }
 
-OpType StandardOperation::parseU2(fp& phi, fp& lambda) {
+OpType StandardOperation::parseU2(double& phi, double& lambda) {
   if (std::abs(phi) < PARAMETER_TOLERANCE) {
     phi = 0.L;
     if (std::abs(std::abs(lambda) - PI) < PARAMETER_TOLERANCE) {
@@ -116,7 +116,7 @@ OpType StandardOperation::parseU2(fp& phi, fp& lambda) {
   return U2;
 }
 
-OpType StandardOperation::parseU1(fp& lambda) {
+OpType StandardOperation::parseU1(double& lambda) {
   if (std::abs(lambda) < PARAMETER_TOLERANCE) {
     parameter.clear();
     return I;
@@ -160,7 +160,7 @@ void StandardOperation::checkUgate() {
   }
 }
 
-void StandardOperation::setup(const std::size_t nq, const Qubit startingQubit) {
+void StandardOperation::setup(const std::size_t nq, const int16_t startingQubit) {
   nqubits = nq;
   startQubit = startingQubit;
   checkUgate();
@@ -170,9 +170,9 @@ void StandardOperation::setup(const std::size_t nq, const Qubit startingQubit) {
 /***
  * Constructors
  ***/
-StandardOperation::StandardOperation(const std::size_t nq, const Qubit target,
-                                     const OpType g, std::vector<fp> params,
-                                     const Qubit startingQubit) {
+StandardOperation::StandardOperation(const std::size_t nq, const int16_t target,
+                                     const OpType g, std::vector<double> params,
+                                     const int16_t startingQubit) {
   type = g;
   parameter = std::move(params);
   setup(nq, startingQubit);
@@ -180,8 +180,8 @@ StandardOperation::StandardOperation(const std::size_t nq, const Qubit target,
 }
 
 StandardOperation::StandardOperation(const std::size_t nq, const Targets& targ,
-                                     const OpType g, std::vector<fp> params,
-                                     const Qubit startingQubit) {
+                                     const OpType g, std::vector<double> params,
+                                     const int16_t startingQubit) {
   type = g;
   parameter = std::move(params);
   setup(nq, startingQubit);
@@ -189,10 +189,10 @@ StandardOperation::StandardOperation(const std::size_t nq, const Targets& targ,
 }
 
 StandardOperation::StandardOperation(const std::size_t nq,
-                                     const Control control, const Qubit target,
+                                     const Control control, const int16_t target,
                                      const OpType g,
-                                     const std::vector<fp>& params,
-                                     const Qubit startingQubit)
+                                     const std::vector<double>& params,
+                                     const int16_t startingQubit)
     : StandardOperation(nq, target, g, params, startingQubit) {
   controls.insert(control);
 }
@@ -200,40 +200,40 @@ StandardOperation::StandardOperation(const std::size_t nq,
 StandardOperation::StandardOperation(const std::size_t nq,
                                      const Control control, const Targets& targ,
                                      const OpType g,
-                                     const std::vector<fp>& params,
-                                     const Qubit startingQubit)
+                                     const std::vector<double>& params,
+                                     const int16_t startingQubit)
     : StandardOperation(nq, targ, g, params, startingQubit) {
   controls.insert(control);
 }
 
 StandardOperation::StandardOperation(const std::size_t nq, const Controls& c,
-                                     const Qubit target, const OpType g,
-                                     const std::vector<fp>& params,
-                                     const Qubit startingQubit)
+                                     const int16_t target, const OpType g,
+                                     const std::vector<double>& params,
+                                     const int16_t startingQubit)
     : StandardOperation(nq, target, g, params, startingQubit) {
   controls = c;
 }
 
 StandardOperation::StandardOperation(const std::size_t nq, const Controls& c,
                                      const Targets& targ, const OpType g,
-                                     const std::vector<fp>& params,
-                                     const Qubit startingQubit)
+                                     const std::vector<double>& params,
+                                     const int16_t startingQubit)
     : StandardOperation(nq, targ, g, params, startingQubit) {
   controls = c;
 }
 
 // MCT Constructor
 StandardOperation::StandardOperation(const std::size_t nq, const Controls& c,
-                                     const Qubit target,
-                                     const Qubit startingQubit)
+                                     const int16_t target,
+                                     const int16_t startingQubit)
     : StandardOperation(nq, c, target, X, {}, startingQubit) {}
 
 // MCF (cSWAP), Peres, parameterized two target Constructor
 StandardOperation::StandardOperation(const std::size_t nq, const Controls& c,
-                                     const Qubit target0, const Qubit target1,
+                                     const int16_t target0, const int16_t target1,
                                      const OpType g,
-                                     const std::vector<fp>& params,
-                                     const Qubit startingQubit)
+                                     const std::vector<double>& params,
+                                     const int16_t startingQubit)
     : StandardOperation(nq, c, {target0, target1}, g, params, startingQubit) {}
 
 /***
@@ -243,7 +243,7 @@ void StandardOperation::dumpOpenQASM(
     std::ostream& of, const RegisterNames& qreg,
     [[maybe_unused]] const RegisterNames& creg) const {
   std::ostringstream op;
-  op << std::setprecision(std::numeric_limits<fp>::digits10);
+  op << std::setprecision(std::numeric_limits<double>::digits10);
   if ((controls.size() > 1 && type != X) || controls.size() > 2) {
     std::cout << "[WARNING] Multiple controlled gates are not natively "
                  "supported by OpenQASM. "

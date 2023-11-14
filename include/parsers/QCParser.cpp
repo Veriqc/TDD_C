@@ -1,13 +1,13 @@
 #include "../QuantumComputation.hpp"
 
 void qc::QuantumComputation::importQC(std::istream& is) {
-  std::map<std::string, Qubit> varMap{};
+  std::map<std::string, int16_t> varMap{};
   auto line = readQCHeader(is, varMap);
   readQCGateDescriptions(is, line, varMap);
 }
 
 int qc::QuantumComputation::readQCHeader(std::istream& is,
-                                         std::map<std::string, Qubit>& varMap) {
+                                         std::map<std::string, int16_t>& varMap) {
   std::string cmd;
   std::string variable;
   std::string identifier;
@@ -135,9 +135,9 @@ int qc::QuantumComputation::readQCHeader(std::istream& is,
           // add X operation in case of initial value 1
           if (constants.at(constidx - inputs.size()) == "1") {
             emplace_back<StandardOperation>(nqubits + nancillae,
-                                            static_cast<Qubit>(constidx), X);
+                                            static_cast<int16_t>(constidx), X);
           }
-          varMap.insert({var, static_cast<Qubit>(constidx++)});
+          varMap.insert({var, static_cast<int16_t>(constidx++)});
         } else {
           throw QFRException("[qc parser] l:" + std::to_string(line) +
                              " msg: Non-binary constant specified: " + cmd);
@@ -145,7 +145,7 @@ int qc::QuantumComputation::readQCHeader(std::istream& is,
       } else {
         // variable does not occur in input statement --> assumed to be |0>
         // ancillary
-        varMap.insert({var, static_cast<Qubit>(constidx++)});
+        varMap.insert({var, static_cast<int16_t>(constidx++)});
       }
     }
   }
@@ -153,17 +153,17 @@ int qc::QuantumComputation::readQCHeader(std::istream& is,
   for (std::size_t q = 0; q < variables.size(); ++q) {
     variable = variables.at(q);
     auto p = varMap.at(variable);
-    initialLayout[static_cast<Qubit>(q)] = p;
+    initialLayout[static_cast<int16_t>(q)] = p;
     if (!outputs.empty()) {
       if (std::count(outputs.begin(), outputs.end(), variable) != 0) {
-        outputPermutation[static_cast<Qubit>(q)] = p;
+        outputPermutation[static_cast<int16_t>(q)] = p;
       } else {
-        outputPermutation.erase(static_cast<Qubit>(q));
+        outputPermutation.erase(static_cast<int16_t>(q));
         garbage.at(p) = true;
       }
     } else {
       // no output statement given --> assume all outputs are relevant
-      outputPermutation[static_cast<Qubit>(q)] = p;
+      outputPermutation[static_cast<int16_t>(q)] = p;
     }
   }
 
@@ -171,7 +171,7 @@ int qc::QuantumComputation::readQCHeader(std::istream& is,
 }
 
 void qc::QuantumComputation::readQCGateDescriptions(
-    std::istream& is, int line, std::map<std::string, Qubit>& varMap) {
+    std::istream& is, int line, std::map<std::string, int16_t>& varMap) {
   const std::regex gateRegex = std::regex(
       R"((H|X|Y|Zd?|[SPT]\*?|tof|cnot|swap|R[xyz])(?:\((pi\/2\^(\d+)|(?:[-+]?[0-9]+[.]?[0-9]*(?:[eE][-+]?[0-9]+)?))\))?)");
   std::smatch m;
@@ -200,7 +200,7 @@ void qc::QuantumComputation::readQCGateDescriptions(
     }
 
     // extract gate information (identifier, #controls, divisor)
-    auto lambda = static_cast<fp>(0L);
+    auto lambda = static_cast<double>(0L);
     OpType gate = None;
     const std::string gateType = m.str(1);
     if (gateType == "H") {
@@ -232,7 +232,7 @@ void qc::QuantumComputation::readQCGateDescriptions(
     if (gate == RX || gate == RY || gate == RZ) {
       if (m.str(3).empty()) {
         // float definition
-        lambda = static_cast<fp>(std::stold(m.str(2)));
+        lambda = static_cast<double>(std::stold(m.str(2)));
       } else if (!m.str(2).empty()) {
         // pi/2^x definition
         auto power = std::stoul(m.str(3));
@@ -243,7 +243,7 @@ void qc::QuantumComputation::readQCGateDescriptions(
         } else if (power == 2UL) {
           lambda = PI_4;
         } else {
-          lambda = PI_4 / (std::pow(static_cast<fp>(2), power - 2UL));
+          lambda = PI_4 / (std::pow(static_cast<double>(2), power - 2UL));
         }
       } else {
         throw QFRException("Rotation gate without angle detected");
@@ -283,23 +283,23 @@ void qc::QuantumComputation::readQCGateDescriptions(
     }
 
     if (gate == X) {
-      const Qubit target = controls.back().qubit;
+      const int16_t target = controls.back().qubit;
       controls.pop_back();
       x(target, Controls{controls.cbegin(), controls.cend()});
     } else if (gate == H || gate == Y || gate == Z || gate == S ||
                gate == Sdag || gate == T || gate == Tdag) {
-      const Qubit target = controls.back().qubit;
+      const int16_t target = controls.back().qubit;
       controls.pop_back();
       emplace_back<StandardOperation>(
           nqubits, Controls{controls.cbegin(), controls.cend()}, target, gate);
     } else if (gate == SWAP) {
-      const Qubit target0 = controls.back().qubit;
+      const int16_t target0 = controls.back().qubit;
       controls.pop_back();
-      const Qubit target1 = controls.back().qubit;
+      const int16_t target1 = controls.back().qubit;
       controls.pop_back();
       swap(target0, target1, Controls{controls.cbegin(), controls.cend()});
     } else if (gate == RX || gate == RY || gate == RZ) {
-      const Qubit target = controls.back().qubit;
+      const int16_t target = controls.back().qubit;
       controls.pop_back();
       emplace_back<StandardOperation>(
           nqubits, Controls{controls.cbegin(), controls.cend()}, target, gate,

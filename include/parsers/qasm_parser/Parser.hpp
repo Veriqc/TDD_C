@@ -41,13 +41,13 @@ class Parser {
       Power,
       Id
     };
-    qc::fp num;
+    double num;
     Kind kind;
     std::shared_ptr<Expr> op1 = nullptr;
     std::shared_ptr<Expr> op2 = nullptr;
     std::string id;
 
-    explicit Expr(const Kind k, const qc::fp n = 0.,
+    explicit Expr(const Kind k, const double n = 0.,
                   std::shared_ptr<Expr> operation1 = nullptr,
                   std::shared_ptr<Expr> operation2 = nullptr,
                   std::string identifier = "")
@@ -195,19 +195,19 @@ public:
 
   static bool gateInfo(const std::string& name, GateInfo& info);
 
-  void parseParameters(const GateInfo& info, std::vector<qc::fp>& parameters);
+  void parseParameters(const GateInfo& info, std::vector<double>& parameters);
 
-  void parseArguments(const GateInfo& info, std::vector<qc::fp>& parameters,
+  void parseArguments(const GateInfo& info, std::vector<double>& parameters,
                       std::vector<qc::QuantumRegister>& controlRegisters,
                       std::vector<qc::QuantumRegister>& targetRegisters);
 
   std::unique_ptr<qc::Operation>
-  knownGate(const GateInfo& info, const std::vector<qc::fp>& parameters,
+  knownGate(const GateInfo& info, const std::vector<double>& parameters,
             const std::vector<qc::QuantumRegister>& controlRegisters,
             const std::vector<qc::QuantumRegister>& targetRegisters);
 
   std::unique_ptr<qc::Operation> knownGate(const GateInfo& info) {
-    std::vector<qc::fp> parameters{};
+    std::vector<double> parameters{};
     std::vector<qc::QuantumRegister> controlRegisters{};
     std::vector<qc::QuantumRegister> targetRegisters{};
     parseArguments(info, parameters, controlRegisters, targetRegisters);

@@ -54,7 +54,7 @@ std::ostream& Operation::printParameters(std::ostream& os) const {
 
   bool isZero = true;
   for (const auto& p : parameter) {
-    if (p != static_cast<fp>(0)) {
+    if (p != static_cast<double>(0)) {
       isZero = false;
       break;
     }
@@ -64,7 +64,7 @@ std::ostream& Operation::printParameters(std::ostream& os) const {
     for (size_t j = 1; j < parameter.size(); ++j) {
       isZero = true;
       for (size_t i = j; i < parameter.size(); ++i) {
-        if (parameter.at(i) != static_cast<fp>(0)) {
+        if (parameter.at(i) != static_cast<double>(0)) {
           isZero = false;
           break;
         }
@@ -203,7 +203,7 @@ bool Operation::equals(const Operation& op, const Permutation& perm1,
   }
 
   // check targets
-  std::set<Qubit> targets1{};
+  std::set<int16_t> targets1{};
   if (perm1.empty()) {
     targets1 = {getTargets().begin(), getTargets().end()};
   } else {
@@ -212,7 +212,7 @@ bool Operation::equals(const Operation& op, const Permutation& perm1,
     }
   }
 
-  std::set<Qubit> targets2{};
+  std::set<int16_t> targets2{};
   if (perm2.empty()) {
     targets2 = {op.getTargets().begin(), op.getTargets().end()};
   } else {

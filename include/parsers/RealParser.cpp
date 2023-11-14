@@ -52,7 +52,7 @@ int qc::QuantumComputation::readRealHeader(std::istream& is) {
               "[real parser] l:" + std::to_string(line) +
               " msg: Invalid or insufficient variables declared");
         }
-        const auto qubit = static_cast<Qubit>(i);
+        const auto qubit = static_cast<int16_t>(i);
         qregs.insert({variable, {qubit, 1U}});
         cregs.insert({"c_" + variable, {qubit, 1U}});
         initialLayout.insert({qubit, qubit});
@@ -69,7 +69,7 @@ int qc::QuantumComputation::readRealHeader(std::istream& is) {
                              " msg: Failed read in '.constants' line");
         }
         if (value == '1') {
-          x(static_cast<Qubit>(i));
+          x(static_cast<int16_t>(i));
         } else if (value != '-' && value != '0') {
           throw QFRException("[real parser] l:" + std::to_string(line) +
                              " msg: Invalid value in '.constants' header: '" +
@@ -160,8 +160,8 @@ void qc::QuantumComputation::readRealGateDescriptions(std::istream& is,
     }
     auto ncontrols =
         m.str(2).empty() ? 0 : std::stoul(m.str(2), nullptr, 0) - 1;
-    const fp lambda = m.str(3).empty() ? static_cast<fp>(0L)
-                                       : static_cast<fp>(std::stold(m.str(3)));
+    const double lambda = m.str(3).empty() ? static_cast<double>(0L)
+                                       : static_cast<double>(std::stold(m.str(3)));
 
     if (gate == V || gate == Vdag || m.str(1) == "c" || gate == SWAP) {
       ncontrols = 1;
@@ -217,7 +217,7 @@ void qc::QuantumComputation::readRealGateDescriptions(std::istream& is,
     }
 
     updateMaxControls(ncontrols);
-    const Qubit target = iter->second.first;
+    const int16_t target = iter->second.first;
     switch (gate) {
     case I:
     case H:

@@ -16,7 +16,7 @@ namespace dd {
 	qc::MatrixDD getStandardOperationDD(const qc::StandardOperation* op,
 		std::unique_ptr<dd::Package<Config>>& dd,
 		const dd::Controls& controls,
-		dd::Qubit target, bool inverse) {
+		int16_t target, bool inverse) {
 		return mEdge::zero;
 	}
 
@@ -25,7 +25,7 @@ namespace dd {
 	qc::MatrixDD getStandardOperationDD(const qc::StandardOperation* op,
 		std::unique_ptr<dd::Package<Config>>& dd,
 		const dd::Controls& controls,
-		dd::Qubit target0, dd::Qubit target1,
+		int16_t target0, int16_t target1,
 		bool inverse) {
 		return mEdge::zero;
 	}

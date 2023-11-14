@@ -15,7 +15,7 @@
 
 namespace dd {
 struct ComplexValue {
-  fp r, i;
+  double r, i;
 
   [[nodiscard]] constexpr bool
   approximatelyEquals(const ComplexValue& c) const {
@@ -53,14 +53,14 @@ struct ComplexValue {
   }
 
   void fromString(const std::string& realStr, std::string imagStr) {
-    const fp real = realStr.empty() ? 0. : std::stod(realStr);
+    const double real = realStr.empty() ? 0. : std::stod(realStr);
 
     imagStr.erase(remove(imagStr.begin(), imagStr.end(), ' '), imagStr.end());
     imagStr.erase(remove(imagStr.begin(), imagStr.end(), 'i'), imagStr.end());
     if (imagStr == "+" || imagStr == "-") {
       imagStr = imagStr + "1";
     }
-    const fp imag = imagStr.empty() ? 0. : std::stod(imagStr);
+    const double imag = imagStr.empty() ? 0. : std::stod(imagStr);
     r = {real};
     i = {imag};
   }
@@ -68,7 +68,7 @@ struct ComplexValue {
   static auto
   getLowestFraction(const double x,
                     const std::uint64_t maxDenominator = 1U << 10,
-                    const fp tol = dd::ComplexTable<>::tolerance()) {
+                    const double tol = dd::ComplexTable<>::tolerance()) {
     assert(x >= 0.);
 
     std::pair<std::uint64_t, std::uint64_t> lowerBound{0U, 1U};
@@ -78,7 +78,7 @@ struct ComplexValue {
            (upperBound.second <= maxDenominator)) {
       auto num = lowerBound.first + upperBound.first;
       auto den = lowerBound.second + upperBound.second;
-      auto median = static_cast<fp>(num) / static_cast<fp>(den);
+      auto median = static_cast<double>(num) / static_cast<double>(den);
       if (std::abs(x - median) <= tol) {
         if (den <= maxDenominator) {
           return std::pair{num, den};
@@ -100,7 +100,7 @@ struct ComplexValue {
     return lowerBound;
   }
 
-  static void printFormatted(std::ostream& os, fp num, bool imaginary = false) {
+  static void printFormatted(std::ostream& os, double num, bool imaginary = false) {
     if (std::abs(num) <= ComplexTable<>::tolerance()) {
       os << (std::signbit(num) ? "-" : "+") << "0" << (imaginary ? "i" : "");
       return;
@@ -109,7 +109,7 @@ struct ComplexValue {
     const auto absnum = std::abs(num);
     auto fraction = getLowestFraction(absnum);
     auto approx =
-        static_cast<fp>(fraction.first) / static_cast<fp>(fraction.second);
+        static_cast<double>(fraction.first) / static_cast<double>(fraction.second);
     auto error = std::abs(absnum - approx);
 
     if (error <= ComplexTable<>::tolerance()) { // suitable fraction a/b found
@@ -131,7 +131,7 @@ struct ComplexValue {
 
     const auto abssqrt = absnum / SQRT2_2;
     fraction = getLowestFraction(abssqrt);
-    approx = static_cast<fp>(fraction.first) / static_cast<fp>(fraction.second);
+    approx = static_cast<double>(fraction.first) / static_cast<double>(fraction.second);
     error = std::abs(abssqrt - approx);
 
     if (error <= ComplexTable<>::tolerance()) { // suitable fraction a/(b *
@@ -154,7 +154,7 @@ struct ComplexValue {
 
     const auto abspi = absnum / PI;
     fraction = getLowestFraction(abspi);
-    approx = static_cast<fp>(fraction.first) / static_cast<fp>(fraction.second);
+    approx = static_cast<double>(fraction.first) / static_cast<double>(fraction.second);
     error = std::abs(abspi - approx);
 
     if (error <= ComplexTable<>::tolerance()) { // suitable fraction a/b π found
@@ -181,7 +181,7 @@ struct ComplexValue {
     }
   }
 
-  static std::string toString(const fp& real, const fp& imag,
+  static std::string toString(const double& real, const double& imag,
                               bool formatted = true, int precision = -1) {
     std::ostringstream ss{};
 
@@ -228,7 +228,7 @@ struct ComplexValue {
     return ss.str();
   }
 
-  explicit operator auto() const { return std::complex<dd::fp>{r, i}; }
+  explicit operator auto() const { return std::complex<double>{r, i}; }
 
   ComplexValue& operator+=(const ComplexValue& rhs) {
     r += rhs.r;

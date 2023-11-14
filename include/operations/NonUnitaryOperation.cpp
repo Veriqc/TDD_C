@@ -13,7 +13,7 @@
 namespace qc {
 // Measurement constructor
 NonUnitaryOperation::NonUnitaryOperation(const std::size_t nq,
-                                         std::vector<Qubit> qubitRegister,
+                                         std::vector<int16_t> qubitRegister,
                                          std::vector<Bit> classicalRegister)
     : qubits(std::move(qubitRegister)), classics(std::move(classicalRegister)) {
   if (qubits.size() != classics.size()) {
@@ -26,7 +26,7 @@ NonUnitaryOperation::NonUnitaryOperation(const std::size_t nq,
   Operation::setName();
 }
 NonUnitaryOperation::NonUnitaryOperation(const std::size_t nq,
-                                         const Qubit qubit, const Bit cbit) {
+                                         const int16_t qubit, const Bit cbit) {
   type = Measure;
   nqubits = nq;
   qubits.emplace_back(qubit);
@@ -36,15 +36,15 @@ NonUnitaryOperation::NonUnitaryOperation(const std::size_t nq,
 
 // Snapshot constructor
 NonUnitaryOperation::NonUnitaryOperation(
-    const std::size_t nq, const std::vector<Qubit>& qubitRegister,
+    const std::size_t nq, const std::vector<int16_t>& qubitRegister,
     const std::size_t n)
     : NonUnitaryOperation(nq, qubitRegister, Snapshot) {
-  parameter.emplace_back(static_cast<fp>(n));
+  parameter.emplace_back(static_cast<double>(n));
 }
 
 // General constructor
 NonUnitaryOperation::NonUnitaryOperation(
-    const std::size_t nq, const std::vector<Qubit>& qubitRegister, OpType op) {
+    const std::size_t nq, const std::vector<int16_t>& qubitRegister, OpType op) {
   type = op;
   nqubits = nq;
   targets = qubitRegister;
@@ -53,7 +53,7 @@ NonUnitaryOperation::NonUnitaryOperation(
 }
 
 std::ostream& NonUnitaryOperation::printNonUnitary(
-    std::ostream& os, const std::vector<Qubit>& q, const std::vector<Bit>& c,
+    std::ostream& os, const std::vector<int16_t>& q, const std::vector<Bit>& c,
     const Permutation& permutation) const {
   switch (type) {
   case Measure:
@@ -134,7 +134,7 @@ void NonUnitaryOperation::dumpOpenQASM(std::ostream& of,
   }
 }
 
-bool NonUnitaryOperation::actsOn(Qubit i) const {
+bool NonUnitaryOperation::actsOn(int16_t i) const {
   if (type == Measure) {
     return std::any_of(qubits.cbegin(), qubits.cend(),
                        [&i](const auto& q) { return q == i; });
@@ -166,7 +166,7 @@ bool NonUnitaryOperation::equals(const Operation& op, const Permutation& perm1,
       assert(qubits.size() == classics.size());
       assert(nonunitary->qubits.size() == nonunitary->classics.size());
 
-      std::set<std::pair<Qubit, Bit>> measurements1{};
+      std::set<std::pair<int16_t, Bit>> measurements1{};
       auto qubitIt1 = qubits.cbegin();
       auto classicIt1 = classics.cbegin();
       while (qubitIt1 != qubits.cend()) {
@@ -179,7 +179,7 @@ bool NonUnitaryOperation::equals(const Operation& op, const Permutation& perm1,
         ++classicIt1;
       }
 
-      std::set<std::pair<Qubit, Bit>> measurements2{};
+      std::set<std::pair<int16_t, Bit>> measurements2{};
       auto qubitIt2 = nonunitary->qubits.cbegin();
       auto classicIt2 = nonunitary->classics.cbegin();
       while (qubitIt2 != nonunitary->qubits.cend()) {
@@ -207,7 +207,7 @@ void NonUnitaryOperation::addDepthContribution(
 }
 
 void NonUnitaryOperation::printMeasurement(
-    std::ostream& os, const std::vector<Qubit>& q, const std::vector<Bit>& c,
+    std::ostream& os, const std::vector<int16_t>& q, const std::vector<Bit>& c,
     const Permutation& permutation) const {
   auto qubitIt = q.cbegin();
   auto classicIt = c.cbegin();
@@ -238,7 +238,7 @@ void NonUnitaryOperation::printMeasurement(
 }
 
 void NonUnitaryOperation::printResetBarrierOrSnapshot(
-    std::ostream& os, const std::vector<Qubit>& q,
+    std::ostream& os, const std::vector<int16_t>& q,
     const Permutation& permutation) const {
   auto qubitIt = q.cbegin();
   os << name << "\t";

@@ -23,7 +23,7 @@ struct ComplexNumbers {
     complexCache.clear();
   }
 
-  static void setTolerance(fp tol) { ComplexTable<>::setTolerance(tol); }
+  static void setTolerance(double tol) { ComplexTable<>::setTolerance(tol); }
 
   // operations on complex numbers
   // meanings are self-evident from the names
@@ -79,14 +79,14 @@ struct ComplexNumbers {
       r.i->value = (ai * br - ar * bi) / cmag;
     }
   }
-  static inline fp mag2(const Complex& a) {
+  static inline double mag2(const Complex& a) {
     auto ar = CTEntry::val(a.r);
     auto ai = CTEntry::val(a.i);
 
     return ar * ar + ai * ai;
   }
-  static inline fp mag(const Complex& a) { return std::sqrt(mag2(a)); }
-  static inline fp arg(const Complex& a) {
+  static inline double mag(const Complex& a) { return std::sqrt(mag2(a)); }
+  static inline double arg(const Complex& a) {
     auto ar = CTEntry::val(a.r);
     auto ai = CTEntry::val(a.i);
     return std::atan2(ai, ar);
@@ -140,10 +140,10 @@ struct ComplexNumbers {
     auto vali = CTEntry::val(c.i);
     return lookup(valr, vali);
   }
-  Complex lookup(const std::complex<fp>& c) {
+  Complex lookup(const std::complex<double>& c) {
     return lookup(c.real(), c.imag());
   }
-  Complex lookup(const fp& r, const fp& i) {
+  Complex lookup(const double& r, const double& i) {
     Complex ret{};
 
     auto signR = std::signbit(r);
@@ -200,7 +200,7 @@ struct ComplexNumbers {
   // provide (temporary) cached complex number
   inline Complex getTemporary() { return complexCache.getTemporaryComplex(); }
 
-  inline Complex getTemporary(const fp& r, const fp& i) {
+  inline Complex getTemporary(const double& r, const double& i) {
     auto c = complexCache.getTemporaryComplex();
     c.r->value = r;
     c.i->value = i;
@@ -213,7 +213,7 @@ struct ComplexNumbers {
 
   inline Complex getCached() { return complexCache.getCachedComplex(); }
 
-  inline Complex getCached(const fp& r, const fp& i) {
+  inline Complex getCached(const double& r, const double& i) {
     auto c = complexCache.getCachedComplex();
     c.r->value = r;
     c.i->value = i;
@@ -224,7 +224,7 @@ struct ComplexNumbers {
     return getCached(c.r, c.i);
   }
 
-  inline Complex getCached(const std::complex<fp>& c) {
+  inline Complex getCached(const std::complex<double>& c) {
     return getCached(c.real(), c.imag());
   }
 

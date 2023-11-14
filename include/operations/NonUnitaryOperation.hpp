@@ -6,29 +6,29 @@ namespace qc {
 
 class NonUnitaryOperation final : public Operation {
 protected:
-  std::vector<Qubit>
+  std::vector<int16_t>
       qubits{}; // vector for the qubits to measure (necessary since std::set
                 // does not preserve the order of inserted elements)
   std::vector<Bit> classics{}; // vector for the classical bits to measure into
 
-  std::ostream& printNonUnitary(std::ostream& os, const std::vector<Qubit>& q,
+  std::ostream& printNonUnitary(std::ostream& os, const std::vector<int16_t>& q,
                                 const std::vector<Bit>& c = {},
                                 const Permutation& permutation = {}) const;
-  void printMeasurement(std::ostream& os, const std::vector<Qubit>& q,
+  void printMeasurement(std::ostream& os, const std::vector<int16_t>& q,
                         const std::vector<Bit>& c,
                         const Permutation& permutation) const;
   void printResetBarrierOrSnapshot(std::ostream& os,
-                                   const std::vector<Qubit>& q,
+                                   const std::vector<int16_t>& q,
                                    const Permutation& permutation) const;
 
 public:
   // Measurement constructor
-  NonUnitaryOperation(std::size_t nq, std::vector<Qubit> qubitRegister,
+  NonUnitaryOperation(std::size_t nq, std::vector<int16_t> qubitRegister,
                       std::vector<Bit> classicalRegister);
-  NonUnitaryOperation(std::size_t nq, Qubit qubit, Bit cbit);
+  NonUnitaryOperation(std::size_t nq, int16_t qubit, Bit cbit);
 
   // Snapshot constructor
-  NonUnitaryOperation(std::size_t nq, const std::vector<Qubit>& qubitRegister,
+  NonUnitaryOperation(std::size_t nq, const std::vector<int16_t>& qubitRegister,
                       std::size_t n);
 
   // ShowProbabilities constructor
@@ -38,7 +38,7 @@ public:
   }
 
   // General constructor
-  NonUnitaryOperation(std::size_t nq, const std::vector<Qubit>& qubitRegister,
+  NonUnitaryOperation(std::size_t nq, const std::vector<int16_t>& qubitRegister,
                       OpType op = Reset);
 
   [[nodiscard]] std::unique_ptr<Operation> clone() const override {
@@ -82,7 +82,7 @@ public:
   std::vector<Bit>& getClassics() { return classics; }
   [[nodiscard]] size_t getNclassics() const { return classics.size(); }
 
-  [[nodiscard]] bool actsOn(Qubit i) const override;
+  [[nodiscard]] bool actsOn(int16_t i) const override;
 
   void addDepthContribution(std::vector<std::size_t>& depths) const override;
 
@@ -109,7 +109,7 @@ public:
   void dumpOpenQASM(std::ostream& of, const RegisterNames& qreg,
                     const RegisterNames& creg) const override;
 
-  [[nodiscard]] std::set<Qubit> getUsedQubits() const override {
+  [[nodiscard]] std::set<int16_t> getUsedQubits() const override {
     const auto& ts = getTargets();
     return {ts.begin(), ts.end()};
   }

@@ -65,10 +65,10 @@ void qc::QuantumComputation::importOpenQASM(std::istream& is) {
       p.argList(args);
       p.check(Token::Kind::Semicolon);
 
-      std::vector<qc::Qubit> qubits{};
+      std::vector<int16_t> qubits{};
       for (auto& arg : args) {
         for (std::size_t q = 0; q < arg.second; ++q) {
-          qubits.emplace_back(static_cast<Qubit>(arg.first + q));
+          qubits.emplace_back(static_cast<int16_t>(arg.first + q));
         }
       }
 

@@ -23,9 +23,9 @@ public:
     nqubits = op->getNqubits();
     name = "c_" + op->getName();
     parameter.reserve(3);
-    parameter.emplace_back(static_cast<fp>(controlRegister.first));
-    parameter.emplace_back(static_cast<fp>(controlRegister.second));
-    parameter.emplace_back(static_cast<fp>(expectedValue));
+    parameter.emplace_back(static_cast<double>(controlRegister.first));
+    parameter.emplace_back(static_cast<double>(controlRegister.second));
+    parameter.emplace_back(static_cast<double>(expectedValue));
     type = ClassicControlled;
   }
 
@@ -72,7 +72,7 @@ public:
     return true;
   }
 
-  [[nodiscard]] bool actsOn(Qubit i) const override { return op->actsOn(i); }
+  [[nodiscard]] bool actsOn(int16_t i) const override { return op->actsOn(i); }
 
   [[nodiscard]] bool equals(const Operation& operation,
                             const Permutation& perm1,
