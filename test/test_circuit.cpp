@@ -1,14 +1,20 @@
-#pragma once
+#include <map>
+#include <string>
+#include <iostream>
+#include <functional>
+#include <ctime>
 
-#include <test.hpp>
-#include <Cir_tn.h>
+
+#include "../include/dd/Export.hpp"
+#include <xtensor/xio.hpp>
+#include <xtensor/xarray.hpp>
+#include "../include/Cir_tn.hpp"
+
 void test_qasm();
 
-namespace test {
-    void test_circuit() {
-        std::cout << "test test.qasm" << std::endl;
-        test_qasm();
-    }
+int main(){
+    std::cout << "test test.qasm" << std::endl;
+    test_qasm();
 }
 void test_qasm() {
     std::string path2 = "Benchmarks/";

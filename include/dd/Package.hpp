@@ -10,7 +10,6 @@
 #include "Control.hpp"
 #include "Definitions.hpp"
 #include "Edge.hpp"
-#include "GateMatrixDefinitions.hpp"
 #include "Package_fwd.hpp"
 
 #include "UniqueTable.hpp"
@@ -125,10 +124,10 @@ namespace dd {
 			const xt::xarray<ComplexValue>& array,
 			std::vector<int> order){
 			if (array.size() == 1) {
-				 if (array[0] == complex_zero) {
+				 if (array[0] == ComplexValue(0,0)) {
 				 	return Edge<mNode>::zero;
 				 }
-				 else if (array[0] == complex_one) {
+				 else if (array[0] == ComplexValue(1,0)) {
 				 	return Edge<mNode>::one;
 				 }
 				 else {
@@ -176,144 +175,9 @@ namespace dd {
 		}
 		
 
-		TDD Matrix2TDD(const GateMatrix mat, std::vector<Index> var_out)
-		{
-
-			TDD low, high, res;
-			Edge<mNode> e_temp[4];
-
-			std::vector<Edge<mNode>> e_low(2), e_high(2), e(2);
-
-			int Radix = 2;
-
-			for (int i = 0; i < Radix; i++) {
-				for (int j = 0; j < Radix; j++) {
-					if (mat[2 * i + j] == complex_zero) {
-						e_temp[i * Radix + j] = Edge<mNode>::zero;
-					}
-					else if (mat[2 * i + j] == complex_one) {
-						e_temp[i * Radix + j] = Edge<mNode>::one;
-					}
-					else {
-						e_temp[i * Radix + j] = Edge<mNode>::terminal(cn.lookup(mat[2 * i + j]));
-					}
-				}
-			}
-
-
-			std::vector<std::string> key_2_index;
-			if (varOrder[var_out[0].key] < varOrder[var_out[1].key]) {
-				e_low[0] = e_temp[0];
-				e_low[1] = e_temp[1];
-				e_high[0] = e_temp[2];
-				e_high[1] = e_temp[3];
-				key_2_index = { var_out[0].key,var_out[1].key };
-			}
-			else {
-				e_low[0] = e_temp[0];
-				e_low[1] = e_temp[2];
-				e_high[0] = e_temp[1];
-				e_high[1] = e_temp[3];
-				key_2_index = { var_out[1].key,var_out[0].key };
-			}
-
-
-			if (e_low[0].p == e_low[1].p and e_low[0].w == e_low[1].w) {
-				low.e = e_low[0];
-			}
-			else {
-				low.e = makeDDNode(0, e_low, false);
-			}
-			if (e_high[0].p == e_high[1].p and e_high[0].w == e_high[1].w) {
-				high.e = e_high[0];
-			}
-			else {
-				high.e = makeDDNode(0, e_high, false);
-			}
-			if (low.e.p == high.e.p and low.e.w == high.e.w) {
-				res.e = low.e;
-			}
-			else {
-				e[0] = low.e;
-				e[1] = high.e;
-				res.e = makeDDNode(1, e, false); ;
-			}
-			res.index_set = var_out;
-			res.key_2_index = key_2_index;
-			return res;
-		}
+		
+		
 		//template <class Node>
-		TDD diag_matrix_2_TDD(const GateMatrix mat, std::vector<Index> var_out)
-		{
-
-			TDD res;
-			int Radix = 2;
-
-			std::vector<Edge<mNode>> e_temp(2);
-			for (int i = 0; i < Radix; i++) {
-
-				if (mat[2 * i + i] == complex_zero) {
-					e_temp[i] = Edge<mNode>::zero;
-				}
-				else {
-					if (mat[2 * i + i] == complex_one) {
-						e_temp[i] = Edge<mNode>::one;
-					}
-					else {
-						e_temp[i] = Edge<mNode>::terminal(cn.lookup(mat[2 * i + i]));
-					}
-				}
-			}
-
-			res.e = makeDDNode(0, e_temp, false);
-			res.index_set = var_out;
-			res.key_2_index = { var_out[0].key };
-			return res;
-		}
-
-		//template <class Node>
-		TDD cnot_2_TDD(std::vector<Index> var, int ca = 1) {
-
-
-			TDD low, high, res;
-			std::vector<Edge<mNode>> e(2);
-			if (ca == 1) {
-				if (varOrder[var[0].key] > varOrder[var[3].key] && varOrder[var[0].key] > varOrder[var[4].key]) {
-					low = Matrix2TDD(Imat, { var[3] ,var[4] });
-					high = Matrix2TDD(Xmat, { var[3] ,var[4] });
-					e[0] = low.e;
-					e[1] = high.e;
-					res.e = makeDDNode(2, e, false);
-					res.index_set = { var[0],var[2],var[3],var[4] };
-					low.key_2_index.push_back(var[0].key);
-					res.key_2_index = low.key_2_index;
-				}
-				else if (varOrder[var[3].key] > varOrder[var[0].key] && varOrder[var[3].key] > varOrder[var[4].key]) {
-					low = Matrix2TDD(Imat, { var[0] ,var[4] });
-					high = Matrix2TDD(Xmat, { var[0] ,var[4] });
-					e[0] = low.e;
-					e[1] = high.e;
-					res.e = makeDDNode(2, e, false);
-					res.index_set = { var[0],var[2],var[3],var[4] };
-					low.key_2_index.push_back(var[3].key);
-					res.key_2_index = low.key_2_index;
-				}
-				else {
-					low = Matrix2TDD(Imat, { var[0] ,var[3] });
-					high = Matrix2TDD(Xmat, { var[0] ,var[3] });
-					e[0] = low.e;
-					e[1] = high.e;
-					res.e = makeDDNode(2, e, false);
-					res.index_set = { var[0],var[2],var[3],var[4] };
-					low.key_2_index.push_back(var[4].key);
-					res.key_2_index = low.key_2_index;
-				}
-				return res;
-			}
-			return res;
-
-		}
-
 		//==========================================我写的========================================
 
 		///

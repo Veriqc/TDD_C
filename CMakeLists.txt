@@ -85,6 +85,114 @@ set(PROJECT_NAME TDD_C)
 ################################################################################
 # Source groups
 ################################################################################
+set(XTENSOR_FILES
+    "extern/xtensor/xaccessible.hpp"
+    "extern/xtensor/xaccumulator.hpp"
+    "extern/xtensor/xadapt.hpp"
+    "extern/xtensor/xarray.hpp"
+    "extern/xtensor/xassign.hpp"
+    "extern/xtensor/xaxis_iterator.hpp"
+    "extern/xtensor/xaxis_slice_iterator.hpp"
+    "extern/xtensor/xblockwise_reducer.hpp"
+    "extern/xtensor/xblockwise_reducer_functors.hpp"
+    "extern/xtensor/xbroadcast.hpp"
+    "extern/xtensor/xbuffer_adaptor.hpp"
+    "extern/xtensor/xbuilder.hpp"
+    "extern/xtensor/xchunked_array.hpp"
+    "extern/xtensor/xchunked_assign.hpp"
+    "extern/xtensor/xchunked_view.hpp"
+    "extern/xtensor/xcomplex.hpp"
+    "extern/xtensor/xcontainer.hpp"
+    "extern/xtensor/xcsv.hpp"
+    "extern/xtensor/xdynamic_view.hpp"
+    "extern/xtensor/xeval.hpp"
+    "extern/xtensor/xexception.hpp"
+    "extern/xtensor/xexpression.hpp"
+    "extern/xtensor/xexpression_holder.hpp"
+    "extern/xtensor/xexpression_traits.hpp"
+    "extern/xtensor/xfixed.hpp"
+    "extern/xtensor/xfunction.hpp"
+    "extern/xtensor/xfunctor_view.hpp"
+    "extern/xtensor/xgenerator.hpp"
+    "extern/xtensor/xhistogram.hpp"
+    "extern/xtensor/xindex_view.hpp"
+    "extern/xtensor/xinfo.hpp"
+    "extern/xtensor/xio.hpp"
+    "extern/xtensor/xiterable.hpp"
+    "extern/xtensor/xiterator.hpp"
+    "extern/xtensor/xjson.hpp"
+    "extern/xtensor/xlayout.hpp"
+    "extern/xtensor/xmanipulation.hpp"
+    "extern/xtensor/xmasked_view.hpp"
+    "extern/xtensor/xmath.hpp"
+    "extern/xtensor/xmime.hpp"
+    "extern/xtensor/xmultiindex_iterator.hpp"
+    "extern/xtensor/xnoalias.hpp"
+    "extern/xtensor/xnorm.hpp"
+    "extern/xtensor/xnpy.hpp"
+    "extern/xtensor/xoffset_view.hpp"
+    "extern/xtensor/xoperation.hpp"
+    "extern/xtensor/xoptional.hpp"
+    "extern/xtensor/xoptional_assembly.hpp"
+    "extern/xtensor/xoptional_assembly_base.hpp"
+    "extern/xtensor/xoptional_assembly_storage.hpp"
+    "extern/xtensor/xpad.hpp"
+    "extern/xtensor/xrandom.hpp"
+    "extern/xtensor/xreducer.hpp"
+    "extern/xtensor/xrepeat.hpp"
+    "extern/xtensor/xscalar.hpp"
+    "extern/xtensor/xsemantic.hpp"
+    "extern/xtensor/xset_operation.hpp"
+    "extern/xtensor/xshape.hpp"
+    "extern/xtensor/xslice.hpp"
+    "extern/xtensor/xsort.hpp"
+    "extern/xtensor/xstorage.hpp"
+    "extern/xtensor/xstrided_view.hpp"
+    "extern/xtensor/xstrided_view_base.hpp"
+    "extern/xtensor/xstrides.hpp"
+    "extern/xtensor/xtensor.hpp"
+    "extern/xtensor/xtensor_config.hpp"
+    "extern/xtensor/xtensor_forward.hpp"
+    "extern/xtensor/xtensor_simd.hpp"
+    "extern/xtensor/xutils.hpp"
+    "extern/xtensor/xvectorize.hpp"
+    "extern/xtensor/xview.hpp"
+    "extern/xtensor/xview_utils.hpp"
+    "extern/xtl/xany.hpp"
+    "extern/xtl/xbase64.hpp"
+    "extern/xtl/xbasic_fixed_string.hpp"
+    "extern/xtl/xclosure.hpp"
+    "extern/xtl/xcompare.hpp"
+    "extern/xtl/xcomplex.hpp"
+    "extern/xtl/xcomplex_sequence.hpp"
+    "extern/xtl/xdynamic_bitset.hpp"
+    "extern/xtl/xfunctional.hpp"
+    "extern/xtl/xhalf_float.hpp"
+    "extern/xtl/xhalf_float_impl.hpp"
+    "extern/xtl/xhash.hpp"
+    "extern/xtl/xhierarchy_generator.hpp"
+    "extern/xtl/xiterator_base.hpp"
+    "extern/xtl/xjson.hpp"
+    "extern/xtl/xmasked_value.hpp"
+    "extern/xtl/xmasked_value_meta.hpp"
+    "extern/xtl/xmeta_utils.hpp"
+    "extern/xtl/xmultimethods.hpp"
+    "extern/xtl/xoptional.hpp"
+    "extern/xtl/xoptional_meta.hpp"
+    "extern/xtl/xoptional_sequence.hpp"
+    "extern/xtl/xplatform.hpp"
+    "extern/xtl/xproxy_wrapper.hpp"
+    "extern/xtl/xsequence.hpp"
+    "extern/xtl/xspan.hpp"
+    "extern/xtl/xspan_impl.hpp"
+    "extern/xtl/xsystem.hpp"
+    "extern/xtl/xtl_config.hpp"
+    "extern/xtl/xtype_traits.hpp"
+    "extern/xtl/xvariant.hpp"
+    "extern/xtl/xvariant_impl.hpp"
+    "extern/xtl/xvisitor.hpp"
+)
+
 set(Header_Files
     "include/CircuitOptimizer.hpp"
     "include/dd/Complex.hpp"
@@ -98,7 +206,6 @@ set(Header_Files
     "include/dd/Definitions.hpp"
     "include/dd/Edge.hpp"
     "include/dd/Export.hpp"
-    "include/dd/GateMatrixDefinitions.hpp"
     "include/dd/GateXarray.hpp"
     "include/dd/Node.hpp"
     "include/dd/Tensor.hpp"
@@ -122,111 +229,6 @@ set(Header_Files
     "include/parsers/qasm_parser/Token.hpp"
     "include/Permutation.hpp"
     "include/QuantumComputation.hpp"
-    "include/xtensor/xaccessible.hpp"
-    "include/xtensor/xaccumulator.hpp"
-    "include/xtensor/xadapt.hpp"
-    "include/xtensor/xarray.hpp"
-    "include/xtensor/xassign.hpp"
-    "include/xtensor/xaxis_iterator.hpp"
-    "include/xtensor/xaxis_slice_iterator.hpp"
-    "include/xtensor/xblockwise_reducer.hpp"
-    "include/xtensor/xblockwise_reducer_functors.hpp"
-    "include/xtensor/xbroadcast.hpp"
-    "include/xtensor/xbuffer_adaptor.hpp"
-    "include/xtensor/xbuilder.hpp"
-    "include/xtensor/xchunked_array.hpp"
-    "include/xtensor/xchunked_assign.hpp"
-    "include/xtensor/xchunked_view.hpp"
-    "include/xtensor/xcomplex.hpp"
-    "include/xtensor/xcontainer.hpp"
-    "include/xtensor/xcsv.hpp"
-    "include/xtensor/xdynamic_view.hpp"
-    "include/xtensor/xeval.hpp"
-    "include/xtensor/xexception.hpp"
-    "include/xtensor/xexpression.hpp"
-    "include/xtensor/xexpression_holder.hpp"
-    "include/xtensor/xexpression_traits.hpp"
-    "include/xtensor/xfixed.hpp"
-    "include/xtensor/xfunction.hpp"
-    "include/xtensor/xfunctor_view.hpp"
-    "include/xtensor/xgenerator.hpp"
-    "include/xtensor/xhistogram.hpp"
-    "include/xtensor/xindex_view.hpp"
-    "include/xtensor/xinfo.hpp"
-    "include/xtensor/xio.hpp"
-    "include/xtensor/xiterable.hpp"
-    "include/xtensor/xiterator.hpp"
-    "include/xtensor/xjson.hpp"
-    "include/xtensor/xlayout.hpp"
-    "include/xtensor/xmanipulation.hpp"
-    "include/xtensor/xmasked_view.hpp"
-    "include/xtensor/xmath.hpp"
-    "include/xtensor/xmime.hpp"
-    "include/xtensor/xmultiindex_iterator.hpp"
-    "include/xtensor/xnoalias.hpp"
-    "include/xtensor/xnorm.hpp"
-    "include/xtensor/xnpy.hpp"
-    "include/xtensor/xoffset_view.hpp"
-    "include/xtensor/xoperation.hpp"
-    "include/xtensor/xoptional.hpp"
-    "include/xtensor/xoptional_assembly.hpp"
-    "include/xtensor/xoptional_assembly_base.hpp"
-    "include/xtensor/xoptional_assembly_storage.hpp"
-    "include/xtensor/xpad.hpp"
-    "include/xtensor/xrandom.hpp"
-    "include/xtensor/xreducer.hpp"
-    "include/xtensor/xrepeat.hpp"
-    "include/xtensor/xscalar.hpp"
-    "include/xtensor/xsemantic.hpp"
-    "include/xtensor/xset_operation.hpp"
-    "include/xtensor/xshape.hpp"
-    "include/xtensor/xslice.hpp"
-    "include/xtensor/xsort.hpp"
-    "include/xtensor/xstorage.hpp"
-    "include/xtensor/xstrided_view.hpp"
-    "include/xtensor/xstrided_view_base.hpp"
-    "include/xtensor/xstrides.hpp"
-    "include/xtensor/xtensor.hpp"
-    "include/xtensor/xtensor_config.hpp"
-    "include/xtensor/xtensor_forward.hpp"
-    "include/xtensor/xtensor_simd.hpp"
-    "include/xtensor/xutils.hpp"
-    "include/xtensor/xvectorize.hpp"
-    "include/xtensor/xview.hpp"
-    "include/xtensor/xview_utils.hpp"
-    "include/xtl/xany.hpp"
-    "include/xtl/xbase64.hpp"
-    "include/xtl/xbasic_fixed_string.hpp"
-    "include/xtl/xclosure.hpp"
-    "include/xtl/xcompare.hpp"
-    "include/xtl/xcomplex.hpp"
-    "include/xtl/xcomplex_sequence.hpp"
-    "include/xtl/xdynamic_bitset.hpp"
-    "include/xtl/xfunctional.hpp"
-    "include/xtl/xhalf_float.hpp"
-    "include/xtl/xhalf_float_impl.hpp"
-    "include/xtl/xhash.hpp"
-    "include/xtl/xhierarchy_generator.hpp"
-    "include/xtl/xiterator_base.hpp"
-    "include/xtl/xjson.hpp"
-    "include/xtl/xmasked_value.hpp"
-    "include/xtl/xmasked_value_meta.hpp"
-    "include/xtl/xmeta_utils.hpp"
-    "include/xtl/xmultimethods.hpp"
-    "include/xtl/xoptional.hpp"
-    "include/xtl/xoptional_meta.hpp"
-    "include/xtl/xoptional_sequence.hpp"
-    "include/xtl/xplatform.hpp"
-    "include/xtl/xproxy_wrapper.hpp"
-    "include/xtl/xsequence.hpp"
-    "include/xtl/xspan.hpp"
-    "include/xtl/xspan_impl.hpp"
-    "include/xtl/xsystem.hpp"
-    "include/xtl/xtl_config.hpp"
-    "include/xtl/xtype_traits.hpp"
-    "include/xtl/xvariant.hpp"
-    "include/xtl/xvariant_impl.hpp"
-    "include/xtl/xvisitor.hpp"
 )
 source_group("Header Files" FILES ${Header_Files})
 
@@ -260,29 +262,27 @@ set(ALL_FILES
     ${Header_Files}
     ${Source_Files}
 )
-# add_library(tdd SHARED ${ALL_FILES} "include/python-c.cpp")
-# target_include_directories(tdd PUBLIC ${PROJECT_SOURCE_DIR}/include)
-# target_link_libraries(tdd
-#     PRIVATE
-#     ${PROJECT_SOURCE_DIR}/build/libtdd.so
-# )
+add_library(XTENSOR SHARED ${XTENSOR_FILES} )
+set_target_properties(XTENSOR PROPERTIES LINKER_LANGUAGE CXX)
+target_include_directories(XTENSOR PUBLIC ${PROJECT_SOURCE_DIR}/extern)
+target_compile_features(XTENSOR PUBLIC cxx_auto_type)
+
+add_library(TDD SHARED ${ALL_FILES} )
+target_include_directories(TDD 
+    PUBLIC 
+    ${PROJECT_SOURCE_DIR}/include
+    )
+target_link_libraries(TDD PUBLIC XTENSOR)
+target_compile_features(TDD PUBLIC cxx_auto_type)
+
+
 ################################################################################
 # Target
 ################################################################################
-add_executable(${PROJECT_NAME} ${ALL_FILES} "main.cpp")
-
+add_executable(${PROJECT_NAME} "main.cpp")
+target_link_libraries(${PROJECT_NAME} PUBLIC XTENSOR TDD)
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_auto_type)
-target_link_directories(${PROJECT_NAME} 
-                        PUBLIC 
-                        ${PROJECT_SOURCE_DIR}/include
-                        ${PROJECT_SOURCE_DIR}/test
-)
-target_include_directories(${PROJECT_NAME}
-                            PUBLIC
-                            ${PROJECT_BINARY_DIR}
-                            ${PROJECT_SOURCE_DIR}/include
-                            ${PROJECT_SOURCE_DIR}/test
-)
+
 use_props(${PROJECT_NAME} "${CMAKE_CONFIGURATION_TYPES}" "${DEFAULT_CXX_PROPS}")
 set_target_properties(${PROJECT_NAME} PROPERTIES
     VS_GLOBAL_KEYWORD "Win32Proj"

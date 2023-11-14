@@ -1,19 +1,26 @@
-#pragma once
-#include "test.hpp"
+#include <map>
+#include <string>
+#include <iostream>
+#include <functional>
+#include <ctime>
+
+
+#include "../include/dd/Export.hpp"
+#include <xtensor/xio.hpp>
+#include <xtensor/xarray.hpp>
+#include "../include/Cir_tn.hpp"
 
 
 void tensor_2_tdd_cx_4();
 void tensor_2_tdd_cx_2();
 void tensor_hyper_index();
-namespace test{
-    void test_tdd_2_tensor() {
-        // std::cout << "test order of 4*4 CNOT" << std::endl;
-        // tensor_2_tdd_cx_4();
-        std::cout << "test order of 2*2*2*2 CNOT" << std::endl;
-        tensor_2_tdd_cx_2();
-        std::cout << "test hyper CNOT" << std::endl;
-        tensor_hyper_index();
-    }
+int main(){
+    std::cout << "test order of 4*4 CNOT" << std::endl;
+    tensor_2_tdd_cx_4();
+    std::cout << "test order of 2*2*2*2 CNOT" << std::endl;
+    tensor_2_tdd_cx_2();
+    std::cout << "test hyper CNOT" << std::endl;
+    tensor_hyper_index();
 }
 dd::ComplexValue one = { 1,0 };
 dd::ComplexValue zero = { 0,0 };

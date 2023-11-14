@@ -2,7 +2,6 @@
 #define OPERATIONS_HPP
 
 #include "../Definitions.hpp"
-#include "GateMatrixDefinitions.hpp"
 #include "Package.hpp"
 #include "../operations/ClassicControlledOperation.hpp"
 #include "../operations/CompoundOperation.hpp"

@@ -1,17 +1,26 @@
-#pragma once
+#include <map>
+#include <string>
+#include <iostream>
+#include <functional>
+#include <ctime>
 
-#include "test.hpp"
+
+#include "../include/dd/Export.hpp"
+#include <xtensor/xio.hpp>
+#include <xtensor/xarray.hpp>
+#include "../include/Cir_tn.hpp"
+
 void test_gate();
 void test_tn();
-namespace test {
-	void test_TensorNetwork_cont() {
-		std::cout << "test gate to tensor" << std::endl;
-		test_gate();
-		std::cout << "-------------------" << std::endl;
-		std::cout << "test circuit to tn" << std::endl;
-		test_tn();
-	}
+
+int main(){
+	std::cout << "test gate to tensor" << std::endl;
+	test_gate();
+	std::cout << "-------------------" << std::endl;
+	std::cout << "test circuit to tn" << std::endl;
+	test_tn();
 }
+
 void test_gate() {
 	dd::Tensor ts = gate_2_tensor("x", { {"x",0},{"y",1} });
 	std::cout << "tensor xarray:" << std::endl << ts.data << std::endl;
