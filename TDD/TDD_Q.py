@@ -113,7 +113,7 @@ def cir_2_tn(cir,input_s=[],output_s=[]):
                 qubits_index[k]+=1
         if nam=='ccx':
 #             print(U)
-            U=np.array([[1,0,0,0,0,0,0,0],[0,1,0,0,0,0,0,0],[0,0,1,0,0,0,0,0],[0,0,0,1,0,0,0,0],[0,0,0,0,1,0,0,0],[0,0,0,0,0,1,0,0],[0,0,0,0,0,0,0,1],[0,0,0,0,0,0,1,0]])
+            U=np.array([[1,0,0,0,0,0,0,0],[0,1,0,0,0,0,0,0],[0,0,1,0,0,0,0,0],[0,0,0,1,0,0,0,0],[0,0,0,0,1,0,0,0],[0,0,0,0,0,1,0,0],[0,0,0,0,0,0,0,1],[0,0,0,0,0,0,1,0]],dtype=complex)
         if len(q)>1:
             U=reshape(U)
         ts.data=U
@@ -144,8 +144,8 @@ def cir_2_tn(cir,input_s=[],output_s=[]):
 #     print(3)
 #     print(time.time()-t)
     if output_s:
-        U0=np.array([1,0])
-        U1=np.array([0,1])
+        U0=np.array([1,0],dtype=complex)
+        U1=np.array([0,1],dtype=complex)
         for k in range(qubits_num):
             if input_s[k]==0:
                 ts=Tensor(U0,[Index('y'+str(k))],'out',[k])

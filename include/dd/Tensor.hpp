@@ -45,6 +45,8 @@ namespace dd {
 		TDD to_tdd(std::unique_ptr<Package<>>& ddpackage) {
 			
 			if (this->data.dimension() != this->index_set.size()) {
+				std::cerr << "dim: " << this->data.dimension() << std::endl;
+				std::cerr << "index: " << this->index_set.size() << std::endl;
 				throw std::runtime_error("action non definies "+ this->name);
 			}
 
@@ -94,7 +96,13 @@ namespace dd {
 			for (int i = 1; i < this->tensors.size(); ++i) {
 				std::cout << "-------------------------" <<std::endl;
 				std::cout << i+1 << "th" <<"/" << this->tensors.size() << " tdd:" << std::endl;
-				dd_temp = ddpackage->cont(dd_temp, tensors[i].to_tdd(ddpackage));
+				try{
+					dd_temp = ddpackage->cont(dd_temp, tensors[i].to_tdd(ddpackage));
+				}
+				catch(...){
+					std::exception_ptr p = std::current_exception();
+					std::clog <<(p ? p.__cxa_exception_type()->name() : "null") << std::endl;
+				}
 			}
 			return dd_temp;
         };
