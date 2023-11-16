@@ -613,7 +613,7 @@ dd::TensorNetwork cir_2_tn(std::string path, std::string  file_name, std::unique
 			dd::TensorNetwork tn;
 
 			for (int k = 0; k < cir.gates_num; k++) {
-				tn.tensors.push_back(gate_2_tensor(cir.gate_set[k].name, Index_set[k]));
+				tn.add_ts(gate_2_tensor(cir.gate_set[k].name, Index_set[k]));
 			}
 
 			std::cout << "Done!!!" << std::endl;

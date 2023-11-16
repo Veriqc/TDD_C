@@ -30,66 +30,71 @@ namespace dd {
 		return order;
 	}
 
-    struct Tensor {
+    class Tensor {
+		private:
+			xt::xarray<ComplexValue> data;
 
-        xt::xarray<ComplexValue> data;
+			std::vector<Index> index_set;
 
-        std::vector<Index> index_set;
-
-        std::string name;
-
-        Tensor(const xt::xarray<ComplexValue>& data_ = xt::xarray<ComplexValue>(),
-           const std::vector<Index>& index_set_ = std::vector<Index>(),
-           const std::string& name_ = "") : data(data_), index_set(index_set_), name(name_) {}
-        
-		TDD to_tdd(std::unique_ptr<Package<>>& ddpackage) {
+			std::string name;
+		public:
+			Tensor(const xt::xarray<ComplexValue>& data_ = xt::xarray<ComplexValue>(),
+			const std::vector<Index>& index_set_ = std::vector<Index>(),
+			const std::string& name_ = "") : data(data_), index_set(index_set_), name(name_) {}
 			
-			if (this->data.dimension() != this->index_set.size()) {
-				std::cerr << "dim: " << this->data.dimension() << std::endl;
-				std::cerr << "index: " << this->index_set.size() << std::endl;
-				throw std::runtime_error("action non definies "+ this->name);
-			}
-
-			std::vector<int> order;
-			for(const auto index: this->index_set){
-				auto it = ddpackage->varOrder.find(index.key);
-				if (it == ddpackage->varOrder.end()) {
-					int num = ddpackage->update_map_value();
-					ddpackage->varOrder[index.key] = num;
+			TDD to_tdd(std::unique_ptr<Package<>>& ddpackage) {
+				
+				if (this->data.dimension() != this->index_set.size()) {
+					std::cerr << "dim: " << this->data.dimension() << std::endl;
+					std::cerr << "index: " << this->index_set.size() << std::endl;
+					throw std::runtime_error("action non definies "+ this->name);
 				}
-				order.push_back(ddpackage->varOrder[index.key]);
-			}
-			order = reOrder(order);
 
-			TDD res;
-			res.e = ddpackage->xarray_2_edge(data, order);
+				std::vector<int> order;
+				for(const auto index: this->index_set){
+					auto it = ddpackage->varOrder.find(index.key);
+					if (it == ddpackage->varOrder.end()) {
+						int num = ddpackage->update_map_value();
+						ddpackage->varOrder[index.key] = num;
+					}
+					order.push_back(ddpackage->varOrder[index.key]);
+				}
+				order = reOrder(order);
+
+				TDD res;
+				res.e = ddpackage->xarray_2_edge(data, order);
+				
+				std::vector<Index> temp_index_set = this->index_set;
+				std::sort(temp_index_set.begin(),
+					temp_index_set.end(),
+					[&](const auto& a, const auto& b) {return ddpackage->varOrder[a.key] < ddpackage->varOrder[b.key]; }
+				);
 			
-			std::vector<Index> temp_index_set = this->index_set;
-			std::sort(temp_index_set.begin(),
-				temp_index_set.end(),
-				[&](const auto& a, const auto& b) {return ddpackage->varOrder[a.key] < ddpackage->varOrder[b.key]; }
-			);
-		
-			res.key_2_index = {};
-			for(const auto index: temp_index_set){
-				res.key_2_index.push_back(index.key);
+				res.key_2_index = {};
+				for(const auto index: temp_index_set){
+					res.key_2_index.push_back(index.key);
+				}
+
+				res.index_set = temp_index_set;
+
+				return res;
 			}
-
-			res.index_set = temp_index_set;
-
-			return res;
-        }
     };
 
-    struct TensorNetwork {
-        std::vector<Tensor> tensors;
-        void infor() {
-            std::cout << "Je suis un TensorNetwork." << std::endl;
-            std::cout << "et j'ai " << this->tensors.size() << " tenseur" << std::endl;
-        }
+    class TensorNetwork {
+		private:
+			std::vector<Tensor> tensors;
+		public:
+			void add_ts(Tensor ts){
+				this->tensors.push_back(ts);
+			}
+			void infor() {
+				std::cout << "Je suis un TensorNetwork." << std::endl;
+				std::cout << "et j'ai " << this->tensors.size() << " tenseur" << std::endl;
+			}
 
-        TDD cont(std::unique_ptr<Package<>>& ddpackage) {
-			if (this->tensors.size() == 0) {
+			TDD cont(std::unique_ptr<Package<>>& ddpackage) {
+				if (this->tensors.size() == 0) {
 				throw std::runtime_error("null tensor network");
 			}
 			TDD dd_temp = tensors[0].to_tdd(ddpackage);

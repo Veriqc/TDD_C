@@ -87,8 +87,10 @@ set(PROJECT_NAME tdd_main)
 ################################################################################
 add_subdirectory(${PROJECT_SOURCE_DIR}/extern/xtl)
 add_subdirectory(${PROJECT_SOURCE_DIR}/extern/xtensor)
+add_subdirectory(${PROJECT_SOURCE_DIR}/extern/xtensor-python)
 set(XTENSOR_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/extern/xtensor/include)
 set(XTL_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/extern/xtl/include)
+set(XPY_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/extern/xtensor-python/include)
 set(Header_Files
     "include/CircuitOptimizer.hpp"
     "include/dd/Complex.hpp"
@@ -166,6 +168,7 @@ target_compile_features(TDD_C PUBLIC cxx_auto_type)
 add_subdirectory(extern/pybind11)
 pybind11_add_module(TDD "include/python-c.cpp")
 target_link_libraries(TDD PUBLIC TDD_C)
+target_include_directories(TDD PUBLIC ${XPY_INCLUDE_DIR} "/home/gaodc/.local/lib/python3.10/site-packages/numpy/core/include")
 
 
 add_executable(${PROJECT_NAME} "main.cpp")

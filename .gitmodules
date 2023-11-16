@@ -8,3 +8,6 @@
 [submodule "extern/xtl"]
 	path = extern/xtl
 	url = https://github.com/xtensor-stack/xtl.git
+[submodule "extern/xtensor-python"]
+	path = extern/xtensor-python
+	url = https://github.com/xtensor-stack/xtensor-python.git

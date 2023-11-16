@@ -1,28 +1,31 @@
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+#include "dd/Tdd.hpp"
+#include "dd/Tensor.hpp"
 #include "Cir_tn.hpp"
+#include <xtensor/xarray.hpp>
+#include <xtensor-python/pyarray.hpp>
+class xarrayClass {
+    private:
+    xt::xarray<double> data;
+    std::vector<xt::xarray<double>> datas;
+    public:
+        xarrayClass(const xt::xarray<double>& data_,const std::vector<xt::xarray<double>>& datas_ = {}):
+        data(data_), datas(datas_){}
 
-class Vector2D {
-public:
-    Vector2D(double x, double y) : x(x), y(y) {}
-
-    double x, y; // For simplicity, let's make these public
-
-    double add(){
-        return this->x+this->y ;
-    }
-
-    Vector2D reverse(){
-        return Vector2D(this->y, this->x);
-    }
-
-    void info(){
-        std::cout<< "x:" << x << " y:" << y  << std::endl;
-    }
+        void add(xt::xarray<double> array){
+            this->datas.push_back(array);
+        }
+        void infor(){
+            std::cout << "data: " << this->data << std::endl;
+            std::cout << "datas: "<< std::endl;
+            for(auto array: this->datas){
+                std::cout << array << std::endl;
+            }
+            
+        }
 };
 
-Vector2D add_vectors(const Vector2D& v1, const Vector2D& v2) {
-    return Vector2D(v1.x + v2.x, v1.y + v2.y);
-}
 
 int add(int i, int j) {
     return i + j;
@@ -36,14 +39,17 @@ PYBIND11_MODULE(TDD, m) {
     m.def("add", &add, "A function which adds two numbers");
 
     // m.def("Cir_2_tn", &cir_2_tn, "A function which convert qasm to tensornetwork");
-    py::class_<Vector2D>(m, "Vector2D")
-    .def(py::init<double, double>())
-    .def_readwrite("x", &Vector2D::x)
-    .def_readwrite("y", &Vector2D::y)
-    .def("add",&Vector2D::add)
-    .def("re",&Vector2D::reverse)
-    .def("infor",&Vector2D::info);
+    py::class_<xarrayClass>(m, "xarrayClass")
+        .def(py::init<const xt::xarray<double>&, const std::vector<xt::xarray<double>>&>())
+        .def("add", &xarrayClass::add)
+        .def("infor", &xarrayClass::infor);
 
-    m.def("add_vectors", &add_vectors);
+
+
+    // py::class_<dd::TensorNetwork>(m, "Tensor")
+    // .def(py::init<>())
+    // .def("add",&Vector2D::add)
+    // .def("re",&Vector2D::reverse)
+    // .def("infor",&Vector2D::info);
 
 }

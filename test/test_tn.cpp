@@ -23,7 +23,7 @@ int main(){
 
 void test_gate() {
 	dd::Tensor ts = gate_2_tensor("x", { {"x",0},{"y",1} });
-	std::cout << "tensor xarray:" << std::endl << ts.data << std::endl;
+	// std::cout << "tensor xarray:" << std::endl << ts.data << std::endl;
 }
 
 void test_tn() {

@@ -160,7 +160,7 @@ int main(int argc, char** argv){
     std::getline(tensorsfile, line);
     while (std::getline(tensorsfile, line)) {
         dd::Tensor ts = string_2_tensor(line);
-        tn.tensors.push_back(ts);
+        tn.add_ts(ts);
     }
     tn.infor();
     
