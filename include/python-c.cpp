@@ -32,7 +32,7 @@ int add(int i, int j) {
 }
 
 namespace py = pybind11;
-void bindclasstest(py::module& m){
+void BindArray(py::module& m){
     py::class_<xarrayClass>(m, "xarrayClass")
         .def(py::init<const xt::xarray<double>&, const std::vector<xt::xarray<double>>&>())
         .def("add", &xarrayClass::add)
@@ -40,10 +40,18 @@ void bindclasstest(py::module& m){
 
 }
 
+void BindComplex(py::module& m){
+    py::class_<dd::ComplexValue>(m, "ComplexValue")
+        .def(py::init<>())  // Default constructor
+        .def(py::init<double, double>())  // Constructor with parameters
+        .def_readwrite("r", &dd::ComplexValue::r)  // Expose member r
+        .def_readwrite("i", &dd::ComplexValue::i); // Expose member i
+}
 PYBIND11_MODULE(TDD, m) {
     m.doc() = "pybind11 example plugin"; // optional module docstring
 
     m.def("add", &add, "A function which adds two numbers");
 
-    bindclasstest(m);
+    BindArray(m);
+    BindComplex(m);
 }
