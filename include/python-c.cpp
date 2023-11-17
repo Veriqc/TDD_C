@@ -32,24 +32,18 @@ int add(int i, int j) {
 }
 
 namespace py = pybind11;
+void bindclasstest(py::module& m){
+    py::class_<xarrayClass>(m, "xarrayClass")
+        .def(py::init<const xt::xarray<double>&, const std::vector<xt::xarray<double>>&>())
+        .def("add", &xarrayClass::add)
+        .def("infor", &xarrayClass::infor);
+
+}
 
 PYBIND11_MODULE(TDD, m) {
     m.doc() = "pybind11 example plugin"; // optional module docstring
 
     m.def("add", &add, "A function which adds two numbers");
 
-    // m.def("Cir_2_tn", &cir_2_tn, "A function which convert qasm to tensornetwork");
-    py::class_<xarrayClass>(m, "xarrayClass")
-        .def(py::init<const xt::xarray<double>&, const std::vector<xt::xarray<double>>&>())
-        .def("add", &xarrayClass::add)
-        .def("infor", &xarrayClass::infor);
-
-
-
-    // py::class_<dd::TensorNetwork>(m, "Tensor")
-    // .def(py::init<>())
-    // .def("add",&Vector2D::add)
-    // .def("re",&Vector2D::reverse)
-    // .def("infor",&Vector2D::info);
-
+    bindclasstest(m);
 }
