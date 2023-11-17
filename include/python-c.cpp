@@ -3,6 +3,7 @@
 #include "dd/Tdd.hpp"
 #include "dd/Tensor.hpp"
 #include "Cir_tn.hpp"
+#include "dd/Tdd.hpp"
 #include <xtensor/xarray.hpp>
 #include <xtensor-python/pyarray.hpp>
 class xarrayClass {
@@ -47,6 +48,14 @@ void BindComplex(py::module& m){
         .def_readwrite("r", &dd::ComplexValue::r)  // Expose member r
         .def_readwrite("i", &dd::ComplexValue::i); // Expose member i
 }
+
+void BindIndex(py::module& m){
+    py::class_<dd::Index>(m, "Index")
+        .def(py::init<>())  // Default constructor
+        .def(py::init<const std::string, const short>())  // Constructor with parameters
+        .def_readwrite("key", &dd::Index::key)  // Expose member r
+        .def_readwrite("idx", &dd::Index::idx); // Expose member i
+}
 PYBIND11_MODULE(TDD, m) {
     m.doc() = "pybind11 example plugin"; // optional module docstring
 
@@ -54,4 +63,5 @@ PYBIND11_MODULE(TDD, m) {
 
     BindArray(m);
     BindComplex(m);
+    BindIndex(m);
 }
