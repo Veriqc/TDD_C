@@ -7,16 +7,34 @@
 #include "dd/Tdd.hpp"
 #include <xtensor/xarray.hpp>
 #include <xtensor-python/pyarray.hpp>
+dd::ComplexValue Complex_Convert(const std::complex<double>& num){
+    return dd::ComplexValue(num.real(),num.imag());
+}
+
+xt::xarray<dd::ComplexValue> xarray_convert(const xt::xarray<std::complex<double>>& data){
+    xt::xarray<dd::ComplexValue> convertedArray(data.shape());
+    int index = 0;
+    for(auto& num: data){
+        convertedArray[index++] = Complex_Convert(num);
+    }
+    return convertedArray;
+}
 class xarrayClass {
     private:
-    xt::xarray<std::complex<double>> data;
-    std::vector<xt::xarray<std::complex<double>>> datas;
+    xt::xarray<dd::ComplexValue> data;
+    std::vector<xt::xarray<dd::ComplexValue>> datas;
+
     public:
-        xarrayClass(const xt::xarray<std::complex<double>>& data_,const std::vector<xt::xarray<std::complex<double>>>& datas_ = {}):
-        data(data_), datas(datas_){}
+        xarrayClass(const xt::xarray<std::complex<double>>& data_,const std::vector<xt::xarray<std::complex<double>>>& datas_ = {}): data(xarray_convert(data_)), datas() {
+            for(auto array: datas_){
+                this->datas.push_back(xarray_convert(array));
+            }
+        }
+
+        xarrayClass(const xt::xarray<dd::ComplexValue>& data_,const  std::vector<xt::xarray<dd::ComplexValue>>& datas_ = {}): data(data_), datas(datas_) {}
 
         void add(xt::xarray<std::complex<double>> array){
-            this->datas.push_back(array);
+            this->datas.push_back(xarray_convert(array));
         }
         void infor(){
             std::cout << "data: " << this->data << std::endl;
