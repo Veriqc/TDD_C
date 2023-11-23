@@ -92,7 +92,6 @@ set(XTENSOR_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/extern/xtensor/include)
 set(XTL_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/extern/xtl/include)
 set(XPY_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/extern/xtensor-python/include)
 set(Header_Files
-    # "include/CircuitOptimizer.hpp"
     "include/dd/Complex.hpp"
     "include/dd/ComplexCache.hpp"
     "include/dd/ComplexNumbers.hpp"
@@ -107,7 +106,6 @@ set(Header_Files
     "include/dd/GateXarray.hpp"
     "include/dd/Node.hpp"
     "include/dd/Tensor.hpp"
-    # "include/dd/Operations.hpp"
     "include/dd/Package.hpp"
     "include/dd/Package_fwd.hpp"
     "include/dd/Tdd.hpp"
@@ -125,7 +123,7 @@ set(Header_Files
     # "include/parsers/qasm_parser/Parser.hpp"
     # "include/parsers/qasm_parser/Scanner.hpp"
     # "include/parsers/qasm_parser/Token.hpp"
-    "include/Permutation.hpp"
+    # "include/Permutation.hpp"
     # "include/QuantumComputation.hpp"
 )
 source_group("Header Files" FILES ${Header_Files})
