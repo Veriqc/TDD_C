@@ -40,6 +40,17 @@ int add(int i, int j) {
     return i + j;
 }
 
+class PackageWrapper {
+public:
+    PackageWrapper(int n) : pkg(std::make_unique<dd::Package<>>(n)) {}
+
+    // Any other necessary methods
+
+private:
+    std::unique_ptr<dd::Package<>> pkg;
+};
+
+
 namespace py = pybind11;
 void BindArray(py::module& m){
     py::class_<xarrayClass>(m, "xarrayClass")
@@ -49,9 +60,48 @@ void BindArray(py::module& m){
 
 }
 
+void BindmNode(py::module& m){
+    py::class_<dd::mNode>(m, "mNode")
+        .def(py::init<>()) // Default constructor
+        .def_readwrite("e", &dd::mNode::e)
+        .def_readwrite("next", &dd::mNode::next)
+        .def_readwrite("ref", &dd::mNode::ref)
+        .def_readwrite("v", &dd::mNode::v)
+        .def_readwrite("flags", &dd::mNode::flags)
+        .def_static("isTerminal", &dd::mNode::isTerminal)
+        .def_static("getTerminal", &dd::mNode::getTerminal);
+}
+
+void BindmEdge(py::module& m){
+    py::class_<dd::Edge<dd::mNode>>(m, "mEdge")
+        .def(py::init<>()) // Default constructor
+        .def_readwrite("p", &dd::Edge<dd::mNode>::p)
+        .def_readwrite("w", &dd::Edge<dd::mNode>::w);
+}
+
+void BindTDD(py::module& m){
+    py::class_<dd::TDD>(m,"tdd")
+        .def(py::init<>())
+        .def_readwrite("e", &dd::TDD::e)
+        .def_readwrite("index_set", &dd::TDD::index_set)
+        .def_readwrite("key_2_index",&dd::TDD::key_2_index);
+}
+
+void BindPackage(py::module& m){
+    py::class_<dd::Package<>>(m, "ddpackage")
+        .def(py::init<int>())
+        .def_readwrite("order",&dd::Package<>::varOrder);
+    m.def("ddtable", [](int n) {
+        auto pkg = std::make_unique<dd::Package<>>(n);
+        return pkg.release();
+    }, py::return_value_policy::take_ownership);
+}
+
 void BindTensor(py::module& m){
     py::class_<dd::Tensor>(m, "Tensor")
-        .def(py::init<const xt::xarray<std::complex<double>>&, const std::vector<dd::Index>& , const std::string&>());
+        .def(py::init<const xt::xarray<std::complex<double>>&, const std::vector<dd::Index>& , const std::string&>())
+        // .def("to_tdd",&dd::Tensor::to_tdd)
+        ;
 }
 
 void BindTn(py::module& m){
@@ -85,6 +135,14 @@ PYBIND11_MODULE(TDD, m) {
     BindComplex(m);
     BindIndex(m);
     BindArray(m);
+    
+
+    BindmNode(m);
+    BindmEdge(m);
+
+    BindPackage(m);
+    BindTDD(m);
+
     BindTensor(m);
     BindTn(m);
 }
