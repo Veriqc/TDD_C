@@ -52,7 +52,13 @@ void BindArray(py::module& m){
 void BindTensor(py::module& m){
     py::class_<dd::Tensor>(m, "Tensor")
         .def(py::init<const xt::xarray<std::complex<double>>&, const std::vector<dd::Index>& , const std::string&>());
+}
 
+void BindTn(py::module& m){
+    py::class_<dd::TensorNetwork>(m, "Tn")
+        .def(py::init<const std::vector<dd::Tensor>&>())
+        .def("infor", &dd::TensorNetwork::infor)
+        .def("add",&dd::TensorNetwork::add_ts);
 }
 
 void BindComplex(py::module& m){
@@ -80,4 +86,5 @@ PYBIND11_MODULE(TDD, m) {
     BindIndex(m);
     BindArray(m);
     BindTensor(m);
+    BindTn(m);
 }

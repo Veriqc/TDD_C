@@ -103,6 +103,7 @@ namespace dd {
 		private:
 			std::vector<Tensor> tensors;
 		public:
+			TensorNetwork(std::vector<Tensor> tensors_={}): tensors(tensors_) {}
 			void add_ts(Tensor ts){
 				this->tensors.push_back(ts);
 			}
