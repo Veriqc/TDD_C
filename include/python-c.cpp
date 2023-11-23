@@ -99,9 +99,13 @@ void BindPackage(py::module& m){
 
 void BindTensor(py::module& m){
     py::class_<dd::Tensor>(m, "Tensor")
-        .def(py::init<const xt::xarray<std::complex<double>>&, const std::vector<dd::Index>& , const std::string&>())
-        // .def("to_tdd",&dd::Tensor::to_tdd)
-        ;
+        .def(py::init<const xt::xarray<std::complex<double>>&,
+                        const std::vector<dd::Index>&,
+                        const std::string&>())
+        .def("to_tdd", [](dd::Tensor &tensor, dd::Package<> *package) {
+        std::unique_ptr<dd::Package<>> ptr(package);
+        tensor.to_tdd(ptr);
+        });
 }
 
 void BindTn(py::module& m){
