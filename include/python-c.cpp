@@ -7,18 +7,7 @@
 #include "dd/Tdd.hpp"
 #include <xtensor/xarray.hpp>
 #include <xtensor-python/pyarray.hpp>
-dd::ComplexValue Complex_Convert(const std::complex<double>& num){
-    return dd::ComplexValue(num.real(),num.imag());
-}
 
-xt::xarray<dd::ComplexValue> xarray_convert(const xt::xarray<std::complex<double>>& data){
-    xt::xarray<dd::ComplexValue> convertedArray(data.shape());
-    int index = 0;
-    for(auto& num: data){
-        convertedArray[index++] = Complex_Convert(num);
-    }
-    return convertedArray;
-}
 class xarrayClass {
     private:
     xt::xarray<dd::ComplexValue> data;
@@ -60,6 +49,12 @@ void BindArray(py::module& m){
 
 }
 
+void BindTensor(py::module& m){
+    py::class_<dd::Tensor>(m, "Tensor")
+        .def(py::init<const xt::xarray<std::complex<double>>&, const std::vector<dd::Index>& , const std::string&>());
+
+}
+
 void BindComplex(py::module& m){
     py::class_<dd::ComplexValue>(m, "ComplexValue")
         .def(py::init<>())  // Default constructor
@@ -84,4 +79,5 @@ PYBIND11_MODULE(TDD, m) {
     BindComplex(m);
     BindIndex(m);
     BindArray(m);
+    BindTensor(m);
 }

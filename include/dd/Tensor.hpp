@@ -3,10 +3,25 @@
 
 #include <xtensor/xarray.hpp>
 #include <xtensor/xtensor.hpp>
+#include <complex>
 #include "Tdd.hpp"
 #include "Package.hpp"
 #include <iostream>
 #include <stdexcept>
+
+
+dd::ComplexValue Complex_Convert(const std::complex<double>& num){
+    return dd::ComplexValue(num.real(),num.imag());
+}
+
+xt::xarray<dd::ComplexValue> xarray_convert(const xt::xarray<std::complex<double>>& data){
+    xt::xarray<dd::ComplexValue> convertedArray(data.shape());
+    int index = 0;
+    for(auto& num: data){
+        convertedArray[index++] = Complex_Convert(num);
+    }
+    return convertedArray;
+}
 
 namespace dd {
 	std::vector<int> reOrder(const std::vector<int>& index_set) {
@@ -38,10 +53,13 @@ namespace dd {
 
 			std::string name;
 		public:
-			Tensor(const xt::xarray<ComplexValue>& data_ = xt::xarray<ComplexValue>(),
+			Tensor(const xt::xarray<ComplexValue>& data_ ,
 			const std::vector<Index>& index_set_ = std::vector<Index>(),
 			const std::string& name_ = "") : data(data_), index_set(index_set_), name(name_) {}
-			
+
+			Tensor(const xt::xarray<std::complex<double>>& data_ ,
+			const std::vector<Index>& index_set_ = std::vector<Index>(),
+			const std::string& name_ = "") : data(xarray_convert(data_)), index_set(index_set_), name(name_) {}
 			TDD to_tdd(std::unique_ptr<Package<>>& ddpackage) {
 				
 				if (this->data.dimension() != this->index_set.size()) {

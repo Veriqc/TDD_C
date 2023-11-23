@@ -111,41 +111,13 @@ set(Header_Files
     "include/dd/Tdd.hpp"
     "include/dd/UniqueTable.hpp"
     "include/Definitions.hpp"
-    # "include/operations/ClassicControlledOperation.hpp"
-    # "include/operations/CompoundOperation.hpp"
     "include/operations/Control.hpp"
-    # "include/operations/Expression.hpp"
-    # "include/operations/NonUnitaryOperation.hpp"
-    # "include/operations/Operation.hpp"
-    # "include/operations/OpType.hpp"
-    # "include/operations/StandardOperation.hpp"
-    # "include/operations/SymbolicOperation.hpp"
-    # "include/parsers/qasm_parser/Parser.hpp"
-    # "include/parsers/qasm_parser/Scanner.hpp"
-    # "include/parsers/qasm_parser/Token.hpp"
-    # "include/Permutation.hpp"
-    # "include/QuantumComputation.hpp"
 )
 source_group("Header Files" FILES ${Header_Files})
 
 set(Source_Files
-    # "include/CircuitOptimizer.cpp"
     "include/dd/Edge.cpp"
     "include/dd/Node.cpp"
-    # "include/dd/Operations.cpp"
-    # "include/operations/Expression.cpp"
-    # "include/operations/NonUnitaryOperation.cpp"
-    # "include/operations/Operation.cpp"
-    # "include/operations/StandardOperation.cpp"
-    # "include/operations/SymbolicOperation.cpp"
-    # "include/parsers/GRCSParser.cpp"
-    # "include/parsers/qasm_parser/Parser.cpp"
-    # "include/parsers/qasm_parser/Scanner.cpp"
-    # "include/parsers/QASMParser.cpp"
-    # "include/parsers/QCParser.cpp"
-    # "include/parsers/RealParser.cpp"
-    # "include/parsers/TFCParser.cpp"
-    # "include/QuantumComputation.cpp"
 )
 
 source_group("Source Files" FILES ${Source_Files} )
