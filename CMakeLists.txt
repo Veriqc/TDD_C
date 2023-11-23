@@ -92,7 +92,7 @@ set(XTENSOR_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/extern/xtensor/include)
 set(XTL_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/extern/xtl/include)
 set(XPY_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/extern/xtensor-python/include)
 set(Header_Files
-    "include/CircuitOptimizer.hpp"
+    # "include/CircuitOptimizer.hpp"
     "include/dd/Complex.hpp"
     "include/dd/ComplexCache.hpp"
     "include/dd/ComplexNumbers.hpp"
@@ -107,47 +107,47 @@ set(Header_Files
     "include/dd/GateXarray.hpp"
     "include/dd/Node.hpp"
     "include/dd/Tensor.hpp"
-    "include/dd/Operations.hpp"
+    # "include/dd/Operations.hpp"
     "include/dd/Package.hpp"
     "include/dd/Package_fwd.hpp"
     "include/dd/Tdd.hpp"
     "include/dd/UniqueTable.hpp"
     "include/Definitions.hpp"
-    "include/operations/ClassicControlledOperation.hpp"
-    "include/operations/CompoundOperation.hpp"
+    # "include/operations/ClassicControlledOperation.hpp"
+    # "include/operations/CompoundOperation.hpp"
     "include/operations/Control.hpp"
-    "include/operations/Expression.hpp"
-    "include/operations/NonUnitaryOperation.hpp"
-    "include/operations/Operation.hpp"
-    "include/operations/OpType.hpp"
-    "include/operations/StandardOperation.hpp"
-    "include/operations/SymbolicOperation.hpp"
-    "include/parsers/qasm_parser/Parser.hpp"
-    "include/parsers/qasm_parser/Scanner.hpp"
-    "include/parsers/qasm_parser/Token.hpp"
+    # "include/operations/Expression.hpp"
+    # "include/operations/NonUnitaryOperation.hpp"
+    # "include/operations/Operation.hpp"
+    # "include/operations/OpType.hpp"
+    # "include/operations/StandardOperation.hpp"
+    # "include/operations/SymbolicOperation.hpp"
+    # "include/parsers/qasm_parser/Parser.hpp"
+    # "include/parsers/qasm_parser/Scanner.hpp"
+    # "include/parsers/qasm_parser/Token.hpp"
     "include/Permutation.hpp"
-    "include/QuantumComputation.hpp"
+    # "include/QuantumComputation.hpp"
 )
 source_group("Header Files" FILES ${Header_Files})
 
 set(Source_Files
-    "include/CircuitOptimizer.cpp"
+    # "include/CircuitOptimizer.cpp"
     "include/dd/Edge.cpp"
     "include/dd/Node.cpp"
-    "include/dd/Operations.cpp"
-    "include/operations/Expression.cpp"
-    "include/operations/NonUnitaryOperation.cpp"
-    "include/operations/Operation.cpp"
-    "include/operations/StandardOperation.cpp"
-    "include/operations/SymbolicOperation.cpp"
-    "include/parsers/GRCSParser.cpp"
-    "include/parsers/qasm_parser/Parser.cpp"
-    "include/parsers/qasm_parser/Scanner.cpp"
-    "include/parsers/QASMParser.cpp"
-    "include/parsers/QCParser.cpp"
-    "include/parsers/RealParser.cpp"
-    "include/parsers/TFCParser.cpp"
-    "include/QuantumComputation.cpp"
+    # "include/dd/Operations.cpp"
+    # "include/operations/Expression.cpp"
+    # "include/operations/NonUnitaryOperation.cpp"
+    # "include/operations/Operation.cpp"
+    # "include/operations/StandardOperation.cpp"
+    # "include/operations/SymbolicOperation.cpp"
+    # "include/parsers/GRCSParser.cpp"
+    # "include/parsers/qasm_parser/Parser.cpp"
+    # "include/parsers/qasm_parser/Scanner.cpp"
+    # "include/parsers/QASMParser.cpp"
+    # "include/parsers/QCParser.cpp"
+    # "include/parsers/RealParser.cpp"
+    # "include/parsers/TFCParser.cpp"
+    # "include/QuantumComputation.cpp"
 )
 
 source_group("Source Files" FILES ${Source_Files} )
@@ -169,7 +169,7 @@ add_subdirectory(extern/pybind11)
 pybind11_add_module(TDD "include/python-c.cpp")
 target_link_libraries(TDD PUBLIC TDD_C)
 target_include_directories(TDD PUBLIC ${XPY_INCLUDE_DIR} "/home/gaodc/.local/lib/python3.10/site-packages/numpy/core/include")
-
+# TODO: make this location more flexable
 
 add_executable(${PROJECT_NAME} "main.cpp")
 target_link_libraries(${PROJECT_NAME} PUBLIC TDD_C)
