@@ -8,11 +8,6 @@
 #include "dd/Export.hpp"
 #include <xtensor/xarray.hpp>
 #include <xtensor-python/pyarray.hpp>
-void draw(const dd::TDD tdd, const std::string& outputFilename, bool colored = true,
-			bool edgeLabels = false, bool classic = false, bool memory = false,
-			bool show = true, bool formatAsPolar = true){
-                dd::export2Dot(tdd.e, outputFilename,colored,edgeLabels,classic,memory,show,formatAsPolar);
-            }
 
 namespace py = pybind11;
 void BindmNode(py::module& m){
@@ -87,15 +82,27 @@ void BindIndex(py::module& m){
 }
 
 void Binddraw(py::module& m){
-    m.def("draw", &draw, 
-          py::arg("tdd"), 
-          py::arg("outputFilename"), 
-          py::arg("colored") = true, 
-          py::arg("edgeLabels") = false, 
-          py::arg("classic") = false, 
-          py::arg("memory") = false, 
-          py::arg("show") = true, 
-          py::arg("formatAsPolar") = true);
+    m.def("draw", [](const dd::mEdge& basic,
+                     const std::string& outputFilename,
+                     bool colored, bool edgeLabels,
+                     bool classic, bool memory,
+                     bool show, bool formatAsPolar) {
+            try{
+                dd::export2Dot(basic, outputFilename, colored, edgeLabels, classic, memory, show, formatAsPolar);
+            } catch (const std::exception& e){
+                std::cerr << "Exception caught: " << e.what() << std::endl;
+                throw;
+            }
+        }, 
+        py::arg("basic"), 
+        py::arg("outputFilename"), 
+        py::arg("colored") = true, 
+        py::arg("edgeLabels") = false, 
+        py::arg("classic") = false, 
+        py::arg("memory") = false, 
+        py::arg("show") = true, 
+        py::arg("formatAsPolar") = true
+    );
 }
 PYBIND11_MODULE(TDD, m) {
     m.doc() = "pybind11 example plugin"; // optional module docstring
