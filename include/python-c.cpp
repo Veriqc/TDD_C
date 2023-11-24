@@ -5,61 +5,16 @@
 #include "dd/Tensor.hpp"
 #include "Cir_tn.hpp"
 #include "dd/Tdd.hpp"
+#include "dd/Export.hpp"
 #include <xtensor/xarray.hpp>
 #include <xtensor-python/pyarray.hpp>
-
-class xarrayClass {
-    private:
-    xt::xarray<dd::ComplexValue> data;
-    std::vector<xt::xarray<dd::ComplexValue>> datas;
-
-    public:
-        xarrayClass(const xt::xarray<std::complex<double>>& data_,const std::vector<xt::xarray<std::complex<double>>>& datas_ = {}): data(xarray_convert(data_)), datas() {
-            for(auto array: datas_){
-                this->datas.push_back(xarray_convert(array));
+void draw(const dd::TDD tdd, const std::string& outputFilename, bool colored = true,
+			bool edgeLabels = false, bool classic = false, bool memory = false,
+			bool show = true, bool formatAsPolar = true){
+                dd::export2Dot(tdd.e, outputFilename,colored,edgeLabels,classic,memory,show,formatAsPolar);
             }
-        }
-
-        xarrayClass(const xt::xarray<dd::ComplexValue>& data_,const  std::vector<xt::xarray<dd::ComplexValue>>& datas_ = {}): data(data_), datas(datas_) {}
-
-        void add(xt::xarray<std::complex<double>> array){
-            this->datas.push_back(xarray_convert(array));
-        }
-        void infor(){
-            std::cout << "data: " << this->data << std::endl;
-            std::cout << "datas: "<< std::endl;
-            for(auto array: this->datas){
-                std::cout << array << std::endl;
-            }
-            
-        }
-};
-
-
-int add(int i, int j) {
-    return i + j;
-}
-
-class PackageWrapper {
-public:
-    PackageWrapper(int n) : pkg(std::make_unique<dd::Package<>>(n)) {}
-
-    // Any other necessary methods
-
-private:
-    std::unique_ptr<dd::Package<>> pkg;
-};
-
 
 namespace py = pybind11;
-void BindArray(py::module& m){
-    py::class_<xarrayClass>(m, "xarrayClass")
-        .def(py::init<const xt::xarray<std::complex<double>>&, const std::vector<xt::xarray<std::complex<double>>>&>())
-        .def("add", &xarrayClass::add)
-        .def("infor", &xarrayClass::infor);
-
-}
-
 void BindmNode(py::module& m){
     py::class_<dd::mNode>(m, "mNode")
         .def(py::init<>()) // Default constructor
@@ -103,9 +58,9 @@ void BindTensor(py::module& m){
                         const std::vector<dd::Index>&,
                         const std::string&>())
         .def("to_tdd", [](dd::Tensor &tensor, dd::Package<> *package) {
-        std::unique_ptr<dd::Package<>> ptr(package);
-        tensor.to_tdd(ptr);
-        });
+            std::unique_ptr<dd::Package<>> ptr(package);
+            return tensor.to_tdd(ptr);
+        }, py::return_value_policy::take_ownership);
 }
 
 void BindTn(py::module& m){
@@ -130,17 +85,24 @@ void BindIndex(py::module& m){
         .def_readwrite("key", &dd::Index::key) 
         .def_readwrite("idx", &dd::Index::idx); 
 }
+
+void Binddraw(py::module& m){
+    m.def("draw", &draw, 
+          py::arg("tdd"), 
+          py::arg("outputFilename"), 
+          py::arg("colored") = true, 
+          py::arg("edgeLabels") = false, 
+          py::arg("classic") = false, 
+          py::arg("memory") = false, 
+          py::arg("show") = true, 
+          py::arg("formatAsPolar") = true);
+}
 PYBIND11_MODULE(TDD, m) {
     m.doc() = "pybind11 example plugin"; // optional module docstring
 
-    m.def("add", &add, "A function which adds two numbers");
-
-    
     BindComplex(m);
     BindIndex(m);
-    BindArray(m);
     
-
     BindmNode(m);
     BindmEdge(m);
 
@@ -149,4 +111,6 @@ PYBIND11_MODULE(TDD, m) {
 
     BindTensor(m);
     BindTn(m);
+
+    Binddraw(m);
 }
