@@ -6,10 +6,11 @@
 #include <complex>
 #include "Tdd.hpp"
 #include "Package.hpp"
+#include "Export.hpp"
 #include <iostream>
 #include <stdexcept>
 
-
+// TODO: hide the following two functions
 dd::ComplexValue Complex_Convert(const std::complex<double>& num){
     return dd::ComplexValue(num.real(),num.imag());
 }
@@ -22,29 +23,27 @@ xt::xarray<dd::ComplexValue> xarray_convert(const xt::xarray<std::complex<double
     }
     return convertedArray;
 }
+std::vector<int> reOrder(const std::vector<int>& index_set) {
+	std::vector<int> sorted_index_set = index_set;
+	std::sort(sorted_index_set.begin(), sorted_index_set.end());
 
-namespace dd {
-	std::vector<int> reOrder(const std::vector<int>& index_set) {
-		std::vector<int> sorted_index_set = index_set;
-		std::sort(sorted_index_set.begin(), sorted_index_set.end());
+	std::map<int, int> index_map;
+	int rank = 0;
 
-		std::map<int, int> index_map;
-		int rank = 0;
-
-		for (int i = 0; i < sorted_index_set.size(); ++i) {
-			if (i == 0 || sorted_index_set[i] != sorted_index_set[i - 1]) {
-				index_map[sorted_index_set[i]] = rank++;
-			}
+	for (int i = 0; i < sorted_index_set.size(); ++i) {
+		if (i == 0 || sorted_index_set[i] != sorted_index_set[i - 1]) {
+			index_map[sorted_index_set[i]] = rank++;
 		}
-
-		std::vector<int> order;
-		for (int value : index_set) {
-			order.push_back(index_map[value]);
-		}
-
-		return order;
 	}
 
+	std::vector<int> order;
+	for (int value : index_set) {
+		order.push_back(index_map[value]);
+	}
+
+	return order;
+}
+namespace dd {
     class Tensor {
 		private:
 			xt::xarray<ComplexValue> data;

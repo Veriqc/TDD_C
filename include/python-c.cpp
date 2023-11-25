@@ -11,7 +11,7 @@
 
 namespace py = pybind11;
 void BindmNode(py::module& m){
-    py::class_<dd::mNode>(m, "mNode")
+    py::class_<dd::mNode,std::unique_ptr<dd::mNode>>(m, "mNode")
         .def(py::init<>()) // Default constructor
         .def_readwrite("e", &dd::mNode::e)
         .def_readwrite("next", &dd::mNode::next)
@@ -23,14 +23,14 @@ void BindmNode(py::module& m){
 }
 
 void BindmEdge(py::module& m){
-    py::class_<dd::Edge<dd::mNode>>(m, "mEdge")
+    py::class_<dd::Edge<dd::mNode>,std::unique_ptr<dd::Edge<dd::mNode>>>(m, "mEdge")
         .def(py::init<>()) // Default constructor
         .def_readwrite("p", &dd::Edge<dd::mNode>::p)
         .def_readwrite("w", &dd::Edge<dd::mNode>::w);
 }
 
 void BindTDD(py::module& m){
-    py::class_<dd::TDD>(m,"tdd")
+    py::class_<dd::TDD,std::unique_ptr<dd::TDD>>(m,"tdd")
         .def(py::init<>())
         .def_readwrite("e", &dd::TDD::e)
         .def_readwrite("index_set", &dd::TDD::index_set)
@@ -38,13 +38,13 @@ void BindTDD(py::module& m){
 }
 
 void BindPackage(py::module& m){
-    py::class_<dd::Package<>>(m, "ddpackage")
+    py::class_<dd::Package<>,std::unique_ptr<dd::Package<>>>(m, "ddpackage")
         .def(py::init<int>())
         .def_readwrite("order",&dd::Package<>::varOrder);
     m.def("ddtable", [](int n) {
         auto pkg = std::make_unique<dd::Package<>>(n);
         return pkg.release();
-    }, py::return_value_policy::take_ownership);
+    }, py::return_value_policy::reference);
 }
 
 void BindTensor(py::module& m){
@@ -66,7 +66,7 @@ void BindTn(py::module& m){
 }
 
 void BindComplex(py::module& m){
-    py::class_<dd::ComplexValue>(m, "ComplexValue")
+    py::class_<dd::ComplexValue>(m, "ComplexValue","a complex value struct")
         .def(py::init<>())  // Default constructor
         .def(py::init<double, double>())  // Constructor with parameters
         .def_readwrite("r", &dd::ComplexValue::r)  // Expose member r
@@ -102,6 +102,7 @@ void Binddraw(py::module& m){
         py::arg("memory") = false, 
         py::arg("show") = true, 
         py::arg("formatAsPolar") = true
+    , py::return_value_policy::take_ownership
     );
 }
 PYBIND11_MODULE(TDD, m) {
