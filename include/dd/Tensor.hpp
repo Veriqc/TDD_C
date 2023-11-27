@@ -94,6 +94,8 @@ namespace dd {
 
 				res.index_set = temp_index_set;
 
+				export2Dot(res.e,this->name);
+
 				return res;
 			}
     };
@@ -106,9 +108,8 @@ namespace dd {
 			void add_ts(Tensor ts){
 				this->tensors.push_back(ts);
 			}
-			void infor() {
-				std::cout << "Je suis un TensorNetwork." << std::endl;
-				std::cout << "et j'ai " << this->tensors.size() << " tenseur" << std::endl;
+			std::string infor() {
+				return "a tensor network with " + std::to_string(this->tensors.size()) + " tensors";
 			}
 
 			TDD cont(std::unique_ptr<Package<>>& ddpackage) {

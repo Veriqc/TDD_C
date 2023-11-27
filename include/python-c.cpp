@@ -1,6 +1,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <complex>
+#include <string>
 #include "dd/Tdd.hpp"
 #include "dd/Tensor.hpp"
 #include "Cir_tn.hpp"
@@ -11,40 +12,52 @@
 
 namespace py = pybind11;
 void BindmNode(py::module& m){
-    py::class_<dd::mNode,std::unique_ptr<dd::mNode>>(m, "mNode")
-        .def(py::init<>()) // Default constructor
-        .def_readwrite("e", &dd::mNode::e)
-        .def_readwrite("next", &dd::mNode::next)
-        .def_readwrite("ref", &dd::mNode::ref)
-        .def_readwrite("v", &dd::mNode::v)
-        .def_readwrite("flags", &dd::mNode::flags)
-        .def_static("isTerminal", &dd::mNode::isTerminal)
-        .def_static("getTerminal", &dd::mNode::getTerminal);
+    py::class_<dd::mNode, std::shared_ptr<dd::mNode>>(m, "mNode")
+        .def(py::init<>(), "Default constructor for mNode")
+        .def_readwrite("e", &dd::mNode::e, "A vector of Edge objects connected to this node")
+        .def_readwrite("next", &dd::mNode::next, "Pointer to the next mNode in the structure")
+        .def_readwrite("ref", &dd::mNode::ref, "Reference count for this node")
+        .def_readwrite("v", &dd::mNode::v, "Variable index (nonterminal) value (-1 for terminal)")
+        .def_readwrite("flags", &dd::mNode::flags, "Flags for various states or properties of the node")
+        .def_static("isTerminal", &dd::mNode::isTerminal, "Check if a given mNode is the terminal node")
+        .def_static("getTerminal", &dd::mNode::getTerminal, "Get the terminal mNode")
+        .def("__repr__",
+             [](const dd::mNode &node) {
+                 return "<mNode v=" + std::to_string(node.v) + ">";
+             });
 }
 
 void BindmEdge(py::module& m){
-    py::class_<dd::Edge<dd::mNode>,std::unique_ptr<dd::Edge<dd::mNode>>>(m, "mEdge")
-        .def(py::init<>()) // Default constructor
-        .def_readwrite("p", &dd::Edge<dd::mNode>::p)
-        .def_readwrite("w", &dd::Edge<dd::mNode>::w);
+    py::class_<dd::Edge<dd::mNode>>(m, "Edge")
+        .def(py::init<>()) // Add constructors and member functions as needed
+        .def_readwrite("p", &dd::Edge<dd::mNode>::p,"ctype: mNode")
+        .def_readwrite("w", &dd::Edge<dd::mNode>::w, "ctype: complex")
+        .def("__repr__",
+             [](const dd::Edge<dd::mNode> &e) {
+                 return "complex number: " 
+                 + std::to_string(e.w.r->value) + "+" 
+                 + std::to_string(e.w.i->value);
+                });
 }
 
 void BindTDD(py::module& m){
-    py::class_<dd::TDD,std::unique_ptr<dd::TDD>>(m,"tdd")
+    py::class_<dd::TDD,std::shared_ptr<dd::TDD>>(m,"tdd")
         .def(py::init<>())
-        .def_readwrite("e", &dd::TDD::e)
-        .def_readwrite("index_set", &dd::TDD::index_set)
-        .def_readwrite("key_2_index",&dd::TDD::key_2_index);
+        .def_readwrite("e", &dd::TDD::e,"A mEdge to the root of TDD")
+        .def_readwrite("index_set", &dd::TDD::index_set,"A vector of Index objects")
+        .def_readwrite("key_2_index",&dd::TDD::key_2_index,"A vector of String objects");
 }
 
 void BindPackage(py::module& m){
-    py::class_<dd::Package<>,std::unique_ptr<dd::Package<>>>(m, "ddpackage")
+    py::class_<dd::Package<>,std::shared_ptr<dd::Package<>>>(m, "ddpackage")
         .def(py::init<int>())
         .def_readwrite("order",&dd::Package<>::varOrder);
-    m.def("ddtable", [](int n) {
-        auto pkg = std::make_unique<dd::Package<>>(n);
-        return pkg.release();
-    }, py::return_value_policy::reference);
+    m.def("init", [](int n) {
+            auto pkg = std::make_unique<dd::Package<>>(n);
+            return pkg.release();
+        },
+        py::arg("nqubits"),
+    py::return_value_policy::reference);
 }
 
 void BindTensor(py::module& m){
@@ -53,16 +66,28 @@ void BindTensor(py::module& m){
                         const std::vector<dd::Index>&,
                         const std::string&>())
         .def("to_tdd", [](dd::Tensor &tensor, dd::Package<> *package) {
-            std::unique_ptr<dd::Package<>> ptr(package);
-            return tensor.to_tdd(ptr);
-        }, py::return_value_policy::take_ownership);
+                std::unique_ptr<dd::Package<>> ptr(package);
+                return tensor.to_tdd(ptr);
+            },
+            py::arg("ddPackage"),
+        py::return_value_policy::take_ownership);
 }
 
 void BindTn(py::module& m){
     py::class_<dd::TensorNetwork>(m, "Tn")
         .def(py::init<const std::vector<dd::Tensor>&>())
         .def("infor", &dd::TensorNetwork::infor)
-        .def("add",&dd::TensorNetwork::add_ts);
+        .def("add",&dd::TensorNetwork::add_ts)
+        .def("to_tdd",[](dd::TensorNetwork &tn, dd::Package<> *package) {
+                std::unique_ptr<dd::Package<>> ptr(package);
+                return tn.cont(ptr);
+            },
+            py::arg("ddPackage"),
+        py::return_value_policy::take_ownership)
+        .def("__repr__",
+             [](dd::TensorNetwork &tn) {
+                 return tn.infor();
+             });
 }
 
 void BindComplex(py::module& m){
@@ -70,7 +95,12 @@ void BindComplex(py::module& m){
         .def(py::init<>())  // Default constructor
         .def(py::init<double, double>())  // Constructor with parameters
         .def_readwrite("r", &dd::ComplexValue::r)  // Expose member r
-        .def_readwrite("i", &dd::ComplexValue::i); // Expose member i
+        .def_readwrite("i", &dd::ComplexValue::i) // Expose member i
+        .def("__repr__",[](const dd::ComplexValue& z){
+            return "complex number: " 
+                 + std::to_string(z.r) + "+" 
+                 + std::to_string(z.i);
+        });
 }
 
 void BindIndex(py::module& m){
@@ -78,7 +108,12 @@ void BindIndex(py::module& m){
         .def(py::init<>()) 
         .def(py::init<const std::string, const short>())  
         .def_readwrite("key", &dd::Index::key) 
-        .def_readwrite("idx", &dd::Index::idx); 
+        .def_readwrite("idx", &dd::Index::idx)
+        .def("__repr__",[](const dd::Index& index){
+            return "Index key: " 
+                 + index.key + " Index idx:" 
+                 + std::to_string(index.idx);
+        });
 }
 
 void Binddraw(py::module& m){
@@ -102,7 +137,6 @@ void Binddraw(py::module& m){
         py::arg("memory") = false, 
         py::arg("show") = true, 
         py::arg("formatAsPolar") = true
-    , py::return_value_policy::take_ownership
     );
 }
 PYBIND11_MODULE(TDD, m) {
