@@ -7,6 +7,7 @@
 #include "Cir_tn.hpp"
 #include "dd/Tdd.hpp"
 #include "dd/Export.hpp"
+#include "Cir_tn.hpp"
 #include <xtensor/xarray.hpp>
 #include <xtensor-python/pyarray.hpp>
 
@@ -49,9 +50,16 @@ void BindTDD(py::module& m){
 }
 
 void BindPackage(py::module& m){
-    py::class_<dd::Package<>,std::shared_ptr<dd::Package<>>>(m, "ddpackage")
+    py::class_<dd::Package<>,std::unique_ptr<dd::Package<>>>(m, "ddpackage")
         .def(py::init<int>())
-        .def_readwrite("order",&dd::Package<>::varOrder);
+        .def_readwrite("order",&dd::Package<>::varOrder)
+        .def("__repr__",[](dd::Package<> *ddpack){
+            std::string mapAsString;
+            for (const auto& pair : ddpack->varOrder) {
+                mapAsString += pair.first + ": " + std::to_string(pair.second) + "; ";
+            }
+            return "ddpack order: "+ mapAsString;
+        });
     m.def("init", [](int n) {
             auto pkg = std::make_unique<dd::Package<>>(n);
             return pkg.release();
@@ -65,12 +73,12 @@ void BindTensor(py::module& m){
         .def(py::init<const xt::xarray<std::complex<double>>&,
                         const std::vector<dd::Index>&,
                         const std::string&>())
-        .def("to_tdd", [](dd::Tensor &tensor, dd::Package<> *package) {
-                std::unique_ptr<dd::Package<>> ptr(package);
-                return tensor.to_tdd(ptr);
+        .def("to_tdd", [](dd::Tensor &tensor, dd::Package<> *package, bool show) {
+                return tensor.to_tdd(package, show);
             },
             py::arg("ddPackage"),
-        py::return_value_policy::take_ownership);
+            py::arg("show")=false,
+        py::return_value_policy::reference);
 }
 
 void BindTn(py::module& m){
@@ -79,11 +87,10 @@ void BindTn(py::module& m){
         .def("infor", &dd::TensorNetwork::infor)
         .def("add",&dd::TensorNetwork::add_ts)
         .def("to_tdd",[](dd::TensorNetwork &tn, dd::Package<> *package) {
-                std::unique_ptr<dd::Package<>> ptr(package);
-                return tn.cont(ptr);
+                return tn.cont(package);
             },
             py::arg("ddPackage"),
-        py::return_value_policy::take_ownership)
+        py::return_value_policy::reference)
         .def("__repr__",
              [](dd::TensorNetwork &tn) {
                  return tn.infor();
@@ -139,6 +146,13 @@ void Binddraw(py::module& m){
         py::arg("formatAsPolar") = true
     );
 }
+
+void BindCir(py::module& m){
+    m.def("qubit_in_cir",&get_qubits_num);
+    m.def("cir2tn", [](std::string path, std::string  file_name, dd::Package<> *package) {
+                return cir_2_tn(path,file_name,package);
+        },py::return_value_policy::reference);
+}
 PYBIND11_MODULE(TDD, m) {
     m.doc() = "pybind11 example plugin"; // optional module docstring
 
@@ -155,4 +169,5 @@ PYBIND11_MODULE(TDD, m) {
     BindTn(m);
 
     Binddraw(m);
+    BindCir(m);
 }

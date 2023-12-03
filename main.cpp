@@ -137,7 +137,7 @@ dd::Tensor string_2_tensor(const std::string& s){
 }
 
 void image(dd::TensorNetwork tn, std::unique_ptr<dd::Package<>>& ddpackage){
-    tn.cont(ddpackage);
+    tn.cont(ddpackage.get());
     std::cout << "finish image function" << std::endl; 
 }
 
@@ -198,7 +198,7 @@ int main(int argc, char** argv){
     // }
     std::cout << "begin:" << std::endl;
     std::clock_t start = clock();
-    dd::TDD tdd = tn.cont(dd);
+    dd::TDD tdd = tn.cont(dd.get());
     std::cout << "time: " << double(clock()-start)/CLOCKS_PER_SEC << "s" << std::endl;
     return 0;
 }

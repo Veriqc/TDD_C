@@ -59,7 +59,10 @@ namespace dd {
 			Tensor(const xt::xarray<std::complex<double>>& data_ ,
 			const std::vector<Index>& index_set_ = std::vector<Index>(),
 			const std::string& name_ = "") : data(xarray_convert(data_)), index_set(index_set_), name(name_) {}
-			TDD to_tdd(std::unique_ptr<Package<>>& ddpackage) {
+			TDD to_tdd(Package<>* ddpackage, const bool show = false) {
+				if (!ddpackage) {
+					throw std::runtime_error("ddpackage is null");
+				}
 				
 				if (this->data.dimension() != this->index_set.size()) {
 					std::cerr << "dim: " << this->data.dimension() << std::endl;
@@ -93,9 +96,9 @@ namespace dd {
 				}
 
 				res.index_set = temp_index_set;
-
-				export2Dot(res.e,this->name);
-
+				if(show){
+					export2Dot(res.e,this->name);
+				}
 				return res;
 			}
     };
@@ -112,26 +115,28 @@ namespace dd {
 				return "a tensor network with " + std::to_string(this->tensors.size()) + " tensors";
 			}
 
-			TDD cont(std::unique_ptr<Package<>>& ddpackage) {
+			TDD cont(Package<>* ddpackage) {
+				if (!ddpackage) {
+					throw std::runtime_error("ddpackage is null");
+				}
 				if (this->tensors.size() == 0) {
-				throw std::runtime_error("null tensor network");
-			}
-			TDD dd_temp = tensors[0].to_tdd(ddpackage);
-			for (int i = 1; i < this->tensors.size(); ++i) {
-				std::cout << "-------------------------" <<std::endl;
-				std::cout << i+1 << "th" <<"/" << this->tensors.size() << " tdd:" << std::endl;
-				try{
-					dd_temp = ddpackage->cont(dd_temp, tensors[i].to_tdd(ddpackage));
+					throw std::runtime_error("null tensor network");
 				}
-				catch(...){
-					std::exception_ptr p = std::current_exception();
-					std::clog <<(p ? p.__cxa_exception_type()->name() : "null") << std::endl;
+				TDD dd_temp = tensors[0].to_tdd(ddpackage);
+				for (int i = 1; i < this->tensors.size(); ++i) {
+					std::cout << "-------------------------" <<std::endl;
+					std::cout << i+1 << "th" <<"/" << this->tensors.size() << " tdd:" << std::endl;
+					try{
+						dd_temp = ddpackage->cont(dd_temp, this->tensors[i].to_tdd(ddpackage));
+						// dd_temp = this->tensors[i].to_tdd(ddpackage);
+					}
+					catch(...){
+						std::exception_ptr p = std::current_exception();
+						std::clog <<(p ? p.__cxa_exception_type()->name() : "null") << std::endl;
+					}
 				}
-			}
-			return dd_temp;
-        };
+				return dd_temp;
+			};
     };
-
-
 }
 #endif

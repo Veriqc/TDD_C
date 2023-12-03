@@ -20,6 +20,7 @@ target_compile_features(${PROJECT_NAME} PUBLIC cxx_auto_type)
 target_link_libraries(${PROJECT_NAME} PUBLIC TDD_C)
 
 project(test_tn CXX)
+set(CMAKE_BUILD_TYPE Debug)
 set(CXX_STANDARD 20)
 set(CXX_STANDARD_REQUIRED True)
 add_executable(${PROJECT_NAME}  "test_tn.cpp")

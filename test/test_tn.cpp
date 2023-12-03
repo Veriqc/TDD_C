@@ -11,14 +11,16 @@
 #include "../include/Cir_tn.hpp"
 
 void test_gate();
-void test_tn();
+void test_tn1();
+void test_tn2();
 
 int main(){
 	std::cout << "test gate to tensor" << std::endl;
 	test_gate();
 	std::cout << "-------------------" << std::endl;
 	std::cout << "test circuit to tn" << std::endl;
-	test_tn();
+	test_tn1();
+	test_tn2();
 }
 
 void test_gate() {
@@ -26,13 +28,26 @@ void test_gate() {
 	// std::cout << "tensor xarray:" << std::endl << ts.data << std::endl;
 }
 
-void test_tn() {
-    std::string path2 = "../include/Benchmarks/";
+void test_tn1() {
+    std::string path2 = "/home/gaodc/TDD_C/Benchmarks/";
     std::string file_name = "test_one.qasm";
+	std::cout << path2+file_name << std::endl;
     int n = get_qubits_num(path2 + file_name);
 	std::cout << "qubits num: " << n << std::endl;
     auto ddpack = std::make_unique<dd::Package<>>(3 * n);
-    dd::TensorNetwork tn = cir_2_tn(path2, file_name, ddpack);
+    dd::TensorNetwork tn = cir_2_tn(path2, file_name, ddpack.get());
 	tn.infor();
-	dd::TDD tdd = tn.cont(ddpack);
+	dd::TDD tdd = tn.cont(ddpack.get());
+}
+
+void test_tn2() {
+    std::string path2 = "/home/gaodc/TDD_C/Benchmarks/";
+    std::string file_name = "test.qasm";
+	std::cout << path2+file_name << std::endl;
+    int n = get_qubits_num(path2 + file_name);
+	std::cout << "qubits num: " << n << std::endl;
+    auto ddpack = std::make_unique<dd::Package<>>(3 * n);
+    dd::TensorNetwork tn = cir_2_tn(path2, file_name, ddpack.get());
+	tn.infor();
+	dd::TDD tdd = tn.cont(ddpack.get());
 }

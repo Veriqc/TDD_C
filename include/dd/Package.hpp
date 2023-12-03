@@ -771,6 +771,7 @@ namespace dd {
 				auto c = cn.mulCached(x.w, y.w);
 
 				if (var_num > 0) {
+					// Q:pow(2) have some problem
 					ComplexNumbers::mul(c, c, cn.getTemporary(pow(2, var_num), 0));
 				}
 

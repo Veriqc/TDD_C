@@ -499,6 +499,9 @@ int get_qubits_num(std::string  file_name) {
 	std::ifstream  infile;
 
 	infile.open(file_name);
+	if (!infile.is_open()) {
+        throw std::runtime_error("null file"); // Return an error code
+    }
 
 	std::string line;
 	std::getline(infile, line);
@@ -549,6 +552,9 @@ int get_gates_num(std::string  file_name) {
 	std::ifstream  infile;
 
 	infile.open(file_name);
+	if (!infile.is_open()) {
+        throw std::runtime_error("null file"); // Return an error code
+    }
 
 	std::string line;
 	std::getline(infile, line);
@@ -602,21 +608,26 @@ dd::Tensor gate_2_tensor(std::string name, std::vector<dd::Index> index_set) {
 	throw std::invalid_argument("Unsupported gate: " + name);
 }
 
-dd::TensorNetwork cir_2_tn(std::string path, std::string  file_name, std::unique_ptr<dd::Package<>>& ddpack) {
+dd::TensorNetwork cir_2_tn(std::string path, std::string  file_name, dd::Package<>* ddpack) {
+	if (!ddpack) {
+		throw std::runtime_error("ddpackage is null");
+	}
 
-			circuitReslut cir = import_circuit(path + file_name);
-			std::cout << "Start!!!" << std::endl;
+	circuitReslut cir = import_circuit(path + file_name);
+	std::cout << "Start!!!" << std::endl;
 
-			ddpack->varOrder = get_var_order(cir.qubits_num, cir.gates_num);
-			std::map<int, std::vector<dd::Index>> Index_set = get_circuit_index(cir, ddpack->varOrder);
+	ddpack->varOrder = get_var_order(cir.qubits_num, cir.gates_num);
+	std::map<int, std::vector<dd::Index>> Index_set = get_circuit_index(cir, ddpack->varOrder);
 
-			dd::TensorNetwork tn;
+	dd::TensorNetwork tn;
 
-			for (int k = 0; k < cir.gates_num; k++) {
-				tn.add_ts(gate_2_tensor(cir.gate_set[k].name, Index_set[k]));
-			}
+	for (int k = 0; k < cir.gates_num; k++) {
+		tn.add_ts(gate_2_tensor(cir.gate_set[k].name, Index_set[k]));
+	}
 
-			std::cout << "Done!!!" << std::endl;
-			return tn;
-		}
+	// std::cout << "init ts" << std::endl;
+	// tn.cont(ddpack);
+	std::cout << "done" << std::endl;
+	return tn;
+}
 #endif
