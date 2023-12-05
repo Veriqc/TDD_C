@@ -50,7 +50,7 @@ void BindTDD(py::module& m){
 }
 
 void BindPackage(py::module& m){
-    py::class_<dd::Package<>,std::unique_ptr<dd::Package<>>>(m, "ddpackage")
+    py::class_<dd::Package<>,std::shared_ptr<dd::Package<>>>(m, "ddpackage")
         .def(py::init<int>())
         .def_readwrite("order",&dd::Package<>::varOrder)
         .def("__repr__",[](dd::Package<> *ddpack){
@@ -59,7 +59,10 @@ void BindPackage(py::module& m){
                 mapAsString += pair.first + ": " + std::to_string(pair.second) + "; ";
             }
             return "ddpack order: "+ mapAsString;
-        });
+        })
+        .def("cont",&dd::Package<>::cont,
+            py::arg("tdd1"), py::arg("tdd2"),"cont(tdd1,tdd2)")
+        .def_readwrite("test",&dd::Package<>::to_test);
     m.def("init", [](int n) {
             auto pkg = std::make_unique<dd::Package<>>(n);
             return pkg.release();

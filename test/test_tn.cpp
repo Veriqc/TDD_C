@@ -37,6 +37,7 @@ void test_tn1() {
     auto ddpack = std::make_unique<dd::Package<>>(3 * n);
     dd::TensorNetwork tn = cir_2_tn(path2, file_name, ddpack.get());
 	tn.infor();
+	ddpack->to_test = true;
 	dd::TDD tdd = tn.cont(ddpack.get());
 }
 
@@ -49,5 +50,6 @@ void test_tn2() {
     auto ddpack = std::make_unique<dd::Package<>>(3 * n);
     dd::TensorNetwork tn = cir_2_tn(path2, file_name, ddpack.get());
 	tn.infor();
+	ddpack->to_test = true;
 	dd::TDD tdd = tn.cont(ddpack.get());
 }
