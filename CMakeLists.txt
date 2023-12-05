@@ -85,12 +85,14 @@ set(PROJECT_NAME tdd_main)
 ################################################################################
 # Source groups
 ################################################################################
+message(STATUS "add submodule")
 add_subdirectory(${PROJECT_SOURCE_DIR}/extern/xtl)
 add_subdirectory(${PROJECT_SOURCE_DIR}/extern/xtensor)
 add_subdirectory(${PROJECT_SOURCE_DIR}/extern/xtensor-python)
 set(XTENSOR_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/extern/xtensor/include)
 set(XTL_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/extern/xtl/include)
 set(XPY_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/extern/xtensor-python/include)
+message(STATUS "add file")
 set(Header_Files
     "include/dd/Complex.hpp"
     "include/dd/ComplexCache.hpp"
@@ -137,8 +139,14 @@ target_compile_features(TDD_C PUBLIC cxx_auto_type)
 ################################################################################
 add_subdirectory(extern/pybind11)
 pybind11_add_module(TDD "include/python-c.cpp")
+find_package(Python3 REQUIRED NumPy)
+if(Python3_NumPy_FOUND)
+    message(STATUS "add numpy from ${Python3_NumPy_INCLUDE_DIRS}")
+else()
+    message(FATAL_ERROR "NumPy not found for Python ${python_version}, try to run:\n ${Python3_EXECUTABLE} -m pip install numpy")
+endif()
 target_link_libraries(TDD PUBLIC TDD_C)
-target_include_directories(TDD PUBLIC ${XPY_INCLUDE_DIR} "/home/gaodc/.local/lib/python3.10/site-packages/numpy/core/include")
+target_include_directories(TDD PUBLIC ${XPY_INCLUDE_DIR} ${Python3_NumPy_INCLUDE_DIRS})
 # TODO: make this location more flexable
 
 add_executable(${PROJECT_NAME} "main.cpp")
