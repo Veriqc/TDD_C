@@ -15,3 +15,4 @@ lib/
 cnot
 cx
 *.svg
+upload.sh
