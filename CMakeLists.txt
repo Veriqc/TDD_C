@@ -86,12 +86,38 @@ set(PROJECT_NAME tdd_main)
 # Source groups
 ################################################################################
 message(STATUS "add submodule")
-add_subdirectory(${PROJECT_SOURCE_DIR}/extern/xtl)
-add_subdirectory(${PROJECT_SOURCE_DIR}/extern/xtensor)
-add_subdirectory(${PROJECT_SOURCE_DIR}/extern/xtensor-python)
-set(XTENSOR_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/extern/xtensor/include)
-set(XTL_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/extern/xtl/include)
-set(XPY_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/extern/xtensor-python/include)
+find_package(xtensor REQUIRED)
+if(NOT xtensor_FOUND)
+    message(FATAL_ERROR "xtensor not found. Please make sure xtensor is installed.")
+else()
+    message(STATUS "xtensor include directories: ${xtensor_INCLUDE_DIRS}")
+endif()
+
+find_package(xtl REQUIRED)
+if(NOT xtl_FOUND)
+    message(FATAL_ERROR "xtl not found. Please make sure xtl is installed.")
+else()
+    message(STATUS "xtl include directories: ${xtl_INCLUDE_DIRS}")
+endif()
+
+find_package(xtensor-python REQUIRED)
+if(NOT xtensor-python_FOUND)
+    message(FATAL_ERROR "xtensor-python not found. Please make sure xtensor-python is installed.")
+else()
+    message(STATUS "xtensor-python include directories: ${xtensor-python_INCLUDE_DIRS}")
+endif()
+
+find_package(pybind11 REQUIRED)
+if(NOT pybind11_FOUND)
+    message(FATAL_ERROR "pybind11 not found. Please make sure pybind11 is installed.")
+else()
+    message(STATUS "pybind11 include directories: ${pybind11_INCLUDE_DIRS}")
+endif()
+
+
+# set(XTENSOR_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/extern/xtensor/include)
+# set(XTL_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/extern/xtl/include)
+# set(XPY_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/extern/xtensor-python/include)
 message(STATUS "add file")
 set(Header_Files
     "include/dd/Complex.hpp"
@@ -130,14 +156,14 @@ set(ALL_FILES
 )
 
 add_library(TDD_C SHARED ${ALL_FILES} )
-target_include_directories(TDD_C PUBLIC ${PROJECT_SOURCE_DIR}/include ${XTENSOR_INCLUDE_DIR} ${XTL_INCLUDE_DIR})
+target_include_directories(TDD_C PUBLIC ${PROJECT_SOURCE_DIR}/include ${XTENSOR_INCLUDE_DIRS} ${XTL_INCLUDE_DIRS})
 target_compile_features(TDD_C PUBLIC cxx_auto_type)
 
 
 ################################################################################
 # Target
 ################################################################################
-add_subdirectory(extern/pybind11)
+
 pybind11_add_module(TDD "include/python-c.cpp")
 find_package(Python3 REQUIRED NumPy)
 if(Python3_NumPy_FOUND)
@@ -146,6 +172,6 @@ else()
     message(FATAL_ERROR "NumPy not found for Python ${python_version}, try to run:\n ${Python3_EXECUTABLE} -m pip install numpy")
 endif()
 target_link_libraries(TDD PUBLIC TDD_C)
-target_include_directories(TDD PUBLIC ${XPY_INCLUDE_DIR} ${Python3_NumPy_INCLUDE_DIRS})
+target_include_directories(TDD PUBLIC ${xtensor-python_INCLUDE_DIRS} ${Python3_NumPy_INCLUDE_DIRS})
 
 add_subdirectory(test)

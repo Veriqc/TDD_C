@@ -19,6 +19,8 @@ TDD_CC.egg-info/SOURCES.txt
 TDD_CC.egg-info/dependency_links.txt
 TDD_CC.egg-info/requires.txt
 TDD_CC.egg-info/top_level.txt
+dist/TDD_CC-0.0.1-cp310-cp310-linux_x86_64.whl
+dist/TDD_CC-0.0.1.tar.gz
 include/Cir_tn.hpp
 include/Definitions.hpp
 include/python-c.cpp

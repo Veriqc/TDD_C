@@ -21,10 +21,7 @@ ext_modules = [
         source_files,
         include_dirs=[
             get_pybind_include(),
-            'include',  # Path to header files
-            'extern/xtensor/include',
-            'extern/xtl/include',
-            'extern/xtensor-python/include',
+            'include',
             numpy.get_include()
         ],
         language='c++'
