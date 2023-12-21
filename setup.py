@@ -27,6 +27,7 @@ ext_modules = [
         language='c++'
     ),
 ]
+
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
@@ -36,15 +37,15 @@ setup(
     author='Hong xing',
     author_email='xin.hong@student.uts.edu.au',
     url='https://github.com/Veriqc/TDD_C',
-    # todo: add describtion and license
+    # TODO: add describtion and license
     description='',
     long_description=long_description,
     long_description_content_type="text/markdown",
-    license='License',
+    license='MIT',
     ext_modules=ext_modules,
     extras_require={'test': ['pytest']},
     install_requires=[],
-    setup_requires=['pybind11>=2.5.0','numpy>=1.20.0'],
-    cmdclass={'build_ext': build_ext},
+    setup_requires=['pybind11>=2.5.0', 'numpy>=1.20.0'],
     packages=find_packages(),
 )
+
