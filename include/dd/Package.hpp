@@ -445,9 +445,11 @@ namespace dd {
 			TDD res;
 
 			std::vector<Index> var_out;
-			std::vector<std::string> var_cont_temp;
+			std::vector<Index> var_cont_temp;
 			std::vector<std::string> var_cont;
 			std::vector<std::string> var_out_key;
+
+			std::vector<short> var_cont_width;
 
 			int k;
 			int k1;
@@ -456,7 +458,7 @@ namespace dd {
 
 				for (k1 = 0; k1 < tdd2.index_set.size(); ++k1) {
 					if (tdd2.index_set[k1].idx == tdd1.index_set[k].idx && tdd2.index_set[k1].key == tdd1.index_set[k].key) {
-						var_cont_temp.push_back(tdd1.index_set[k].key);
+						var_cont_temp.push_back(tdd1.index_set[k]);
 						flag = false;
 						break;
 					}
@@ -480,10 +482,18 @@ namespace dd {
 					var_out_key.push_back(tdd2.index_set[k].key);
 				}
 			}
+			
+			
+			std::sort(var_cont_temp.begin(),
+					var_cont_temp.end(),
+					[&](const auto& a, const auto& b) {return varOrder[a.key] > varOrder[b.key]; }
+			);
+
 			for (k = 0; k < var_cont_temp.size(); ++k) {
-				if (find(var_out_key.begin(), var_out_key.end(), var_cont_temp[k]) == var_out_key.end()) {
-					if (find(var_cont.begin(), var_cont.end(), var_cont_temp[k]) == var_cont.end()) {
-						var_cont.push_back(var_cont_temp[k]);
+				if (find(var_out_key.begin(), var_out_key.end(), var_cont_temp[k].key) == var_out_key.end()) {
+					if (find(var_cont.begin(), var_cont.end(), var_cont_temp[k].key) == var_cont.end()) {
+						var_cont.push_back(var_cont_temp[k].key);
+						var_cont_width.push_back(var_cont_temp[k].width);
 					}
 				}
 			}
@@ -599,7 +609,7 @@ namespace dd {
 
 			[[maybe_unused]] const auto before = cn.cacheCount();
 
-			res.e = cont2(tdd1.e, tdd2.e, key_2_new_key1, key_2_new_key2, var_cont.size());
+			res.e = cont2(tdd1.e, tdd2.e, key_2_new_key1, key_2_new_key2, var_cont.size(),var_cont_width);
 
 			if (to_test) {
 				std::cout << "TDD: ";
@@ -748,7 +758,7 @@ namespace dd {
 		}
 
 		//template <class LeftOperandNode, class RightOperandNode>
-		Edge<mNode> cont2(const Edge<mNode>& x, const Edge<mNode>& y, key_2_new_key_node* key_2_new_key1, key_2_new_key_node* key_2_new_key2, const int var_num) {
+		Edge<mNode> cont2(const Edge<mNode>& x, const Edge<mNode>& y, key_2_new_key_node* key_2_new_key1, key_2_new_key_node* key_2_new_key2, const int var_num, const std::vector<short>& var_cont_width ) {
 
 			//std::cout <<"838 " << x.w << " " << y.w << " " << int(x.p->v) << " " << int(y.p->v) << std::endl;
 
@@ -770,9 +780,12 @@ namespace dd {
 			{
 				auto c = cn.mulCached(x.w, y.w);
 
-				if (var_num > 0) {
-					// Q:pow(2) have some problem
-					ComplexNumbers::mul(c, c, cn.getTemporary(pow(2, var_num), 0));
+				// if (var_num > 0) {
+				// 	// Q:pow(2) have some problem
+				// 	ComplexNumbers::mul(c, c, cn.getTemporary(pow(2, var_num), 0));
+				// }
+				for(int i=0; i < var_num; ++i){
+					ComplexNumbers::mul(c, c, cn.getTemporary(var_cont_width.at(i), 0));
 				}
 
 				return ResultEdge::terminal(c);
@@ -835,7 +848,7 @@ namespace dd {
 					for (int k = 0; k < x.p->e.size(); ++k) {
 						e1 = x.p->e[k];
 						e2 = yCopy;
-						etemp = cont2(e1, e2, temp_key_2_new_key1, temp_key_2_new_key2, var_num - 1);
+						etemp = cont2(e1, e2, temp_key_2_new_key1, temp_key_2_new_key2, var_num - 1,var_cont_width);
 						if (!etemp.w.exactlyZero()) {
 							if (r != ResultEdge::zero) {
 								auto temp = r.w;
@@ -854,7 +867,7 @@ namespace dd {
 					for (int k = 0; k < x.p->e.size(); ++k) {
 						e1 = x.p->e[k];
 						e2 = yCopy;
-						e.push_back(cont2(e1, e2, temp_key_2_new_key1, temp_key_2_new_key2, var_num));
+						e.push_back(cont2(e1, e2, temp_key_2_new_key1, temp_key_2_new_key2, var_num,var_cont_width));
 					}
 					r = makeDDNode(int16_t(newk1), e, true);
 				}
@@ -866,7 +879,7 @@ namespace dd {
 					for (int k = 0; k < y.p->e.size(); ++k) {
 						e1 = xCopy;
 						e2 = y.p->e[k];
-						etemp = cont2(e1, e2, temp_key_2_new_key1, temp_key_2_new_key2, var_num - 1);
+						etemp = cont2(e1, e2, temp_key_2_new_key1, temp_key_2_new_key2, var_num - 1,var_cont_width);
 						if (!etemp.w.exactlyZero()) {
 							if (r != ResultEdge::zero) {
 								auto temp = r.w;
@@ -885,7 +898,7 @@ namespace dd {
 					for (int k = 0; k < y.p->e.size(); ++k) {
 						e1 = xCopy;
 						e2 = y.p->e[k];
-						e.push_back(cont2(e1, e2, temp_key_2_new_key1, temp_key_2_new_key2, var_num));
+						e.push_back(cont2(e1, e2, temp_key_2_new_key1, temp_key_2_new_key2, var_num,var_cont_width));
 					}
 					r = makeDDNode(int16_t(newk2), e, true);
 				}
@@ -898,7 +911,7 @@ namespace dd {
 					for (int k = 0; k < x.p->e.size(); ++k) {
 						e1 = x.p->e[k];
 						e2 = y.p->e[k];
-						etemp = cont2(e1, e2, temp_key_2_new_key1, temp_key_2_new_key2, var_num - 1);
+						etemp = cont2(e1, e2, temp_key_2_new_key1, temp_key_2_new_key2, var_num - 1,var_cont_width);
 						if (!etemp.w.exactlyZero()) {
 							if (r != ResultEdge::zero) {
 								auto temp = r.w;
@@ -917,7 +930,7 @@ namespace dd {
 					for (int k = 0; k < x.p->e.size(); ++k) {
 						e1 = x.p->e[k];
 						e2 = y.p->e[k];
-						e.push_back(cont2(e1, e2, temp_key_2_new_key1, temp_key_2_new_key2, var_num));
+						e.push_back(cont2(e1, e2, temp_key_2_new_key1, temp_key_2_new_key2, var_num,var_cont_width));
 					}
 					r = makeDDNode(int16_t(newk1), e, true);
 				}
