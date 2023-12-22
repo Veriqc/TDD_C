@@ -92,7 +92,9 @@ namespace dd {
 			
 				res.key_2_index = {};
 				for(const auto index: temp_index_set){
-					res.key_2_index.push_back(index.key);
+					if (res.key_2_index.empty() || res.key_2_index.back() != index.key) {
+						res.key_2_index.push_back(index.key);
+					}
 				}
 
 				res.index_set = temp_index_set;
