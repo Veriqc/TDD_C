@@ -126,8 +126,8 @@ namespace dd {
 				}
 				TDD dd_temp = tensors[0].to_tdd(ddpackage);
 				for (int i = 1; i < this->tensors.size(); ++i) {
-					std::cout << "-------------------------" <<std::endl;
-					std::cout << i+1 << "th" <<"/" << this->tensors.size() << " tdd:" << std::endl;
+					// std::cout << "-------------------------" <<std::endl;
+					// std::cout << i+1 << "th" <<"/" << this->tensors.size() << " tdd:" << std::endl;
 					try{
 						dd_temp = ddpackage->cont(dd_temp, this->tensors[i].to_tdd(ddpackage));
 						// dd_temp = this->tensors[i].to_tdd(ddpackage);

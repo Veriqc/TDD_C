@@ -517,7 +517,7 @@ int get_qubits_num(std::string  file_name) {
 
 		if (g[0] == "cx") {
 
-			std::regex pattern("q\\[(\\d+)\\],q\\[(\\d+)\\];");
+			std::regex pattern("q\\[(\\d+)\\],q\\[(\\d+)\\];\r?");
 			if (std::regex_match(g[1], result, pattern))
 			{
 				if (stoi(result[1]) > qubits_num) {
@@ -530,7 +530,7 @@ int get_qubits_num(std::string  file_name) {
 
 		}
 		else {
-			std::regex pattern("q\\[(\\d+)\\];");
+			std::regex pattern("q\\[(\\d+)\\];\r?");
 			if (regex_match(g[1], result, pattern))
 			{
 				if (stoi(result[1]) > qubits_num) {
