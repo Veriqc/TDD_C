@@ -52,4 +52,5 @@ void test_tn2() {
 	tn.infor();
 	ddpack->to_test = true;
 	dd::TDD tdd = tn.cont(ddpack.get());
+	dd::export2Dot(tdd.e, "testQasm");
 }

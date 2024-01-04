@@ -16,3 +16,4 @@ cnot
 cx
 *.svg
 upload.sh
+Benchmarks/
