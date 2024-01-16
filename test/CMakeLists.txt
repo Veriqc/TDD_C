@@ -1,36 +1,16 @@
-project(test_sort CXX)
-set(CXX_STANDARD 20)
-set(CXX_STANDARD_REQUIRED True)
-add_executable(${PROJECT_NAME} "sort.cpp" )
-target_compile_features(${PROJECT_NAME} PUBLIC cxx_auto_type)
-target_link_libraries(${PROJECT_NAME} PUBLIC TDD_C)
+# List your test source files here
+add_definitions(-DPROJECT_SOURCE_DIR="${CMAKE_SOURCE_DIR}")
+set(TEST_SOURCES
+    # test_whole.cpp
+    test_tn.cpp
+    test_tdd.cpp
+    test_bv.cpp
+    # Add new test files here
+)
 
-project(test_cnot CXX)
-set(CXX_STANDARD 20)
-set(CXX_STANDARD_REQUIRED True)
-add_executable(${PROJECT_NAME}  "cnot.cpp")
-target_compile_features(${PROJECT_NAME} PUBLIC cxx_auto_type)
-target_link_libraries(${PROJECT_NAME} TDD_C)
-
-project(test_tdd CXX)
-set(CXX_STANDARD 20)
-set(CXX_STANDARD_REQUIRED True)
-add_executable(${PROJECT_NAME}  "test_tdd.cpp")
-target_compile_features(${PROJECT_NAME} PUBLIC cxx_auto_type)
-target_link_libraries(${PROJECT_NAME} PUBLIC TDD_C)
-
-project(test_tn CXX)
-set(CMAKE_BUILD_TYPE Debug)
-set(CXX_STANDARD 20)
-set(CXX_STANDARD_REQUIRED True)
-add_executable(${PROJECT_NAME}  "test_tn.cpp")
-target_compile_features(${PROJECT_NAME} PUBLIC cxx_auto_type)
-target_link_libraries(${PROJECT_NAME} PUBLIC TDD_C)
-
-project(test_bv  CXX)
-set(CMAKE_BUILD_TYPE Debug)
-set(CXX_STANDARD 20)
-set(CXX_STANDARD_REQUIRED True)
-add_executable(${PROJECT_NAME}  "test_bv.cpp")
-target_compile_features(${PROJECT_NAME} PUBLIC cxx_auto_type)
-target_link_libraries(${PROJECT_NAME} PUBLIC TDD_C)
+# Loop through each source file to create an executable and link libraries
+foreach(TEST_SOURCE ${TEST_SOURCES})
+    get_filename_component(TEST_NAME ${TEST_SOURCE} NAME_WE)
+    add_executable(${TEST_NAME} ${TEST_SOURCE})
+    target_link_libraries(${TEST_NAME} PRIVATE TDD_C)
+endforeach()

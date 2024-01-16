@@ -106,7 +106,7 @@ namespace dd {
     };
 
     class TensorNetwork {
-		private:
+		public:
 			std::vector<Tensor> tensors;
 		public:
 			TensorNetwork(std::vector<Tensor> tensors_={}): tensors(tensors_) {}
