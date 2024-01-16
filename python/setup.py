@@ -1,8 +1,7 @@
 from setuptools import setup, Extension, find_packages
-from setuptools.command.build_ext import build_ext
-import glob
-import numpy
+import numpy,os
 
+include_dir = os.path.abspath('../include')
 class get_pybind_include(object):
     """Helper class to determine the pybind11 include path
     The purpose of this class is to postpone importing pybind11
@@ -12,23 +11,21 @@ class get_pybind_include(object):
     def __str__(self):
         import pybind11
         return pybind11.get_include()
-    
-source_files = glob.glob('/include/*.cpp')
 
 ext_modules = [
     Extension(
         'TDD_CC',
-        source_files,
+        sources = ['python-c.cpp'],
         include_dirs=[
             get_pybind_include(),
-            'include',
+            include_dir, 
             numpy.get_include()
         ],
         language='c++'
     ),
 ]
 
-with open("README.md", "r") as fh:
+with open("../README.md", "r") as fh:
     long_description = fh.read()
 
 setup(
@@ -37,7 +34,6 @@ setup(
     author='Hong xing',
     author_email='xin.hong@student.uts.edu.au',
     url='https://github.com/Veriqc/TDD_C',
-    # TODO: add describtion and license
     description='',
     long_description=long_description,
     long_description_content_type="text/markdown",
