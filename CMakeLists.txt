@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.16.0 FATAL_ERROR)
 
 set(CMAKE_SYSTEM_VERSION 10.0 CACHE STRING "" FORCE)
+option(BUILD_PYBIND "Build the pybind11 component" ON)
 
 project(TDD_C LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
@@ -56,15 +57,6 @@ if(MSVC)
     set(CMAKE_STATIC_LINKER_FLAGS_RELEASE "${CMAKE_STATIC_LINKER_FLAGS}")
 endif()
 
-################################################################################
-# Nuget packages function stub.
-################################################################################
-function(use_package TARGET PACKAGE VERSION)
-    message(WARNING "No implementation of use_package. Create yours. "
-                    "Package \"${PACKAGE}\" with version \"${VERSION}\" "
-                    "for target \"${TARGET}\" is ignored!")
-endfunction()
-
 
 
 ################################################################################
@@ -90,20 +82,6 @@ if(NOT xtl_FOUND)
     message(FATAL_ERROR "xtl not found. Please make sure xtl is installed.")
 else()
     message(STATUS "xtl include directories: ${xtl_INCLUDE_DIRS}")
-endif()
-
-find_package(xtensor-python REQUIRED)
-if(NOT xtensor-python_FOUND)
-    message(FATAL_ERROR "xtensor-python not found. Please make sure xtensor-python is installed.")
-else()
-    message(STATUS "xtensor-python include directories: ${xtensor-python_INCLUDE_DIRS}")
-endif()
-
-find_package(pybind11 REQUIRED)
-if(NOT pybind11_FOUND)
-    message(FATAL_ERROR "pybind11 not found. Please make sure pybind11 is installed.")
-else()
-    message(STATUS "pybind11 include directories: ${pybind11_INCLUDE_DIRS}")
 endif()
 
 
@@ -135,18 +113,6 @@ set(Header_Files
 )
 source_group("Header Files" FILES ${Header_Files})
 
-# set(Source_Files
-#     "include/dd/Edge.cpp"
-#     # "include/dd/Node.cpp"
-# )
-
-# source_group("Source Files" FILES ${Source_Files} )
-
-set(ALL_FILES
-    ${Header_Files}
-    # ${Source_Files}
-)
-
 add_library(TDD_C INTERFACE )
 target_include_directories(TDD_C INTERFACE ${PROJECT_SOURCE_DIR}/include ${XTENSOR_INCLUDE_DIRS} ${XTL_INCLUDE_DIRS})
 target_compile_features(TDD_C INTERFACE cxx_auto_type)
@@ -155,15 +121,8 @@ target_compile_features(TDD_C INTERFACE cxx_auto_type)
 ################################################################################
 # Target
 ################################################################################
-
-pybind11_add_module(TDD "include/python-c.cpp")
-find_package(Python3 REQUIRED NumPy)
-if(Python3_NumPy_FOUND)
-    message(STATUS "add numpy from ${Python3_NumPy_INCLUDE_DIRS}")
-else()
-    message(FATAL_ERROR "NumPy not found for Python ${python_version}, try to run:\n ${Python3_EXECUTABLE} -m pip install numpy")
+if(BUILD_PYBIND)
+    add_subdirectory(python) 
 endif()
-target_link_libraries(TDD PUBLIC TDD_C)
-target_include_directories(TDD PUBLIC ${xtensor-python_INCLUDE_DIRS} ${Python3_NumPy_INCLUDE_DIRS})
 
 add_subdirectory(test)
