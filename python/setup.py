@@ -2,6 +2,7 @@ from setuptools import setup, Extension, find_packages
 import numpy,os
 
 include_dir = os.path.abspath('../include')
+project_name = "tensordd"
 class get_pybind_include(object):
     """Helper class to determine the pybind11 include path
     The purpose of this class is to postpone importing pybind11
@@ -14,14 +15,15 @@ class get_pybind_include(object):
 
 ext_modules = [
     Extension(
-        'TDD_CC',
+        project_name,
         sources = ['python-c.cpp'],
         include_dirs=[
             get_pybind_include(),
             include_dir, 
             numpy.get_include()
         ],
-        language='c++'
+        language='c++',
+        extra_compile_args=['-std=c++20']
     ),
 ]
 
@@ -29,7 +31,7 @@ with open("../README.md", "r") as fh:
     long_description = fh.read()
 
 setup(
-    name='TDD_CC',
+    name=project_name,
     version='0.0.1',
     author='Hong xing',
     author_email='xin.hong@student.uts.edu.au',
@@ -40,7 +42,7 @@ setup(
     license='MIT',
     ext_modules=ext_modules,
     extras_require={'test': ['pytest']},
-    install_requires=[],
+    install_requires=['pybind11>=2.5.0', 'numpy>=1.20.0'],
     setup_requires=['pybind11>=2.5.0', 'numpy>=1.20.0'],
     packages=find_packages(),
 )
