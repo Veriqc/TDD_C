@@ -28,10 +28,18 @@ template <class Node> struct Edge {
   static const Edge zero; // NOLINT(readability-identifier-naming)
   static const Edge one;  // NOLINT(readability-identifier-naming)
 
-  [[nodiscard]] static Edge terminal(const Complex& w);
-  [[nodiscard]] bool isTerminal() const;
-  [[nodiscard]] bool isZeroTerminal() const;
-  [[nodiscard]] bool isOneTerminal() const;
+  [[nodiscard]] static Edge terminal(const Complex& w) {
+        return {Node::getTerminal(), w};
+    }
+  [[nodiscard]] bool isTerminal() const{
+        return Node::isTerminal(p);
+    }
+  [[nodiscard]] bool isZeroTerminal() const {
+        return isTerminal() && w == Complex::zero;
+    }
+  [[nodiscard]] bool isOneTerminal() const {
+        return isTerminal() && w == Complex::one;
+    }
 
 };
 
@@ -79,4 +87,9 @@ template <class Node> struct hash<dd::CachedEdge<Node>> {
   }
 };
 } // namespace std
+// Explicit instantiation of Edge for mNode
+// namespace dd {
+//     template struct Edge<mNode>;
+// }
+
 #endif

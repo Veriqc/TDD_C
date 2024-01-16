@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16.0 FATAL_ERROR)
 
 set(CMAKE_SYSTEM_VERSION 10.0 CACHE STRING "" FORCE)
 
-project(TDD_C CXX)
+project(TDD_C LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED On)
 ################################################################################
@@ -135,21 +135,21 @@ set(Header_Files
 )
 source_group("Header Files" FILES ${Header_Files})
 
-set(Source_Files
-    "include/dd/Edge.cpp"
-    "include/dd/Node.cpp"
-)
+# set(Source_Files
+#     "include/dd/Edge.cpp"
+#     # "include/dd/Node.cpp"
+# )
 
-source_group("Source Files" FILES ${Source_Files} )
+# source_group("Source Files" FILES ${Source_Files} )
 
 set(ALL_FILES
     ${Header_Files}
-    ${Source_Files}
+    # ${Source_Files}
 )
 
-add_library(TDD_C SHARED ${ALL_FILES} )
-target_include_directories(TDD_C PUBLIC ${PROJECT_SOURCE_DIR}/include ${XTENSOR_INCLUDE_DIRS} ${XTL_INCLUDE_DIRS})
-target_compile_features(TDD_C PUBLIC cxx_auto_type)
+add_library(TDD_C INTERFACE )
+target_include_directories(TDD_C INTERFACE ${PROJECT_SOURCE_DIR}/include ${XTENSOR_INCLUDE_DIRS} ${XTL_INCLUDE_DIRS})
+target_compile_features(TDD_C INTERFACE cxx_auto_type)
 
 
 ################################################################################

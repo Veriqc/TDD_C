@@ -29,6 +29,12 @@ namespace dd {
 		static constexpr mNode* getTerminal() { return &terminal; }
 
 	};
+	mNode mNode::terminal{{{{nullptr, Complex::zero},
+                            {nullptr, Complex::zero}}},
+                          nullptr,
+                          0U,
+                          -1,
+                          32 + 16};
 	using mEdge = Edge<mNode>;
 	using mCachedEdge = CachedEdge<mNode>;
 
