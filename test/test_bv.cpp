@@ -6,7 +6,7 @@
 #include <time.h>
 #include <xtensor/xio.hpp>
 #include <xtensor/xarray.hpp>
-#include "Cir_tn.hpp"
+#include "dd/Cir_tn.hpp"
 #include <algorithm>
 
 using namespace dd;

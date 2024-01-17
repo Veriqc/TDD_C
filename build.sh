@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Remove the "build" directory and its contents
-rm -rf build
+sudo rm -rf build
 
 # Create the "build" directory
 mkdir build

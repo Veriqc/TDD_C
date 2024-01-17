@@ -4,10 +4,9 @@
 #include <string>
 #include "dd/Tdd.hpp"
 #include "dd/Tensor.hpp"
-#include "Cir_tn.hpp"
+#include "dd/Cir_tn.hpp"
 #include "dd/Tdd.hpp"
 #include "dd/Export.hpp"
-#include "Cir_tn.hpp"
 #include <xtensor/xarray.hpp>
 #include <xtensor-python/pyarray.hpp>
 

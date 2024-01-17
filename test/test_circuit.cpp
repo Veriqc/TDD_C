@@ -5,10 +5,10 @@
 #include <ctime>
 
 
-#include "../include/dd/Export.hpp"
+#include "dd/Export.hpp"
 #include <xtensor/xio.hpp>
 #include <xtensor/xarray.hpp>
-#include "../include/Cir_tn.hpp"
+#include "dd/Cir_tn.hpp"
 
 void test_qasm();
 
