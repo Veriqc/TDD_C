@@ -155,7 +155,7 @@ void BindCir(py::module& m){
                 return cir_2_tn(path,file_name,package);
         },py::return_value_policy::reference);
 }
-PYBIND11_MODULE(TDD, m) {
+PYBIND11_MODULE(tensordd, m) {
     m.doc() = "pybind11 example plugin"; // optional module docstring
 
     BindComplex(m);
