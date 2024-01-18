@@ -10,7 +10,7 @@
 #include <algorithm>
 
 using namespace dd;
-TDD cont(dd::TensorNetwork* tn,dd::Package<>* ddpackage, bool release = true) {
+TDD cont(dd::TensorNetwork* ,dd::Package<>* ddpackage, bool release = true) {
     if (!ddpackage) {
         throw std::runtime_error("ddpackage is null");
     }
