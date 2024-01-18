@@ -2,6 +2,7 @@ from setuptools import setup, Extension, find_packages
 import numpy,os
 
 include_dir = os.path.abspath('../include')
+# @windows: conda_lib_include_dir = os.path.join(os.path.dirname(sys.executable), 'Library', 'include')
 project_name = "tensordd"
 class get_pybind_include(object):
     """Helper class to determine the pybind11 include path
@@ -21,9 +22,11 @@ ext_modules = [
             get_pybind_include(),
             include_dir, 
             numpy.get_include()
+            # @windows: ,conda_lib_include_dir
         ],
         language='c++',
         extra_compile_args=['-std=c++20']
+        # @windows: extra_compile_args=['/std:c++20']
     ),
 ]
 
