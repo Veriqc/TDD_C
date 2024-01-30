@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.16.0 FATAL_ERROR)
 
 set(CMAKE_SYSTEM_VERSION 10.0 CACHE STRING "" FORCE)
-option(BUILD_PYBIND "Build the pybind11 component" on)
-option(BUILD_TEST "Build the test executable")
+option(BUILD_PYBIND "Build the pybind11 component" OFF)
+option(BUILD_TEST "Build the test executable" on)
 project(TDD_C LANGUAGES CXX VERSION 0.0.1)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED On)
