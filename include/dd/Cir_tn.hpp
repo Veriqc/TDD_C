@@ -140,7 +140,7 @@ circuitReslut import_circuit(std::string file_name) {
 	std::getline(infile, line);
 	std::getline(infile, line);
 	std::getline(infile, line);
-	// std::getline(infile, line);
+	std::getline(infile, line);
 	while (std::getline(infile, line))
 	{
 		gate temp_gate;
@@ -507,7 +507,7 @@ int get_qubits_num(std::string  file_name) {
 	std::getline(infile, line);
 	std::getline(infile, line);
 	std::getline(infile, line);
-	// std::getline(infile, line);
+	std::getline(infile, line);
 	while (std::getline(infile, line))
 	{
 
@@ -560,7 +560,7 @@ int get_gates_num(std::string  file_name) {
 	std::getline(infile, line);
 	std::getline(infile, line);
 	std::getline(infile, line);
-	// std::getline(infile, line);
+	std::getline(infile, line);
 	while (std::getline(infile, line))
 	{
 		gates_num += 1;
