@@ -1,0 +1,3 @@
+[submodule "Benchmark"]
+	path = Benchmark
+	url = https://github.com/Veri-Q/Benchmark.git
