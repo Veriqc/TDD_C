@@ -12,7 +12,8 @@
 
 // TODO: hide the following two functions
 dd::ComplexValue Complex_Convert(const std::complex<double>& num){
-    return dd::ComplexValue(num.real(),num.imag());
+	dd::ComplexValue res = {num.real(),num.imag()};
+    return res;
 }
 
 xt::xarray<dd::ComplexValue> xarray_convert(const xt::xarray<std::complex<double>>& data){

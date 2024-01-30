@@ -124,10 +124,10 @@ namespace dd {
 			const xt::xarray<ComplexValue>& array,
 			std::vector<int> order){
 			if (array.size() == 1) {
-				 if (array[0] == ComplexValue(0,0)) {
+				 if (array[0].approximatelyZero()) {
 				 	return Edge<mNode>::zero;
 				 }
-				 else if (array[0] == ComplexValue(1,0)) {
+				 else if (array[0].approximatelyOne()) {
 				 	return Edge<mNode>::one;
 				 }
 				 else {
