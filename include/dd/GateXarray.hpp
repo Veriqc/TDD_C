@@ -5,7 +5,7 @@
 #include <set>
 namespace xgate{
 	std::set<std::string> singleGate = {"X","Y","Z","S","Sdag"};
-	std::set<std::string> twoGate = {"cx","cu1"};
+	std::set<std::string> twoGate = {"cx","cu1","swap"};
 	double SQRT2_2 = 0.707106781186547524400844362104849039284835937688474036588L;
 	dd::ComplexValue complex_one = {1., 0.};
 	dd::ComplexValue complex_mone = {-1., 0.};
@@ -92,6 +92,28 @@ namespace xgate{
             {
                 {complex_zero, complex_one},
                 {complex_one, complex_zero}
+            }
+        }
+    };
+    xt::xarray<dd::ComplexValue> SWAPmat{
+        {
+            {
+                {complex_one, complex_zero},
+                {complex_zero, complex_zero}
+            },
+            {
+                {complex_zero, complex_zero},
+                {complex_one, complex_zero}
+            }
+        },
+        {
+            {
+                {complex_zero, complex_one},
+                {complex_zero, complex_zero}
+            },
+            {
+                {complex_zero, complex_zero},
+                {complex_zero, complex_one}
             }
         }
     };
