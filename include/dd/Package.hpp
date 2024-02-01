@@ -164,6 +164,25 @@ namespace dd {
 			return makeDDNode((int16_t)x, edges, false);
 
 		}
+		Edge<mNode> makeZeroState(int n, std::size_t start = 0) {
+			if (n + start > nqubits) {
+			throw std::runtime_error("Requested state with " +
+						std::to_string(n + start) +
+						" qubits, but current package configuration only supports up to " +
+						std::to_string(nqubits) +
+						" qubits. Please allocate a larger package instance.");
+			}
+			auto f = Edge<mNode>::one;
+			for (std::size_t p = start; p < n + start; p++) {
+				std::vector<Edge<mNode>> temp = {f, Edge<mNode>::zero};
+				f = makeDDNode(static_cast<int16_t>(p), temp ,false);
+				if (!f.w.exactlyOne()) {
+					cn.returnToCache(f.w);
+					f.w = Complex::one;
+				}
+			}
+			return f;
+		}
 
 		int update_map_value() {
 			if (varOrder.empty()) {
