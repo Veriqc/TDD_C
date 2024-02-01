@@ -151,7 +151,7 @@ circuitReslut import_circuit(std::string file_name) {
 		temp_gate.name = g[0];
 
 		if (xgate::twoGate.find(g[0]) != xgate::twoGate.end()) {
-			std::regex pattern("q\\[(\\d+)\\], ?q\\[(\\d+)\\];");
+			std::regex pattern("q\\[(\\d+)\\], ?q\\[(\\d+)\\];\r?");
 			if (std::regex_match(g[1], result, pattern))
 			{
 				if (stoi(result[1]) > res.qubits_num) {
@@ -166,7 +166,7 @@ circuitReslut import_circuit(std::string file_name) {
 
 		}
 		else {
-			std::regex pattern("q\\[(\\d+)\\];");
+			std::regex pattern("q\\[(\\d+)\\];\r?");
 			if (regex_match(g[1], result, pattern))
 			{
 				if (stoi(result[1]) > res.qubits_num) {
@@ -212,16 +212,16 @@ std::map<int, std::vector<dd::Index>> get_circuit_index(const circuitReslut& cir
 			int tar_q = gateObj.qubits[1];
 			std::string cont_idx = "x";
 			cont_idx += std::to_string(con_q);
-			cont_idx += std::to_string(0);
+			cont_idx += "_";
 			cont_idx += std::to_string(qubit_idx[con_q]);
 			std::string targ_idx1 = "x";
 			targ_idx1 += std::to_string(tar_q);
-			targ_idx1 += std::to_string(0);
+			targ_idx1 += "_";
 			targ_idx1 += std::to_string(qubit_idx[tar_q]);
 			qubit_idx[tar_q] += 1;
 			std::string targ_idx2 = "x";
 			targ_idx2 += std::to_string(tar_q);
-			targ_idx2 += std::to_string(0);
+			targ_idx2 += "_";
 			targ_idx2 += std::to_string(qubit_idx[tar_q]);
 			Index_set[k] = {
 				{cont_idx,hyper_idx[cont_idx]},
@@ -238,23 +238,24 @@ std::map<int, std::vector<dd::Index>> get_circuit_index(const circuitReslut& cir
 			std::string targ_idx2 = "x";
 
 			targ_idx1 += std::to_string(tar_q);
-			targ_idx1 += std::to_string(0);
+			targ_idx1 += "_";
 			targ_idx1 += std::to_string(qubit_idx[tar_q]);
 			qubit_idx[tar_q] += 1;
 			targ_idx2 += std::to_string(tar_q);
-			targ_idx2 += std::to_string(0);
+			targ_idx2 += "_";
 			targ_idx2 += std::to_string(qubit_idx[tar_q]);
 			Index_set[k] = { {targ_idx1,hyper_idx[targ_idx1]},{targ_idx2,hyper_idx[targ_idx2]} };
-			if (nam == "z" || nam == "s" || nam == "sdg" || nam == "t" || nam == "tdg" || (nam[0] == 'u' && nam[1] == '1') || (nam[0] == 'r' && nam[1] == 'z')) {
-				Index_set[k] = {
-					{targ_idx1,hyper_idx[targ_idx1]},
-					{targ_idx1,short(hyper_idx[targ_idx1] + 1)} };
-				qubit_idx[tar_q] -= 1;
-				hyper_idx[targ_idx1] += 1;
-			}
-			else {
-				Index_set[k] = { {targ_idx1,hyper_idx[targ_idx1]},{targ_idx2,hyper_idx[targ_idx2]} };
-			}
+			// TODO:bug here
+			// if (nam == "z" || nam == "s" || nam == "sdg" || nam == "t" || nam == "tdg" || (nam[0] == 'u' && nam[1] == '1') || (nam[0] == 'r' && nam[1] == 'z')) {
+			// 	Index_set[k] = {
+			// 		{targ_idx1,hyper_idx[targ_idx1]},
+			// 		{targ_idx1,short(hyper_idx[targ_idx1] + 1)} };
+			// 	qubit_idx[tar_q] -= 1;
+			// 	hyper_idx[targ_idx1] += 1;
+			// }
+			// else {
+			// 	Index_set[k] = { {targ_idx1,hyper_idx[targ_idx1]},{targ_idx2,hyper_idx[targ_idx2]} };
+			// }
 		}
 		//std::cout << k << " ";
 		//print_index_set(Index_set[k]);
@@ -476,7 +477,7 @@ std::map<std::string, int> get_var_order(const int qubits_num,const int gates_nu
 		for (int k2 = gates_num; k2 >= 0; k2--) {
 			idx_nam = "x";
 			idx_nam += std::to_string(k);
-			idx_nam += std::to_string(0);
+			idx_nam += "_";
 			idx_nam += std::to_string(k2);
 			var[idx_nam] = order_num;
 			order_num -= 1;
@@ -593,7 +594,7 @@ dd::Tensor gate_2_tensor(std::string name, std::vector<dd::Index> index_set) {
 		std::smatch result;
 		if (std::regex_search(name, result, std::regex("u1\\((-?\\d+\\.\\d+)\\)"))) {
 			int Fraction = stof(result[1]);
-			return dd::Tensor(xgate::CU1mat(PI/Fraction), index_set, "cu1");
+			return dd::Tensor(xgate::CU1mat(dd::PI/Fraction), index_set, "cu1");
 		}
 	}
 	if (name.rfind("cu1(", 0) == 0) {
