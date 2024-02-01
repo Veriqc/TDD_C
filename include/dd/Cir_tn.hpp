@@ -150,7 +150,7 @@ circuitReslut import_circuit(std::string file_name) {
 
 		temp_gate.name = g[0];
 
-		if (g[0] == "cx") {
+		if (xgate::twoGate.find(g[0]) != xgate::twoGate.end()) {
 			std::regex pattern("q\\[(\\d+)\\], ?q\\[(\\d+)\\];");
 			if (std::regex_match(g[1], result, pattern))
 			{
@@ -207,7 +207,7 @@ std::map<int, std::vector<dd::Index>> get_circuit_index(const circuitReslut& cir
 		std::string nam = gateObj.name;
 		//std::cout << nam << std::endl;
 		//std::cout << gate_set[k].qubits[0]<<"    "<<gate_set[k].qubits[1] << endl;
-		if (nam == "cx") {
+		if (xgate::twoGate.find(nam) != xgate::twoGate.end()) {
 			int con_q = gateObj.qubits[0];
 			int tar_q = gateObj.qubits[1];
 			std::string cont_idx = "x";
@@ -515,7 +515,7 @@ int get_qubits_num(std::string  file_name) {
 
 		std::smatch result;
 
-		if (g[0] == "cx") {
+		if (xgate::twoGate.find(g[0]) != xgate::twoGate.end()) {
 
 			std::regex pattern("q\\[(\\d+)\\],q\\[(\\d+)\\];\r?");
 			if (std::regex_match(g[1], result, pattern))
@@ -592,6 +592,13 @@ dd::Tensor gate_2_tensor(std::string name, std::vector<dd::Index> index_set) {
 	if (name.rfind("u1(", 0) == 0) {
 		std::smatch result;
 		if (std::regex_search(name, result, std::regex("u1\\((-?\\d+\\.\\d+)\\)"))) {
+			int Fraction = stof(result[1]);
+			return dd::Tensor(xgate::CU1mat(PI/Fraction), index_set, "cu1");
+		}
+	}
+	if (name.rfind("cu1(", 0) == 0) {
+		std::smatch result;
+		if (std::regex_search(name, result, std::regex("cu1\\(pi/(\\d+)(?:\\))"))) {
 			float theta = stof(result[1]);
 			return dd::Tensor(xgate::Phasemat(theta), index_set, "Rz");
 		}
@@ -609,6 +616,7 @@ dd::Tensor gate_2_tensor(std::string name, std::vector<dd::Index> index_set) {
 }
 
 dd::TensorNetwork cir_2_tn(std::string path, std::string  file_name, dd::Package<>* ddpack) {
+	// TODO: optimize code structure
 	if (!ddpack) {
 		throw std::runtime_error("ddpackage is null");
 	}
@@ -625,8 +633,6 @@ dd::TensorNetwork cir_2_tn(std::string path, std::string  file_name, dd::Package
 		tn.add_ts(gate_2_tensor(cir.gate_set[k].name, Index_set[k]));
 	}
 
-	// std::cout << "init ts" << std::endl;
-	// tn.cont(ddpack);
 	std::cout << "done" << std::endl;
 	return tn;
 }

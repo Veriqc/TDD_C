@@ -2,8 +2,10 @@
 #define xgate
 #include "Complex.hpp"
 #include <xtensor/xarray.hpp>
-
+#include <set>
 namespace xgate{
+	std::set<std::string> singleGate = {"X","Y","Z","S","Sdag"};
+	std::set<std::string> twoGate = {"cx","cu1"};
 	double SQRT2_2 = 0.707106781186547524400844362104849039284835937688474036588L;
 	dd::ComplexValue complex_one = {1., 0.};
 	dd::ComplexValue complex_mone = {-1., 0.};
@@ -94,6 +96,30 @@ namespace xgate{
         }
     };
 
+	xt::xarray<dd::ComplexValue> CU1mat(double lambda){
+	return xt::xarray<dd::ComplexValue>{
+        {
+            {
+                {complex_one, complex_zero},
+                {complex_zero, complex_one}
+            },
+            {
+                {complex_zero, complex_zero},
+                {complex_zero, complex_zero}
+            }
+        },
+        {
+            {
+                {complex_zero, complex_zero},
+                {complex_zero, complex_zero}
+            },
+            {
+                {complex_one, complex_zero},
+                {complex_zero, {std::cos(lambda), std::sin(lambda)}}
+            }
+        }
+    };
+	}
 	xt::xarray<dd::ComplexValue> U3mat(double lambda, double phi, double theta) {
 	return xt::xarray<dd::ComplexValue>{
             {
