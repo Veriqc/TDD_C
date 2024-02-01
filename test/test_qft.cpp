@@ -10,16 +10,7 @@
 #include <algorithm>
 
 using namespace dd;
-TDD makezero(int n, dd::Package<>* ddpackage) {
-    TensorNetwork tn;
-    for(int i=0; i < n; i++){
-        xt::xarray<dd::ComplexValue> zero = {complex_one,complex_zero};
-        Tensor temp = Tensor(zero,{{"x"+std::to_string(i)+"_0",0}});
-        tn.add_ts(temp);
-    }
-    return tn.cont(ddpackage);
-}
-TDD cont(dd::TensorNetwork* tn,dd::Package<>* ddpackage, int n,bool release = true) {
+TDD cont(dd::TensorNetwork* tn,dd::Package<>* ddpackage, bool release = true) {
     if (!ddpackage) {
         throw std::runtime_error("ddpackage is null");
     }
@@ -28,13 +19,14 @@ TDD cont(dd::TensorNetwork* tn,dd::Package<>* ddpackage, int n,bool release = tr
     }
 
     clock_t start,end;
-    TDD res_dd = makezero(n,ddpackage);
+    TDD res_dd = tn->tensors[0].to_tdd(ddpackage);
+
 
     ddpackage->incRef(res_dd.e);
     TDD temp_dd;
     unsigned int MAX_NODE = ddpackage->size(res_dd.e);
     start = clock();
-    for (int i=0; i < tn->tensors.size(); ++i) {
+    for (int i=1; i < tn->tensors.size(); ++i) {
         auto tensor = tn->tensors[i];
         try{
             temp_dd = ddpackage->cont(res_dd, tensor.to_tdd(ddpackage));
@@ -63,15 +55,15 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    std::string path2 = std::string(PROJECT_SOURCE_DIR)+"/Benchmark/combinational/bv/";
-    std::string file_name = std::string("bv_") + argv[1] + ".qasm";
+    std::string path2 = std::string(PROJECT_SOURCE_DIR)+"/Benchmark/combinational/qft/";
+    std::string file_name = std::string("qft_") + argv[1] + ".qasm";
 	std::cout << path2+file_name << std::endl;
     
     int n = get_qubits_num(path2 + file_name);
     auto ddpack = std::make_unique<dd::Package<>>(3 * n);
     dd::TensorNetwork tn = cir_2_tn(path2, file_name, ddpack.get());
 
-	dd::TDD tdd = cont(&tn,ddpack.get(),n);
+	dd::TDD tdd = cont(&tn,ddpack.get());
     
     std::cout<<"final node: " << ddpack->size(tdd.e) <<std::endl;
     return 0;

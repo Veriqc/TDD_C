@@ -6,6 +6,9 @@ set(TEST_SOURCES
     test_tdd.cpp
     test_bv.cpp
     test_zero.cpp
+    test_qft.cpp
+    test_cl.cpp
+    test_clt.cpp
     # Add new test files here
 )
 

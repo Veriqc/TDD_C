@@ -63,8 +63,8 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    std::string path2 = std::string(PROJECT_SOURCE_DIR)+"/Benchmark/combinational/bv/";
-    std::string file_name = std::string("bv_") + argv[1] + ".qasm";
+    std::string path2 = std::string(PROJECT_SOURCE_DIR)+"/Benchmark/Clifford_T/";
+    std::string file_name = std::string("clifford_") + argv[1] + ".qasm";
 	std::cout << path2+file_name << std::endl;
     
     int n = get_qubits_num(path2 + file_name);
