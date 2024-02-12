@@ -150,7 +150,7 @@ circuitReslut import_circuit(std::string file_name) {
 
 		temp_gate.name = g[0];
 
-		if (xgate::twoGate.find(g[0]) != xgate::twoGate.end()) {
+		if (xgate::twoGate.find(g[0]) != xgate::twoGate.end()||g[0].substr(0,3)=="cu1") {
 			std::regex pattern("q\\[(\\d+)\\], ?q\\[(\\d+)\\];\r?");
 			if (std::regex_match(g[1], result, pattern))
 			{
@@ -207,10 +207,10 @@ std::map<int, std::vector<dd::Index>> get_circuit_index(const circuitReslut& cir
 		std::string nam = gateObj.name;
 		//std::cout << nam << std::endl;
 		//std::cout << gate_set[k].qubits[0]<<"    "<<gate_set[k].qubits[1] << endl;
-		if (xgate::twoGate.find(nam) != xgate::twoGate.end()) {
+		if (xgate::twoGate.find(nam) != xgate::twoGate.end()||nam.substr(0,3)=="cu1") {
 			int con_q = gateObj.qubits[0];
 			int tar_q = gateObj.qubits[1];
-			std::string cont_idx = "x";
+						std::string cont_idx = "x";
 			cont_idx += std::to_string(con_q);
 			cont_idx += "_";
 			cont_idx += std::to_string(qubit_idx[con_q]);
@@ -516,7 +516,7 @@ int get_qubits_num(std::string  file_name) {
 
 		std::smatch result;
 
-		if (xgate::twoGate.find(g[0]) != xgate::twoGate.end()) {
+		if (xgate::twoGate.find(g[0]) != xgate::twoGate.end()||g[0].substr(0,3)=="cu1") {
 
 			std::regex pattern("q\\[(\\d+)\\],q\\[(\\d+)\\];\r?");
 			if (std::regex_match(g[1], result, pattern))
@@ -593,15 +593,15 @@ dd::Tensor gate_2_tensor(std::string name, std::vector<dd::Index> index_set) {
 	if (name.rfind("u1(", 0) == 0) {
 		std::smatch result;
 		if (std::regex_search(name, result, std::regex("u1\\((-?\\d+\\.\\d+)\\)"))) {
-			int Fraction = stof(result[1]);
-			return dd::Tensor(xgate::CU1mat(dd::PI/Fraction), index_set, "cu1");
+			float theta = stof(result[1]);
+			return dd::Tensor(xgate::Phasemat(theta), index_set, "Rz");
 		}
 	}
 	if (name.rfind("cu1(", 0) == 0) {
 		std::smatch result;
 		if (std::regex_search(name, result, std::regex("cu1\\(pi/(\\d+)(?:\\))"))) {
-			float theta = stof(result[1]);
-			return dd::Tensor(xgate::Phasemat(theta), index_set, "Rz");
+			int Fraction = stof(result[1]);
+			return dd::Tensor(xgate::CU1mat(PI/Fraction), index_set, "cu1");
 		}
 	}
 	if (name.rfind("u3(", 0) == 0) {

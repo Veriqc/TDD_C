@@ -848,7 +848,7 @@ namespace dd {
 			ResultEdge e1{}, e2{}, r{};
 
 			if (newk1 > newk2) {
-				if (int(newk1 * 2) % 2 == 1) {
+				if (int(newk1 * 2) % 2 != 0) {
 					r = ResultEdge::zero;
 					ResultEdge etemp{};
 					for (int k = 0; k < x.p->e.size(); ++k) {
@@ -879,7 +879,7 @@ namespace dd {
 				}
 			}
 			else if (newk1 < newk2) {
-				if (int(newk2 * 2) % 2 == 1) {
+				if (int(newk2 * 2) % 2 != 0) {
 					r = ResultEdge::zero;
 					ResultEdge etemp{};
 					for (int k = 0; k < y.p->e.size(); ++k) {
@@ -911,7 +911,7 @@ namespace dd {
 
 			}
 			else {
-				if (int(newk2 * 2) % 2 == 1) {
+				if (int(newk2 * 2) % 2 != 0) {
 					r = ResultEdge::zero;
 					ResultEdge etemp{};
 					for (int k = 0; k < x.p->e.size(); ++k) {
