@@ -26,5 +26,7 @@ int main(){
     const auto qc = qc::QuantumComputation::fromQASM(fileContent);
     std::unique_ptr<qc::QuantumComputation> QC = std::make_unique<qc::QuantumComputation>(std::move(qc));
     auto ddPack = std::make_unique<dd::Package<>>(QC->getNqubits());
-    cir_2_tn(QC,ddPack);
+    auto ts = cir_2_tn(QC,ddPack);
+    std::cout << ts.infor() << std::endl;
+    ts.cont(ddPack.get());
 }

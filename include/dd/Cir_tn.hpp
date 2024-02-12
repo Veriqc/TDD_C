@@ -779,8 +779,11 @@ dd::TensorNetwork cir_2_tn(std::unique_ptr<qc::QuantumComputation>& QC, std::uni
 		}
 
 		auto indexSet = getOpIndex(op,existIndexs,hyperIndexs);
-		print_index_set(indexSet);
-		std::cout << getOpData(op) << std::endl;
+		auto data = getOpData(op);
+
+		std::string prefix(op->getControls().size(), 'c');
+		std::string gateName = prefix + op->getName();
+		tn.add_ts(dd::Tensor(data,indexSet,gateName));
 	}
 	return tn;
 
