@@ -18,7 +18,10 @@ endif()
 
 message(STATUS "add library")
 
+# Define ${DD_LIBRARY} as an INTERFACE library since it's header-only
 add_library(${DD_LIBRARY} INTERFACE)
+
+# Specify include directories for ${DD_LIBRARY}
 target_include_directories(${DD_LIBRARY} INTERFACE 
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include> 
     $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
@@ -26,9 +29,14 @@ target_include_directories(${DD_LIBRARY} INTERFACE
     ${XTENSOR_INCLUDE_DIRS} 
     ${XTL_INCLUDE_DIRS}
 )
+
+# Specify compile features for ${DD_LIBRARY}
 target_compile_features(${DD_LIBRARY} INTERFACE cxx_auto_type)
 
-# Add only .hpp files from the dd folder
+# Link ${DD_LIBRARY} with ${CORE_LIBRARY}. Since ${DD_LIBRARY} is an INTERFACE library,
+# it does not link directly but specifies that consumers of ${DD_LIBRARY} need to link with ${CORE_LIBRARY}
+target_link_libraries(${DD_LIBRARY} INTERFACE ${CORE_LIBRARY})
+
 target_sources(${DD_LIBRARY} INTERFACE
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include/dd/Cir_tn.hpp>
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include/dd/Complex.hpp>

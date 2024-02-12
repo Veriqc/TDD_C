@@ -12,6 +12,7 @@
 
 #include "dd/Tensor.hpp"
 #include "dd/Package.hpp"
+#include "QuantumComputation.hpp"
 
 #include <xtensor/xarray.hpp>
 
@@ -636,5 +637,24 @@ dd::TensorNetwork cir_2_tn(std::string path, std::string  file_name, dd::Package
 
 	std::cout << "done" << std::endl;
 	return tn;
+}
+
+// dd::Tensor op_2_tensor(std::unique_ptr<qc::Operation> op) {
+void op_2_tensor(const std::unique_ptr<qc::Operation>& op) {
+	if(op->isControlled()){
+      auto c = op->getControls();
+      for(auto i: c){
+        std::cout << i.qubit << " ";
+      }
+      std::cout << std::endl;
+    }
+    std::cout<< op->getName() << std::endl;
+}
+
+// dd::TensorNetwork cir_2_tn(std::unique_ptr<qc::QuantumComputation qc, std::unique_ptr<dd::Package<>> ddPack){
+void cir_2_tn(std::unique_ptr<qc::QuantumComputation>& QC, std::unique_ptr<dd::Package<>>& ddPack){
+	for(const auto& op: *QC){
+		op_2_tensor(op);
+	}
 }
 #endif
