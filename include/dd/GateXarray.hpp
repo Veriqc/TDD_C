@@ -170,6 +170,15 @@ namespace xgate{
             }
         };
 	}
+
+    // xt::xarray<dd::ComplexValue> Controlmat(xt::xarray<dd::ComplexValue> workmat, size_t ncontrol){
+    //     if(workmat.dimn() != || workmat.shape()[0] != workmat.shape()[1]){
+    //         throw std::invalid_argument("wrong matrix for work matrix");
+    //     }
+    //     size_t n = 1 << (ncontrol + workmat.shape()[0]); // 2^(ncontrol + workmat.shape()[0])
+    // TODO: add support
+        
+    // }
 }
 
 #endif

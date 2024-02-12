@@ -639,22 +639,150 @@ dd::TensorNetwork cir_2_tn(std::string path, std::string  file_name, dd::Package
 	return tn;
 }
 
-// dd::Tensor op_2_tensor(std::unique_ptr<qc::Operation> op) {
 void op_2_tensor(const std::unique_ptr<qc::Operation>& op) {
-	if(op->isControlled()){
+	std::cout << "----------------------" <<std::endl;
+    std::cout<< op->getName() << std::endl;
+    std::cout << "is control: "<<op->isControlled() << std::endl;
+	std::cout << "is stanard: "<<op->isStandardOperation() << std::endl;
+    std::cout << "qubits: " ;
+    for(auto& q: op->getUsedQubits()){
+      std::cout << q <<" ";
+    }
+    std::cout << std::endl;
+    if(op->isControlled()){
+      std::cout << "controls:";
       auto c = op->getControls();
       for(auto i: c){
         std::cout << i.qubit << " ";
       }
       std::cout << std::endl;
+	  std::cout << "targets:";
+      auto t = op->getTargets();
+      for(auto i: t){
+        std::cout << i << " ";
+      }
+      std::cout << std::endl;
     }
-    std::cout<< op->getName() << std::endl;
+    auto p = op->getParameter();
+    if(!p.empty()){
+      std::cout << "para" << std::endl;
+      for(auto& i: p){
+        std::cout << i << " ";
+      }
+	std::cout << std::endl;
+	}
 }
 
-// dd::TensorNetwork cir_2_tn(std::unique_ptr<qc::QuantumComputation qc, std::unique_ptr<dd::Package<>> ddPack){
-void cir_2_tn(std::unique_ptr<qc::QuantumComputation>& QC, std::unique_ptr<dd::Package<>>& ddPack){
-	for(const auto& op: *QC){
-		op_2_tensor(op);
+std::vector<dd::Index> getOpIndex(const std::unique_ptr<qc::Operation>& op,std::vector<int>& existIndexs, std::map<std::string, short>& hyperIndexs){
+	size_t n = op->getUsedQubits().size();
+
+	auto buildIndex = [](int q, int idx) {
+		std::ostringstream oss;
+		oss << 'x' << q << '_' << idx;
+		return oss.str();
+	};
+	std::vector<dd::Index> indexSet;
+
+	if (op->isControlled() && n == 2) {
+		auto it = op->getControls();
+		const int con_q = it.begin()->qubit;
+		const int tar_q = op->getTargets()[0];
+
+		const std::string cont_idx = buildIndex(con_q, existIndexs[con_q]);
+		const std::string targ_idx1 = buildIndex(tar_q, existIndexs[tar_q]);
+		existIndexs[tar_q] += 1;
+		const std::string targ_idx2 = buildIndex(tar_q, existIndexs[tar_q]);
+
+		indexSet = {
+			{cont_idx, hyperIndexs[cont_idx]},
+			{cont_idx, static_cast<short>(hyperIndexs[cont_idx] + 1)},
+			{targ_idx1, hyperIndexs[targ_idx1]},
+			{targ_idx2, hyperIndexs[targ_idx2]}
+		};
+		hyperIndexs[cont_idx] += 1;
+		return indexSet;
 	}
+	else if (n == 1){
+		const int tar_q = *op->getUsedQubits().begin();
+		const std::string targ_idx1 = buildIndex(tar_q,existIndexs[tar_q]);
+		existIndexs[tar_q] += 1;
+		const std::string targ_idx2 = buildIndex(tar_q,existIndexs[tar_q]);
+		indexSet = {
+			{targ_idx1,hyperIndexs[targ_idx1]},
+			{targ_idx2,hyperIndexs[targ_idx2]}
+		};
+		return indexSet;
+	}
+	throw std::invalid_argument("throw from getOpIndex. unknown gate: "+ op->getName());
+}
+
+xt::xarray<dd::ComplexValue> getOpData(const std::unique_ptr<qc::Operation>& op) {
+    static const std::map<std::string, xt::xarray<dd::ComplexValue>> supportGate = {
+        {"x", xgate::Xmat}, {"y", xgate::Ymat}, {"z", xgate::Zmat}, {"h", xgate::Hmat},
+        {"s", xgate::Smat}, {"sdg", xgate::Sdagmat}, {"t", xgate::Tmat}, {"tdg", xgate::Tdagmat},
+        {"swap", xgate::SWAPmat},
+    };
+
+    const std::string& gateName = op->getName(); // Use reference to avoid copying
+    const auto& parameters = op->getParameter(); // Avoid multiple calls
+    size_t Npara = parameters.size();
+    bool isControlled = op->isControlled();
+
+    // Check for non-controlled operations with no parameters first
+    if (!isControlled && Npara == 0) {
+        auto it = supportGate.find(gateName);
+        if (it != supportGate.end()) {
+            return it->second;
+        }
+    } 
+    else if (!isControlled && Npara == 1 && gateName == "p") {
+        return xgate::Phasemat(parameters[0]);
+    } 
+    else if (isControlled && Npara == 0 && gateName == "x") {
+        return xgate::CXmat;
+    }
+
+    // If no condition is met, throw an exception
+    std::string prefix(op->getControls().size(), 'c'); // Create a string of 'c' characters
+	throw std::invalid_argument("Unsupported gate: " + prefix + gateName);
+}
+
+
+dd::TensorNetwork cir_2_tn(std::unique_ptr<qc::QuantumComputation>& QC, std::unique_ptr<dd::Package<>>& ddPack){
+	auto var = get_var_order(QC->getNqubits(), QC->getNops());
+	ddPack->varOrder = var;
+
+	std::vector<int> existIndexs(QC->getNqubits(), 0);
+	std::map<std::string, short> hyperIndexs;
+	for (const auto& pair : var) {
+		hyperIndexs[pair.first] = 0;
+	}
+
+	dd::TensorNetwork tn;
+	for(const auto& op: *QC){
+		// op_2_tensor(op);
+		if(!op->isStandardOperation()){
+			throw std::invalid_argument("unstandard gate, which is not support");
+		}
+		// if it contains any dynamic circuit primitives, it certainly is dynamic
+		if (op->isClassicControlledOperation() || op->getType() == qc::Reset) {
+			// isDynamicCircuit = true;
+			throw std::invalid_argument("a dynamic circuit, which is not suppory");
+		}
+
+		// once a measurement is encountered we store the corresponding mapping
+		// (qubit -> bit)
+		if (const auto* measure = dynamic_cast<qc::NonUnitaryOperation*>(op.get());
+			measure != nullptr && measure->getType() == qc::Measure) {
+			// hasMeasurements = true;
+			throw std::invalid_argument("have measurement, which is not suppory");
+		}
+
+		auto indexSet = getOpIndex(op,existIndexs,hyperIndexs);
+		print_index_set(indexSet);
+		std::cout << getOpData(op) << std::endl;
+	}
+	return tn;
+
 }
 #endif
