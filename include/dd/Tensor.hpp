@@ -60,10 +60,7 @@ namespace dd {
 			Tensor(const xt::xarray<std::complex<double>>& data_ ,
 			const std::vector<Index>& index_set_ = std::vector<Index>(),
 			const std::string& name_ = "") : data(xarray_convert(data_)), index_set(index_set_), name(name_) {}
-			TDD to_tdd(Package<>* ddpackage, const bool show = false) {
-				if (!ddpackage) {
-					throw std::runtime_error("ddpackage is null");
-				}
+			TDD to_tdd(std::shared_ptr<Package<>> ddpackage, const bool show = false) {
 				
 				if (this->data.dimension() != this->index_set.size()) {
 					std::cerr << "dim: " << this->data.dimension() << std::endl;
@@ -118,10 +115,7 @@ namespace dd {
 				return "a tensor network with " + std::to_string(this->tensors.size()) + " tensors";
 			}
 
-			TDD cont(Package<>* ddpackage) {
-				if (!ddpackage) {
-					throw std::runtime_error("ddpackage is null");
-				}
+			TDD cont(std::shared_ptr<Package<>> ddpackage) {
 				if (this->tensors.size() == 0) {
 					throw std::runtime_error("null tensor network");
 				}

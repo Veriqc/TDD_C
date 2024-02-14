@@ -63,11 +63,10 @@ void BindPackage(py::module& m){
             py::arg("tdd1"), py::arg("tdd2"),"cont(tdd1,tdd2)")
         .def_readwrite("test",&dd::Package<>::to_test);
     m.def("init", [](int n) {
-            auto pkg = std::make_unique<dd::Package<>>(n);
-            return pkg.release();
+            return std::make_shared<dd::Package<>>(n);
         },
         py::arg("nqubits"),
-    py::return_value_policy::reference);
+    py::return_value_policy::automatic);
 }
 
 void BindTensor(py::module& m){
@@ -75,12 +74,12 @@ void BindTensor(py::module& m){
         .def(py::init<const xt::xarray<std::complex<double>>&,
                         const std::vector<dd::Index>&,
                         const std::string&>())
-        .def("to_tdd", [](dd::Tensor &tensor, dd::Package<> *package, bool show) {
+        .def("to_tdd", [](dd::Tensor &tensor, std::shared_ptr<dd::Package<>> package, bool show) {
                 return tensor.to_tdd(package, show);
             },
             py::arg("ddPackage"),
             py::arg("show")=false,
-        py::return_value_policy::reference);
+        py::return_value_policy::automatic);
 }
 
 void BindTn(py::module& m){
@@ -88,11 +87,11 @@ void BindTn(py::module& m){
         .def(py::init<const std::vector<dd::Tensor>&>())
         .def("infor", &dd::TensorNetwork::infor)
         .def("add",&dd::TensorNetwork::add_ts)
-        .def("to_tdd",[](dd::TensorNetwork &tn, dd::Package<> *package) {
+        .def("to_tdd",[](dd::TensorNetwork &tn, std::shared_ptr<dd::Package<>> package) {
                 return tn.cont(package);
             },
             py::arg("ddPackage"),
-        py::return_value_policy::reference)
+        py::return_value_policy::automatic)
         .def("__repr__",
              [](dd::TensorNetwork &tn) {
                  return tn.infor();
