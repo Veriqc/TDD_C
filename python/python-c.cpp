@@ -49,7 +49,7 @@ void BindTDD(py::module& m){
 }
 
 void BindPackage(py::module& m){
-    py::class_<dd::Package<>,std::shared_ptr<dd::Package<>>>(m, "ddpackage")
+    py::class_<dd::Package<>,std::shared_ptr<dd::Package<>>>(m, "Package")
         .def(py::init<int>())
         .def_readwrite("order",&dd::Package<>::varOrder)
         .def("__repr__",[](std::shared_ptr<dd::Package<>> ddpack){
@@ -57,7 +57,7 @@ void BindPackage(py::module& m){
             for (const auto& pair : ddpack->varOrder) {
                 mapAsString += pair.first + ": " + std::to_string(pair.second) + "; ";
             }
-            return "ddpack order: "+ mapAsString;
+            return "package order: "+ mapAsString;
         })
         .def("cont",&dd::Package<>::cont,
             py::arg("tdd1"), py::arg("tdd2"),"cont(tdd1,tdd2)")
@@ -65,7 +65,7 @@ void BindPackage(py::module& m){
     m.def("init", [](int n) {
             return std::make_shared<dd::Package<>>(n);
         },
-        py::arg("nqubits"),
+        py::arg("qubit number"),
     py::return_value_policy::automatic);
 }
 
@@ -124,35 +124,52 @@ void BindIndex(py::module& m){
         });
 }
 
-void Binddraw(py::module& m){
-    m.def("draw", [](const dd::mEdge& basic,
-                     const std::string& outputFilename,
-                     bool colored, bool edgeLabels,
-                     bool classic, bool memory,
-                     bool show, bool formatAsPolar) {
-            try{
-                dd::export2Dot(basic, outputFilename, colored, edgeLabels, classic, memory, show, formatAsPolar);
-            } catch (const std::exception& e){
-                std::cerr << "Exception caught: " << e.what() << std::endl;
-                throw;
-            }
-        }, 
-        py::arg("basic"), 
-        py::arg("outputFilename"), 
-        py::arg("colored") = true, 
-        py::arg("edgeLabels") = false, 
-        py::arg("classic") = false, 
-        py::arg("memory") = false, 
-        py::arg("show") = true, 
-        py::arg("formatAsPolar") = true
-    );
+// void Binddraw(py::module& m){
+//     m.def("draw", [](const dd::mEdge& basic,
+//                      const std::string& outputFilename,
+//                      bool colored, bool edgeLabels,
+//                      bool classic, bool memory,
+//                      bool show, bool formatAsPolar) {
+//             try{
+//                 dd::export2Dot(basic, outputFilename, colored, edgeLabels, classic, memory, show, formatAsPolar);
+//             } catch (const std::exception& e){
+//                 std::cerr << "Exception caught: " << e.what() << std::endl;
+//                 throw;
+//             }
+//         }, 
+//         py::arg("basic"), 
+//         py::arg("outputFilename"), 
+//         py::arg("colored") = true, 
+//         py::arg("edgeLabels") = false, 
+//         py::arg("classic") = false, 
+//         py::arg("memory") = false, 
+//         py::arg("show") = true, 
+//         py::arg("formatAsPolar") = true
+//     );
+// }
+void toDotWrapper(const dd::mEdge& e, const std::string& filename, bool colored = true,
+                  bool edgeLabels = false, bool classic = false,
+                  bool memory = false, bool formatAsPolar = true) {
+    std::ofstream os(filename);
+    if (!os.is_open()) {
+        throw std::runtime_error("Cannot open file: " + filename);
+    }
+    dd::toDot(e, os, colored, edgeLabels, classic, memory, formatAsPolar);
+    os.close();
 }
+void Binddraw(py::module& m){
 
+    m.def("to_dot", &toDotWrapper, 
+            py::arg("edge"), py::arg("filename"), py::arg("colored") = true, 
+            py::arg("edge_labels") = false, py::arg("classic") = false,
+            py::arg("memory") = false, py::arg("format_as_polar") = true,
+            "A function to export the edge to a DOT file.");
+}
 void BindCir(py::module& m){
     m.def("qubit_in_cir",&get_qubits_num);
-    m.def("cir2tn", [](std::string path, std::string  file_name, dd::Package<> *package) {
+    m.def("cir2tn", [](std::string path, std::string  file_name, std::shared_ptr<dd::Package<>> package) {
                 return cir_2_tn(path,file_name,package);
-        },py::return_value_policy::reference);
+        },py::return_value_policy::automatic);
 }
 PYBIND11_MODULE(TDDpy, m) {
     m.doc() = "pybind11 example plugin"; // optional module docstring
