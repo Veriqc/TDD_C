@@ -10,7 +10,7 @@ mkdir build
 cd build
 
 # Run CMake to generate Makefiles
-cmake ..
+cmake  -DCMAKE_BUILD_TYPE=Debug ..
 
 # Build your project
 cmake --build .
