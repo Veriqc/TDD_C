@@ -34,11 +34,11 @@ void test_tn1() {
 	std::cout << path2+file_name << std::endl;
     int n = get_qubits_num(path2 + file_name);
 	std::cout << "qubits num: " << n << std::endl;
-    auto ddpack = std::make_unique<dd::Package<>>(3 * n);
-    dd::TensorNetwork tn = cir_2_tn(path2, file_name, ddpack.get());
+    auto ddpack = std::make_shared<dd::Package<>>(3 * n);
+    dd::TensorNetwork tn = cir_2_tn(path2, file_name, ddpack);
 	tn.infor();
 	ddpack->to_test = true;
-	dd::TDD tdd = tn.cont(ddpack.get());
+	dd::TDD tdd = tn.cont(ddpack);
 }
 
 void test_tn2() {
@@ -47,10 +47,10 @@ void test_tn2() {
 	std::cout << path2+file_name << std::endl;
     int n = get_qubits_num(path2 + file_name);
 	std::cout << "qubits num: " << n << std::endl;
-    auto ddpack = std::make_unique<dd::Package<>>(3 * n);
-    dd::TensorNetwork tn = cir_2_tn(path2, file_name, ddpack.get());
+    auto ddpack = std::make_shared<dd::Package<>>(3 * n);
+    dd::TensorNetwork tn = cir_2_tn(path2, file_name, ddpack);
 	tn.infor();
 	ddpack->to_test = true;
-	dd::TDD tdd = tn.cont(ddpack.get());
+	dd::TDD tdd = tn.cont(ddpack);
 	dd::export2Dot(tdd.e,"qasm_test");
 }

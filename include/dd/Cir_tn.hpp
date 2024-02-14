@@ -745,7 +745,7 @@ xt::xarray<dd::ComplexValue> getOpData(const std::unique_ptr<qc::Operation>& op)
 }
 
 
-dd::TensorNetwork cir_2_tn(std::unique_ptr<qc::QuantumComputation>& QC, std::unique_ptr<dd::Package<>>& ddPack){
+dd::TensorNetwork cir_2_tn(std::shared_ptr<qc::QuantumComputation>& QC, std::shared_ptr<dd::Package<>>& ddPack){
 	auto var = get_var_order(QC->getNqubits(), QC->getNops());
 	ddPack->varOrder = var;
 

@@ -10,7 +10,7 @@
 #include <algorithm>
 
 using namespace dd;
-TDD makezero(int n, dd::Package<>* ddpackage) {
+TDD makezero(int n, std::shared_ptr<dd::Package<>> ddpackage) {
     TensorNetwork tn;
     for(int i=0; i < n; i++){
         xt::xarray<dd::ComplexValue> zero = {complex_one,complex_zero};
@@ -28,7 +28,7 @@ TDD makezero(int n, dd::Package<>* ddpackage) {
     std::cout << std::endl;
     return res_dd;
 }
-TDD cont(dd::TensorNetwork* tn,dd::Package<>* ddpackage,int n, bool release = true) {
+TDD cont(dd::TensorNetwork* tn,std::shared_ptr<dd::Package<>> ddpackage,int n, bool release = true) {
     if (!ddpackage) {
         throw std::runtime_error("ddpackage is null");
     }
@@ -90,10 +90,10 @@ int main(int argc, char *argv[]) {
 	std::cout << path2+file_name << std::endl;
     
     int n = get_qubits_num(path2 + file_name);
-    auto ddpack = std::make_unique<dd::Package<>>(3 * n);
-    dd::TensorNetwork tn = cir_2_tn(path2, file_name, ddpack.get());
+    auto ddpack = std::make_shared<dd::Package<>>(3 * n);
+    dd::TensorNetwork tn = cir_2_tn(path2, file_name, ddpack);
 
-	dd::TDD tdd = cont(&tn,ddpack.get(),n);
+	dd::TDD tdd = cont(&tn,ddpack,n);
     
     std::cout<<"final node: " << ddpack->size(tdd.e) <<std::endl;
     return 0;

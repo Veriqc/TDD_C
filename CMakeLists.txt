@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.20.0 FATAL_ERROR)
 
 set(CMAKE_SYSTEM_VERSION 10.0 CACHE STRING "" FORCE)
 option(BUILD_PYBIND "Build the pybind11 component" on)
-option(BUILD_TEST "Build the test executable" OFF)
+option(BUILD_TEST "Build the test executable" on)
 option(BUILD_INSTALL "Build the make install" OFF)
 
 # add -fPIC to the compilation flags
