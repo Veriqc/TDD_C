@@ -1,10 +1,12 @@
 cmake_minimum_required(VERSION 3.20.0 FATAL_ERROR)
 
 set(CMAKE_SYSTEM_VERSION 10.0 CACHE STRING "" FORCE)
-option(BUILD_PYBIND "Build the pybind11 component" OFF)
+option(BUILD_PYBIND "Build the pybind11 component" on)
 option(BUILD_TEST "Build the test executable" on)
 option(BUILD_INSTALL "Build the make install" OFF)
 
+# add -fPIC to the compilation flags
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(DD_LIBRARY "TDD_C")
 set(CORE_LIBRARY "TDD_CORE")
 set(PYBIND_COM "TDDpy")

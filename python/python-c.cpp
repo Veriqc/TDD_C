@@ -52,7 +52,7 @@ void BindPackage(py::module& m){
     py::class_<dd::Package<>,std::shared_ptr<dd::Package<>>>(m, "ddpackage")
         .def(py::init<int>())
         .def_readwrite("order",&dd::Package<>::varOrder)
-        .def("__repr__",[](dd::Package<> *ddpack){
+        .def("__repr__",[](std::shared_ptr<dd::Package<>> ddpack){
             std::string mapAsString;
             for (const auto& pair : ddpack->varOrder) {
                 mapAsString += pair.first + ": " + std::to_string(pair.second) + "; ";
@@ -155,7 +155,7 @@ void BindCir(py::module& m){
                 return cir_2_tn(path,file_name,package);
         },py::return_value_policy::reference);
 }
-PYBIND11_MODULE(tensordd, m) {
+PYBIND11_MODULE(TDDpy, m) {
     m.doc() = "pybind11 example plugin"; // optional module docstring
 
     BindComplex(m);
