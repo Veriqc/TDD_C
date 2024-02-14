@@ -617,7 +617,7 @@ dd::Tensor gate_2_tensor(std::string name, std::vector<dd::Index> index_set) {
 	throw std::invalid_argument("Unsupported gate: " + name);
 }
 
-dd::TensorNetwork cir_2_tn(std::string path, std::string  file_name, std::shared_ptr<dd::Package<>> ddpack) {
+dd::TensorNetwork cir_2_tn(std::string path, std::string  file_name, std::shared_ptr<dd::Package<>>& ddpack) {
 	// TODO: optimize code structure
 
 	circuitReslut cir = import_circuit(path + file_name);

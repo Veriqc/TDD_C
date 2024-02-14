@@ -4,11 +4,11 @@ set(TEST_SOURCES
     # test_whole.cpp
     test_tn.cpp
     test_tdd.cpp
-    # test_bv.cpp
-    # test_zero.cpp
-    # test_qft.cpp
-    # test_cl.cpp
-    # test_clt.cpp
+    test_bv.cpp
+    test_zero.cpp
+    test_qft.cpp
+    test_cl.cpp
+    test_clt.cpp
     test_io.cpp
     test_core.cpp
     # Add new test files here
