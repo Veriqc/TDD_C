@@ -15,6 +15,7 @@
 #include "QuantumComputation.hpp"
 
 #include <xtensor/xarray.hpp>
+#include <xtensor/xio.hpp>
 
 
 #ifndef gate
@@ -699,6 +700,31 @@ std::vector<dd::Index> getOpIndex(const std::unique_ptr<qc::Operation>& op,std::
 		hyperIndexs[cont_idx] += 1;
 		return indexSet;
 	}
+	else if (op->isControlled() && n == 3) {
+		auto it = op->getControls().begin();
+		const int con_q1 = it->qubit;
+		++ it;
+		const int con_q2 = it->qubit;
+		const int tar_q = op->getTargets()[0];
+
+		const std::string cont_idx1 = buildIndex(con_q1, existIndexs[con_q1]);
+		const std::string cont_idx2 = buildIndex(con_q2, existIndexs[con_q2]);
+		const std::string targ_idx1 = buildIndex(tar_q, existIndexs[tar_q]);
+		existIndexs[tar_q] += 1;
+		const std::string targ_idx2 = buildIndex(tar_q, existIndexs[tar_q]);
+
+		indexSet = {
+			{cont_idx1, hyperIndexs[cont_idx1]},
+			{cont_idx1, static_cast<short>(hyperIndexs[cont_idx1] + 1)},
+			{cont_idx2, hyperIndexs[cont_idx2]},
+			{cont_idx2, static_cast<short>(hyperIndexs[cont_idx2] + 1)},
+			{targ_idx1, hyperIndexs[targ_idx1]},
+			{targ_idx2, hyperIndexs[targ_idx2]}
+		};
+		hyperIndexs[cont_idx1] += 1;
+		hyperIndexs[cont_idx2] += 1;
+		return indexSet;
+	}
 	else if (n == 1){
 		const int tar_q = *op->getUsedQubits().begin();
 		const std::string targ_idx1 = buildIndex(tar_q,existIndexs[tar_q]);
@@ -710,7 +736,8 @@ std::vector<dd::Index> getOpIndex(const std::unique_ptr<qc::Operation>& op,std::
 		};
 		return indexSet;
 	}
-	throw std::invalid_argument("throw from getOpIndex. unknown gate: "+ op->getName());
+	std::string prefix(op->getNcontrols(), 'c');
+	throw std::invalid_argument("throw from getOpIndex. unknown gate: "+ prefix + op->getName());
 }
 
 xt::xarray<dd::ComplexValue> getOpData(const std::unique_ptr<qc::Operation>& op) {
@@ -723,25 +750,34 @@ xt::xarray<dd::ComplexValue> getOpData(const std::unique_ptr<qc::Operation>& op)
     const std::string& gateName = op->getName(); // Use reference to avoid copying
     const auto& parameters = op->getParameter(); // Avoid multiple calls
     size_t Npara = parameters.size();
-    bool isControlled = op->isControlled();
 
     // Check for non-controlled operations with no parameters first
-    if (!isControlled && Npara == 0) {
+	xt::xarray<dd::ComplexValue> res;
+    if (Npara == 0) {
         auto it = supportGate.find(gateName);
         if (it != supportGate.end()) {
-            return it->second;
+            res = it->second;
         }
+		else{
+			std::string prefix(op->getControls().size(), 'c'); // Create a string of 'c' characters
+			throw std::invalid_argument("Unsupported gate: " + prefix + gateName);
+		}
     } 
-    else if (!isControlled && Npara == 1 && gateName == "p") {
-        return xgate::Phasemat(parameters[0]);
+    else if (Npara == 1 && gateName == "p") {
+        res = xgate::Phasemat(parameters[0]);
     } 
-    else if (isControlled && Npara == 0 && gateName == "x") {
-        return xgate::CXmat;
-    }
+    else{
+		// If no condition is met, throw an exception
+		std::string prefix(op->getControls().size(), 'c'); // Create a string of 'c' characters
+		throw std::invalid_argument("Unsupported gate: " + prefix + gateName);	
+	}
 
-    // If no condition is met, throw an exception
-    std::string prefix(op->getControls().size(), 'c'); // Create a string of 'c' characters
-	throw std::invalid_argument("Unsupported gate: " + prefix + gateName);
+	size_t c = op->getNcontrols();
+	auto mat = xgate::controlMat(res,c);
+	std::string prefix(c, 'c');
+	std::cout << prefix << gateName << std::endl;
+	std::cout << mat << std::endl;
+	return mat;
 }
 
 
@@ -764,7 +800,7 @@ dd::TensorNetwork cir_2_tn(std::shared_ptr<qc::QuantumComputation>& QC, std::sha
 		// if it contains any dynamic circuit primitives, it certainly is dynamic
 		if (op->isClassicControlledOperation() || op->getType() == qc::Reset) {
 			// isDynamicCircuit = true;
-			throw std::invalid_argument("a dynamic circuit, which is not suppory");
+			throw std::invalid_argument("a dynamic circuit, which is not support");
 		}
 
 		// once a measurement is encountered we store the corresponding mapping
@@ -772,10 +808,11 @@ dd::TensorNetwork cir_2_tn(std::shared_ptr<qc::QuantumComputation>& QC, std::sha
 		if (const auto* measure = dynamic_cast<qc::NonUnitaryOperation*>(op.get());
 			measure != nullptr && measure->getType() == qc::Measure) {
 			// hasMeasurements = true;
-			throw std::invalid_argument("have measurement, which is not suppory");
+			throw std::invalid_argument("have measurement, which is not support");
 		}
 
 		auto indexSet = getOpIndex(op,existIndexs,hyperIndexs);
+		print_index_set(indexSet);
 		auto data = getOpData(op);
 
 		std::string prefix(op->getControls().size(), 'c');

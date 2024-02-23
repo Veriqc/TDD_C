@@ -5,7 +5,7 @@
 #include <iostream>
 #include <string>
 int main(){
-    const std::string filePath = std::string(PROJECT_SOURCE_DIR)+"/Benchmark/combinational/bv/bv_5.qasm";
+    const std::string filePath = std::string(PROJECT_SOURCE_DIR)+"/Benchmark/combinational/grover/grover_5.qasm";
 
     // Open the file
     std::ifstream fileStream(filePath);
