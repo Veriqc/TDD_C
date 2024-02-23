@@ -5,51 +5,57 @@
 #include <vector>
 
 // Function to simulate splitting and reshaping
-xt::xarray<int> reshapeViaSplit(const xt::xarray<int>& arr, int n) {
-    // Base case: If n is 1, the array is already at the desired shape
-    if (n == 1) {
-        return arr;
+xt::xarray<int> identity(int n) {
+    if (n==1){
+        return {{1, 0},{0, 1}};
     }
 
-    // Calculate the size of the sub-arrays after splitting
-    size_t newSize = 1<< (n - 1);
+    xt::xarray<int> I = identity(n-1);
 
-    // Placeholder for the result of the splits, initialized for demonstration
-    std::vector<xt::xarray<int>> splits;
+    auto originalShape = I.shape();
+    xt::xarray<int> zero = xt::xarray<int>::from_shape(originalShape);
+    zero.fill(0);
+    std::vector<size_t> newShape(originalShape.begin(), originalShape.end());
+    newShape.insert(newShape.begin(), {2, 2});
 
-    // Simulate horizontal and vertical splits
-    // For demonstration purposes, we'll just use views to represent splits
+    xt::xarray<int> combined = xt::xarray<int>::from_shape(newShape);
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < 2; j++) {
-            auto split = xt::view(arr, xt::range(i * newSize, (i + 1) * newSize), xt::range(j * newSize, (j + 1) * newSize));
-            splits.push_back(split);
+            if (i==j)
+            xt::view(combined, i, j) = I;
+            else
+            xt::view(combined, i, j) = zero;
         }
     }
+    return combined;
+}
 
-    // Recursively apply the function to each split and combine them
-    xt::xarray<int> combined = xt::xarray<int>::from_shape({2, 2, newSize, newSize});
-    int index = 0;
-    for (int i = 0; i < 2; i++) {
-        for (int j = 0; j < 2; j++) {
-            auto reshapedSplit = reshapeViaSplit(splits[index++], n - 1);
-            // Assign reshapedSplit to the correct position in combined
-            // This requires proper indexing or reshaping to fit into combined
-            // For demonstration, assuming reshapedSplit can be directly assigned
-            xt::view(combined, i, j) = reshapedSplit;
-        }
-    }
+xt::xarray<int> controlMat(xt::xarray<int> mat, int c){
+    if(c==0) return mat;
 
+    mat = controlMat(mat,c-1);
+    auto originalShape = mat.shape();
+    int n = mat.dimension()/2;
+    xt::xarray<int> zero = xt::xarray<int>::from_shape(originalShape);
+    zero.fill(0);
+    std::vector<size_t> newShape(originalShape.begin(), originalShape.end());
+    newShape.insert(newShape.begin(), {2, 2});
+
+    xt::xarray<int> combined = xt::xarray<int>::from_shape(newShape);
+    xt::view(combined, 0, 0) = identity(n);
+    xt::view(combined, 0, 1) = zero;
+    xt::view(combined, 1, 0) = zero;
+    xt::view(combined, 1, 1) = mat;
     return combined;
 }
 
 // Example usage
 int main() {
-    // Example: Initialize a 4x4 array to demonstrate the concept
-    xt::xarray<int> original = xt::arange(64).reshape({8, 8});
-    int n = 2; // For a 4x4 array, n=2 since 2^2 * 2^2 = 4 * 4
+    auto I = identity(3);
+    std::cout << I << std::endl;
+    std::cout << I.dimension() << std::endl;
 
-    auto reshaped = reshapeViaSplit(original, n);
-    std::cout << reshaped << std::endl;
-
+    auto cx = controlMat({{0, 1},{1, 0}},1);
+    std::cout << cx <<std::endl;
     return 0;
 }
