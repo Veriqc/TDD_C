@@ -681,63 +681,27 @@ std::vector<dd::Index> getOpIndex(const std::unique_ptr<qc::Operation>& op,std::
 	};
 	std::vector<dd::Index> indexSet;
 
-	if (op->isControlled() && n == 2) {
-		auto it = op->getControls();
-		const int con_q = it.begin()->qubit;
-		const int tar_q = op->getTargets()[0];
-
-		const std::string cont_idx = buildIndex(con_q, existIndexs[con_q]);
-		const std::string targ_idx1 = buildIndex(tar_q, existIndexs[tar_q]);
-		existIndexs[tar_q] += 1;
-		const std::string targ_idx2 = buildIndex(tar_q, existIndexs[tar_q]);
-
-		indexSet = {
-			{cont_idx, hyperIndexs[cont_idx]},
-			{cont_idx, static_cast<short>(hyperIndexs[cont_idx] + 1)},
-			{targ_idx1, hyperIndexs[targ_idx1]},
-			{targ_idx2, hyperIndexs[targ_idx2]}
-		};
-		hyperIndexs[cont_idx] += 1;
-		return indexSet;
+	if (op->isControlled()) {
+		auto controls = op->getControls(); // Assuming this returns a container of control qubits
+		// Loop through the control qubits
+		for (auto it = controls.begin(); it != controls.end(); ++it) {
+			const int con_q = it->qubit;
+			const std::string cont_idx = buildIndex(con_q, existIndexs[con_q]);
+			indexSet.push_back({cont_idx, hyperIndexs[cont_idx]});
+			indexSet.push_back({cont_idx, static_cast<short>(hyperIndexs[cont_idx] + 1)});
+			hyperIndexs[cont_idx] += 1;
+		}
 	}
-	else if (op->isControlled() && n == 3) {
-		auto it = op->getControls().begin();
-		const int con_q1 = it->qubit;
-		++ it;
-		const int con_q2 = it->qubit;
-		const int tar_q = op->getTargets()[0];
 
-		const std::string cont_idx1 = buildIndex(con_q1, existIndexs[con_q1]);
-		const std::string cont_idx2 = buildIndex(con_q2, existIndexs[con_q2]);
-		const std::string targ_idx1 = buildIndex(tar_q, existIndexs[tar_q]);
-		existIndexs[tar_q] += 1;
-		const std::string targ_idx2 = buildIndex(tar_q, existIndexs[tar_q]);
-
-		indexSet = {
-			{cont_idx1, hyperIndexs[cont_idx1]},
-			{cont_idx1, static_cast<short>(hyperIndexs[cont_idx1] + 1)},
-			{cont_idx2, hyperIndexs[cont_idx2]},
-			{cont_idx2, static_cast<short>(hyperIndexs[cont_idx2] + 1)},
-			{targ_idx1, hyperIndexs[targ_idx1]},
-			{targ_idx2, hyperIndexs[targ_idx2]}
-		};
-		hyperIndexs[cont_idx1] += 1;
-		hyperIndexs[cont_idx2] += 1;
-		return indexSet;
+	auto targets = op->getTargets();
+	for(auto &qubit: targets){
+		const std::string targ_idx1 = buildIndex(qubit, existIndexs[qubit]);
+		existIndexs[qubit] += 1;
+		const std::string targ_idx2 = buildIndex(qubit, existIndexs[qubit]);
+		indexSet.push_back({targ_idx1, hyperIndexs[targ_idx1]});
+		indexSet.push_back({targ_idx2, hyperIndexs[targ_idx2]});
 	}
-	else if (n == 1){
-		const int tar_q = *op->getUsedQubits().begin();
-		const std::string targ_idx1 = buildIndex(tar_q,existIndexs[tar_q]);
-		existIndexs[tar_q] += 1;
-		const std::string targ_idx2 = buildIndex(tar_q,existIndexs[tar_q]);
-		indexSet = {
-			{targ_idx1,hyperIndexs[targ_idx1]},
-			{targ_idx2,hyperIndexs[targ_idx2]}
-		};
-		return indexSet;
-	}
-	std::string prefix(op->getNcontrols(), 'c');
-	throw std::invalid_argument("throw from getOpIndex. unknown gate: "+ prefix + op->getName());
+	return indexSet;
 }
 
 xt::xarray<dd::ComplexValue> getOpData(const std::unique_ptr<qc::Operation>& op) {
@@ -783,6 +747,7 @@ xt::xarray<dd::ComplexValue> getOpData(const std::unique_ptr<qc::Operation>& op)
 
 dd::TensorNetwork cir_2_tn(std::shared_ptr<qc::QuantumComputation>& QC, std::shared_ptr<dd::Package<>>& ddPack){
 	auto var = get_var_order(QC->getNqubits(), QC->getNops());
+	// possible bug about qubit number
 	ddPack->varOrder = var;
 
 	std::vector<int> existIndexs(QC->getNqubits(), 0);
